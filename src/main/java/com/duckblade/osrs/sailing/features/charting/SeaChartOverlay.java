@@ -84,7 +84,7 @@ public class SeaChartOverlay
 	}
 
 	@Override
-	public Dimension render(Graphics2D graphics)
+	public Dimension render(Graphics2D g)
 	{
 		SailingConfig.ShowChartsMode mode = config.showCharts();
 		if (mode == SailingConfig.ShowChartsMode.NONE)
@@ -108,9 +108,9 @@ public class SeaChartOverlay
 			if (poly != null)
 			{
 				Color color = completed ? colorCharted : colorUncharted;
-				OverlayUtil.renderPolygon(graphics, poly, color);
+				OverlayUtil.renderPolygon(g, poly, color);
 			}
-			OverlayUtil.renderImageLocation(client, graphics, obj.getLocalLocation(), taskIndex.getTaskSprite(task), 0);
+			OverlayUtil.renderImageLocation(client, g, obj.getLocalLocation(), taskIndex.getTaskSprite(task), 0);
 		}
 
 		for (Map.Entry<NPC, SeaChartTask> tracked : chartNpcs.entrySet())
@@ -125,29 +125,34 @@ public class SeaChartOverlay
 			}
 
 			Color color = isTaskCompleted(task) ? Color.YELLOW : Color.GREEN;
-			OverlayUtil.renderActorOverlayImage(graphics, npc, taskIndex.getTaskSprite(task), color, npc.getLogicalHeight() / 2);
+			OverlayUtil.renderActorOverlayImage(g, npc, taskIndex.getTaskSprite(task), color, npc.getLogicalHeight() / 2);
 		}
 
+		renderWeatherTaskTarget(g);
+
+		return null;
+	}
+
+	private void renderWeatherTaskTarget(Graphics2D g)
+	{
 		if (weatherTaskTracker.getActiveTask() != null && !weatherTaskTracker.isTaskComplete())
 		{
 			LocalPoint lp = LocalPoint.fromWorld(client.getTopLevelWorldView(), weatherTaskTracker.getActiveTask().getDestination());
 			if (lp == null)
 			{
-				return null;
+				return;
 			}
 
 			Polygon poly = Perspective.getCanvasTilePoly(client, lp, 0);
 			if (poly == null)
 			{
-				return null;
+				return;
 			}
 
 			BufferedImage icon = itemManager.getImage(ItemID.SAILING_CHARTING_WEATHER_STATION_EMPTY);
-			OverlayUtil.renderPolygon(graphics, poly, Color.GREEN);
-			OverlayUtil.renderImageLocation(client, graphics, lp, icon, 0);
+			OverlayUtil.renderPolygon(g, poly, Color.GREEN);
+			OverlayUtil.renderImageLocation(client, g, lp, icon, 0);
 		}
-
-		return null;
 	}
 
 	@Subscribe
