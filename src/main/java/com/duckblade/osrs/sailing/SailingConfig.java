@@ -126,6 +126,16 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+			keyName = "hideCrewOverheadMessages",
+			name = "Hide crew overhead messages",
+			description = "Disable overhead messages from crew mates."
+	)
+	default boolean hideCrewOverheadMessages()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "barracudaHighlightLostCrates",
 		name = "Highlight Crates",
 		description = "Highlight lost crates that need to be collected during Barracuda Trials.",
