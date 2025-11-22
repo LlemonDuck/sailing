@@ -28,8 +28,9 @@ import net.runelite.client.eventbus.Subscribe;
 public class BoatTracker
 	implements PluginLifecycleComponent
 {
-
-	private static final int WORLD_ENTITY_TYPE_BOAT = 2;
+	private static final int WORLD_ENTITY_TYPE_RAFT = 1;
+	private static final int WORLD_ENTITY_TYPE_SKIFF = 2;
+	private static final int WORLD_ENTITY_TYPE_SLOOP = 3;
 
 	private final Map<Integer, Boat> trackedBoats = new HashMap<>();
 	private final Client client;
@@ -43,7 +44,7 @@ public class BoatTracker
 	public void onWorldEntitySpawned(WorldEntitySpawned e)
 	{
 		WorldEntity we = e.getWorldEntity();
-		if (we.getConfig().getId() == WORLD_ENTITY_TYPE_BOAT)
+		if (we.getConfig().getId() == WORLD_ENTITY_TYPE_RAFT || we.getConfig().getId() == WORLD_ENTITY_TYPE_SKIFF || we.getConfig().getId() == WORLD_ENTITY_TYPE_SLOOP)
 		{
 			int wvId = we.getWorldView().getId();
 			log.debug("tracking boat in wv {}", wvId);
