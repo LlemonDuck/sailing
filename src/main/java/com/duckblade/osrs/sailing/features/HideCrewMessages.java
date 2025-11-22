@@ -50,9 +50,6 @@ public class HideCrewMessages
 			NPC npc = (NPC) actor;
 			if (NPC_IDS.contains(npc.getId())) {
 				npc.setOverheadText(null);
-			} else  {
-				// TODO
-				log.debug("message from npc id {}, message: {}", npc.getId(), npc.getOverheadText());
 			}
 		}
 	}
