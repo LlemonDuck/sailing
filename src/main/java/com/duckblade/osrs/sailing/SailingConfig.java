@@ -45,6 +45,14 @@ public interface SailingConfig extends Config
 	)
 	String SECTION_CARGO_HOLD_TRACKING = "cargoHoldTracking";
 
+	@ConfigSection(
+			name = "Salvage Highlighting",
+			description = "Settings for highlighting salvage.",
+			position = 500,
+			closedByDefault = true
+	)
+	String SECTION_SALVAGE = "salvageHighlight";
+
 	enum ShowChartsMode
 	{
 		NONE,
@@ -186,4 +194,55 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
+
+	@ConfigItem(
+			keyName = "salvageHighlight",
+			name = "Highlight Salvage",
+			description = "Shows which ships you can salvage.",
+			section = SECTION_SALVAGE,
+			position = 1
+	)
+	default boolean salvageHighlight()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+			keyName = "salvageHighlightColor",
+			name = "Salvage Colour",
+			description = "Colour to highlight ships you can salvage.",
+			section = SECTION_SALVAGE,
+			position = 2
+	)
+	@Alpha
+	default Color salvageHighlightColor()
+	{
+		return Color.GREEN;
+	}
+
+	@ConfigItem(
+			keyName = "salvageHighlightSunkColor",
+			name = "Salvage Sunk Colour",
+			description = "Colour to highlight ships that are sunken.",
+			section = SECTION_SALVAGE,
+			position = 3
+	)
+	@Alpha
+	default Color salvageHighlightSunkColor()
+	{
+		return Color.YELLOW;
+	}
+
+	@ConfigItem(
+			keyName = "salvageHighlightNotLevelColor",
+			name = "Salvage Unmet Requirement Colour",
+			description = "Colour to highlight ships that you don't have the level for.",
+			section = SECTION_SALVAGE,
+			position = 4
+	)
+	@Alpha
+	default Color salvageHighlightNotLevelColor()
+	{
+		return Color.RED;
+	}
 }

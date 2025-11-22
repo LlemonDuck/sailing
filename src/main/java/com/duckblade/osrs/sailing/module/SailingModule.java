@@ -7,6 +7,7 @@ import com.duckblade.osrs.sailing.features.charting.WeatherTaskTracker;
 import com.duckblade.osrs.sailing.features.barracudatrials.BarracudaTrialHelper;
 import com.duckblade.osrs.sailing.features.mes.DeprioSailsOffHelm;
 import com.duckblade.osrs.sailing.features.mes.PrioritizeCargoHold;
+import com.duckblade.osrs.sailing.features.salvage.SalvageHighlighter;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.LuffOverlay;
 import com.duckblade.osrs.sailing.features.RapidsOverlay;
@@ -42,7 +43,8 @@ public class SailingModule extends AbstractModule
 		SeaChartOverlay seaChartOverlay,
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
-		WeatherTaskTracker weatherTaskTracker
+		WeatherTaskTracker weatherTaskTracker,
+		SalvageHighlighter salvageHighlighter
 	)
 	{
 		return ImmutableSet.of(
@@ -56,7 +58,8 @@ public class SailingModule extends AbstractModule
 			seaChartOverlay,
 			seaChartPanelOverlay,
 			seaChartTaskIndex,
-			weatherTaskTracker
+			weatherTaskTracker,
+			salvageHighlighter
 		);
 	}
 
