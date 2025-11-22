@@ -40,11 +40,11 @@ public class SailingModule extends AbstractModule
 		LuffOverlay luffOverlay,
 		PrioritizeCargoHold prioritizeCargoHold,
 		RapidsOverlay rapidsOverlay,
+		SalvageHighlighter salvageHighlighter,
 		SeaChartOverlay seaChartOverlay,
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
-		WeatherTaskTracker weatherTaskTracker,
-		SalvageHighlighter salvageHighlighter
+		WeatherTaskTracker weatherTaskTracker
 	)
 	{
 		return ImmutableSet.of(
@@ -55,11 +55,11 @@ public class SailingModule extends AbstractModule
 			luffOverlay,
 			prioritizeCargoHold,
 			rapidsOverlay,
+			salvageHighlighter,
 			seaChartOverlay,
 			seaChartPanelOverlay,
 			seaChartTaskIndex,
-			weatherTaskTracker,
-			salvageHighlighter
+			weatherTaskTracker
 		);
 	}
 
