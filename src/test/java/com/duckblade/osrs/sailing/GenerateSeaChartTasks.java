@@ -29,7 +29,7 @@ public class GenerateSeaChartTasks
 		Map<Integer, String> npcNames = readConstants(NPC_ID_URL);
 		System.setOut(new PrintStream(new FileOutputStream("src/main/java/com/duckblade/osrs/sailing/features/charting/SeaChartTask.java")));
 
-		System.out.println("package com.duckblade.osrs.sailing;");
+		System.out.println("package com.duckblade.osrs.sailing.features.charting;");
 		System.out.println();
 		System.out.println("import lombok.Getter;");
 		System.out.println("import lombok.RequiredArgsConstructor;");
@@ -56,6 +56,8 @@ public class GenerateSeaChartTasks
 				int npc = Integer.parseInt(parts[3]);
 				int x = Integer.parseInt(parts[4]);
 				int y = Integer.parseInt(parts[5]);
+				int dstX = Integer.parseInt(parts[6]);
+				int dstY = Integer.parseInt(parts[7]);
 
 				System.out.print("\t");
 				System.out.print("TASK_");
@@ -83,18 +85,9 @@ public class GenerateSeaChartTasks
 					System.out.print("-1");
 				}
 				System.out.print(", ");
-				if (x != -1 && y != -1)
-				{
-					System.out.print("new WorldPoint(");
-					System.out.print(x);
-					System.out.print(", ");
-					System.out.print(y);
-					System.out.print(", 0)");
-				}
-				else
-				{
-					System.out.print("null");
-				}
+				writeWorldPoint(x, y);
+				System.out.print(", ");
+				writeWorldPoint(dstX, dstY);
 				System.out.println("),");
 			}
 		}
@@ -106,8 +99,25 @@ public class GenerateSeaChartTasks
 		System.out.println("\tprivate final int objectId;");
 		System.out.println("\tprivate final int npcId;");
 		System.out.println("\tprivate final WorldPoint location;");
+		System.out.println("\tprivate final WorldPoint dstLocation;");
 		System.out.println();
 		System.out.println("}");
+	}
+
+	private void writeWorldPoint(int x, int y)
+	{
+		if (x != -1 && y != -1)
+		{
+			System.out.print("new WorldPoint(");
+			System.out.print(x);
+			System.out.print(", ");
+			System.out.print(y);
+			System.out.print(", 0)");
+		}
+		else
+		{
+			System.out.print("null");
+		}
 	}
 
 	private Map<Integer, String> readConstants(String url) throws IOException

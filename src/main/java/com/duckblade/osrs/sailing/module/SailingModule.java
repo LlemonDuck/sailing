@@ -1,5 +1,8 @@
 package com.duckblade.osrs.sailing.module;
 
+import com.duckblade.osrs.sailing.features.charting.SeaChartPanelOverlay;
+import com.duckblade.osrs.sailing.features.charting.SeaChartTaskIndex;
+import com.duckblade.osrs.sailing.features.charting.WeatherTaskTracker;
 import com.duckblade.osrs.sailing.features.barracudatrials.BarracudaTrialHelper;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.LuffOverlay;
@@ -30,7 +33,10 @@ public class SailingModule extends AbstractModule
 		BoatTracker boatTracker,
 		LuffOverlay luffOverlay,
 		RapidsOverlay rapidsOverlay,
-		SeaChartOverlay seaChartOverlay
+		SeaChartOverlay seaChartOverlay,
+		SeaChartTaskIndex seaChartTaskIndex,
+		WeatherTaskTracker weatherTaskTracker,
+		SeaChartPanelOverlay seaChartPanelOverlay
 	)
 	{
 		return ImmutableSet.of(
@@ -38,7 +44,10 @@ public class SailingModule extends AbstractModule
 			boatTracker,
 			luffOverlay,
 			rapidsOverlay,
-			seaChartOverlay
+			seaChartOverlay,
+			seaChartTaskIndex,
+			weatherTaskTracker,
+			seaChartPanelOverlay
 		);
 	}
 
