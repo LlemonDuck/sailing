@@ -15,6 +15,7 @@ public class Boat
 	GameObject sail;
 	GameObject helm;
 	GameObject salvagingHook;
+	GameObject cargoHold;
 
 	// these are intentionally not cached in case the object is transformed without respawning
 	// e.g. helms have a different idle vs in-use id
@@ -38,15 +39,21 @@ public class Boat
 		return salvagingHook != null ? SalvagingHookTier.fromGameObjectId(salvagingHook.getId()) : null;
 	}
 
+	public CargoHoldTier getCargoHoldTier()
+	{
+		return cargoHold != null ? CargoHoldTier.fromGameObjectId(cargoHold.getId()) : null;
+	}
+
 	public String getDebugString()
 	{
 		return String.format(
-			"Id: %d, Hull: %s, Sail: %s, Helm: %s, Hook: %s",
+			"Id: %d, Hull: %s, Sail: %s, Helm: %s, Hook: %s, Cargo: %s",
 			worldViewId,
 			getHullTier(),
 			getSailTier(),
 			getHelmTier(),
-			getSalvagingHookTier()
+			getSalvagingHookTier(),
+			getCargoHoldTier()
 		);
 	}
 }

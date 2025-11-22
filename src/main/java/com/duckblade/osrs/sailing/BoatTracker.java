@@ -1,6 +1,7 @@
 package com.duckblade.osrs.sailing;
 
 import com.duckblade.osrs.sailing.model.Boat;
+import com.duckblade.osrs.sailing.model.CargoHoldTier;
 import com.duckblade.osrs.sailing.model.HelmTier;
 import com.duckblade.osrs.sailing.model.HullTier;
 import com.duckblade.osrs.sailing.model.SailTier;
@@ -89,6 +90,10 @@ public class BoatTracker
 		{
 			boat.setSalvagingHook(o);
 		}
+		if (CargoHoldTier.fromGameObjectId(o.getId()) != null)
+		{
+			boat.setCargoHold(o);
+		}
 	}
 
 	@Subscribe
@@ -116,6 +121,10 @@ public class BoatTracker
 		if (boat.getSalvagingHook() == o)
 		{
 			boat.setSalvagingHook(null);
+		}
+		if (boat.getCargoHold() == o)
+		{
+			boat.setCargoHold(null);
 		}
 	}
 
