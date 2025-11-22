@@ -1,6 +1,7 @@
 package com.duckblade.osrs.sailing.module;
 
 import com.duckblade.osrs.sailing.features.CargoHoldTracker;
+import com.duckblade.osrs.sailing.features.HideCrewMessages;
 import com.duckblade.osrs.sailing.features.charting.SeaChartPanelOverlay;
 import com.duckblade.osrs.sailing.features.charting.SeaChartTaskIndex;
 import com.duckblade.osrs.sailing.features.charting.WeatherTaskTracker;
@@ -36,6 +37,7 @@ public class SailingModule extends AbstractModule
 		BoatTracker boatTracker,
 //		CargoHoldTracker cargoHoldTracker,
 		DeprioSailsOffHelm deprioSailsOffHelm,
+		HideCrewMessages hideCrewMessages,
 		LuffOverlay luffOverlay,
 		PrioritizeCargoHold prioritizeCargoHold,
 		RapidsOverlay rapidsOverlay,
@@ -50,6 +52,7 @@ public class SailingModule extends AbstractModule
 			boatTracker,
 //			cargoHoldTracker,
 			deprioSailsOffHelm,
+			hideCrewMessages,
 			luffOverlay,
 			prioritizeCargoHold,
 			rapidsOverlay,
