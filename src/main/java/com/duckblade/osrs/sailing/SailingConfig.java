@@ -229,6 +229,18 @@ public interface SailingConfig extends Config
 		return Color.ORANGE;
 	}
 
+	@ConfigItem(
+			keyName = "barracudaExpandHighlightLostCrates",
+			name = "Expand Crate Highlight Area",
+			description = "Expands the crate highlight to a 3x3",
+			section = SECTION_BARRACUDA_TRIALS,
+			position = 3
+	)
+	default boolean barracudaExpandHighlightLostCrates()
+	{
+		return false;
+	}
+
 	// 7. Cargo Hold Tracking
 	@ConfigItem(
 		keyName = "cargoHoldShowCounts",
