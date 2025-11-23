@@ -1,6 +1,7 @@
 package com.duckblade.osrs.sailing.features.barracudatrials;
 
 import com.duckblade.osrs.sailing.SailingConfig;
+import com.duckblade.osrs.sailing.features.util.BarracudaTrialTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import com.google.common.collect.ImmutableSet;
@@ -11,7 +12,6 @@ import net.runelite.api.GameState;
 import net.runelite.api.ObjectComposition;
 import net.runelite.api.events.*;
 import net.runelite.api.gameval.ObjectID;
-import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -223,16 +223,17 @@ public class LostCratesOverlay
 
 	private final Client client;
 	private final SailingConfig config;
+	private final BarracudaTrialTracker trialTracker;
 
-	private boolean inTrial;
 	private final Set<GameObject> lostCrates = new HashSet<>();
 	private Color crateColor;
 
 	@Inject
-	public LostCratesOverlay(Client client, SailingConfig config)
+	public LostCratesOverlay(Client client, SailingConfig config, BarracudaTrialTracker trialTracker)
 	{
 		this.client = client;
 		this.config = config;
+		this.trialTracker = trialTracker;
 
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_SCENE);
@@ -248,7 +249,6 @@ public class LostCratesOverlay
 	@Override
 	public void shutDown()
 	{
-		inTrial = false;
 		lostCrates.clear();
 	}
 
@@ -257,9 +257,7 @@ public class LostCratesOverlay
 	{
 		if (e.getGameState() == GameState.LOGIN_SCREEN || e.getGameState() == GameState.HOPPING)
 		{
-			inTrial = false;
 			lostCrates.clear();
-			log.debug("onGameStateChanged: cleared lost crates");
 		}
 	}
 
@@ -288,29 +286,10 @@ public class LostCratesOverlay
 		}
 	}
 
-	@Subscribe
-	public void onVarbitChanged(VarbitChanged e)
-	{
-		if (e.getVarbitId() == VarbitID.SAILING_BT_IN_TRIAL)
-		{
-			if (e.getValue() > 0) // In Trial, regardless of difficulty
-			{
-				inTrial = true;
-				log.debug("entered trial");
-			}
-			else
-			{
-				inTrial = false;
-				lostCrates.clear();
-				log.debug("exited trial");
-			}
-		}
-	}
-
 	@Override
 	public Dimension render(Graphics2D g)
 	{
-		if (!SailingUtil.isSailing(client) || !config.barracudaHighlightLostCrates() || !inTrial)
+		if (!SailingUtil.isSailing(client) || !config.barracudaHighlightLostCrates() || !trialTracker.isInTrial())
 		{
 			return null;
 		}

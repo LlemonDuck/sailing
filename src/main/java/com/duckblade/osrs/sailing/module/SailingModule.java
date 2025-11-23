@@ -8,6 +8,7 @@ import com.duckblade.osrs.sailing.features.barracudatrials.LostCratesOverlay;
 import com.duckblade.osrs.sailing.features.mes.DeprioSailsOffHelm;
 import com.duckblade.osrs.sailing.features.mes.PrioritizeCargoHold;
 import com.duckblade.osrs.sailing.features.navigation.LightningCloudsOverlay;
+import com.duckblade.osrs.sailing.features.util.BarracudaTrialTracker;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.facilities.LuffOverlay;
 import com.duckblade.osrs.sailing.features.navigation.RapidsOverlay;
@@ -33,6 +34,7 @@ public class SailingModule extends AbstractModule
 
 	@Provides
 	Set<PluginLifecycleComponent> lifecycleComponents(
+		BarracudaTrialTracker barracudaTrialTracker,
 		LostCratesOverlay lostCratesOverlay,
 		BoatTracker boatTracker,
 //		CargoHoldTracker cargoHoldTracker,
@@ -49,6 +51,7 @@ public class SailingModule extends AbstractModule
 	)
 	{
 		return ImmutableSet.of(
+			barracudaTrialTracker,
 			lostCratesOverlay,
 			boatTracker,
 //			cargoHoldTracker,
