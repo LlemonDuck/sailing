@@ -1,10 +1,13 @@
 package com.duckblade.osrs.sailing.debugplugin;
 
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
+import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.model.Boat;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
+import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.Client;
@@ -12,6 +15,7 @@ import net.runelite.api.Perspective;
 import net.runelite.api.Point;
 import net.runelite.api.WorldEntity;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -71,6 +75,16 @@ public class SailingDebugBoatInfoOverlay extends OverlayPanel
 			if (p != null)
 			{
 				OverlayUtil.renderTextLocation(graphics, p, text, Color.BLUE);
+			}
+		}
+
+		if (SailingUtil.isSailing(client))
+		{
+			WorldPoint tlwp = SailingUtil.getTopLevelWorldPoint(client, boatTracker);
+			Polygon poly = Perspective.getCanvasTilePoly(client, Objects.requireNonNull(LocalPoint.fromWorld(client, tlwp)));
+			if (poly != null)
+			{
+				OverlayUtil.renderPolygon(graphics, poly, Color.cyan);
 			}
 		}
 

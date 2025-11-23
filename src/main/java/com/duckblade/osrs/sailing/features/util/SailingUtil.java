@@ -1,14 +1,20 @@
 package com.duckblade.osrs.sailing.features.util;
 
+import com.duckblade.osrs.sailing.model.Boat;
 import javax.inject.Inject;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Actor;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.ObjectComposition;
 import net.runelite.api.Player;
+import net.runelite.api.WorldView;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarbitID;
 
+@Slf4j
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class SailingUtil
 {
@@ -44,6 +50,34 @@ public class SailingUtil
 		}
 
 		return def.getImpostor();
+	}
+
+	public static LocalPoint getTopLevelLocalPoint(Client client, BoatTracker boatTracker)
+	{
+		Player player = client.getLocalPlayer();
+		WorldView wv = player.getWorldView();
+		if (wv.isTopLevel())
+		{
+			return player.getLocalLocation();
+		}
+
+		Boat boat = boatTracker.getBoat();
+		if (boat == null)
+		{
+			log.warn("getClosestWorldPoint failed due to lack of boat");
+			return player.getLocalLocation();
+		}
+
+		return boat.getWorldEntity()
+			.transformToMainWorld(client.getLocalPlayer().getLocalLocation());
+	}
+
+	public static WorldPoint getTopLevelWorldPoint(Client client, BoatTracker boatTracker)
+	{
+		return WorldPoint.fromLocal(
+			client,
+			getTopLevelLocalPoint(client, boatTracker)
+		);
 	}
 
 }

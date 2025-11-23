@@ -47,7 +47,7 @@ public class BoatTracker
 		{
 			int wvId = we.getWorldView().getId();
 			log.trace("tracking boat in wv {}", wvId);
-			trackedBoats.put(wvId, new Boat(wvId));
+			trackedBoats.put(wvId, new Boat(wvId, we));
 		}
 	}
 

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
+import net.runelite.api.WorldEntity;
 
 @Data
 public class Boat
@@ -12,6 +13,7 @@ public class Boat
 
 	@Getter
 	private final int worldViewId;
+	private final WorldEntity worldEntity;
 
 	GameObject hull;
 	GameObject sail;
