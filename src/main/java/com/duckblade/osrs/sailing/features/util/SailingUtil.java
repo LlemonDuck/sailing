@@ -20,8 +20,7 @@ public class SailingUtil
 
 	public static boolean isSailing(Client client)
 	{
-		return client.getLocalPlayer() != null &&
-				!client.getLocalPlayer().getWorldView().isTopLevel();
+		return client.getLocalPlayer() != null && !client.getLocalPlayer().getWorldView().isTopLevel();
 	}
 
 	public static boolean isUim(Client client)

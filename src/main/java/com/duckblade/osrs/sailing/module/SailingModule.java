@@ -7,9 +7,10 @@ import com.duckblade.osrs.sailing.features.charting.WeatherTaskTracker;
 import com.duckblade.osrs.sailing.features.barracudatrials.BarracudaTrialHelper;
 import com.duckblade.osrs.sailing.features.mes.DeprioSailsOffHelm;
 import com.duckblade.osrs.sailing.features.mes.PrioritizeCargoHold;
+import com.duckblade.osrs.sailing.features.navigation.LightningCloudsOverlay;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
-import com.duckblade.osrs.sailing.features.LuffOverlay;
-import com.duckblade.osrs.sailing.features.RapidsOverlay;
+import com.duckblade.osrs.sailing.features.facilities.LuffOverlay;
+import com.duckblade.osrs.sailing.features.navigation.RapidsOverlay;
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.charting.SeaChartOverlay;
 import com.google.common.collect.ImmutableSet;
@@ -40,6 +41,7 @@ public class SailingModule extends AbstractModule
 		LuffOverlay luffOverlay,
 		PrioritizeCargoHold prioritizeCargoHold,
 		RapidsOverlay rapidsOverlay,
+		LightningCloudsOverlay lightningCloudsOverlay,
 		SeaChartOverlay seaChartOverlay,
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
@@ -55,6 +57,7 @@ public class SailingModule extends AbstractModule
 			luffOverlay,
 			prioritizeCargoHold,
 			rapidsOverlay,
+			lightningCloudsOverlay,
 			seaChartOverlay,
 			seaChartPanelOverlay,
 			seaChartTaskIndex,

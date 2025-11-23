@@ -1,4 +1,4 @@
-package com.duckblade.osrs.sailing.features;
+package com.duckblade.osrs.sailing.features.navigation;
 
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
@@ -35,7 +35,6 @@ public class RapidsOverlay
 	implements PluginLifecycleComponent
 {
 
-	private static final Color COLOR_RAPID_SAFE = Color.CYAN;
 	private static final Color COLOR_RAPID_DANGER = Color.RED;
 	private static final Color COLOR_RAPID_UNKNOWN = Color.YELLOW;
 
@@ -128,6 +127,8 @@ public class RapidsOverlay
 
 	private final Set<GameObject> rapids = new HashSet<>();
 
+	private Color safeRapidsColor;
+
 	@Inject
 	public RapidsOverlay(Client client, SailingConfig config, BoatTracker boatTracker)
 	{
@@ -142,6 +143,7 @@ public class RapidsOverlay
 	@Override
 	public boolean isEnabled(SailingConfig config)
 	{
+		safeRapidsColor = config.safeRapidsColor();
 		return config.highlightRapids();
 	}
 
@@ -218,7 +220,7 @@ public class RapidsOverlay
 
 		if (helmTier.ordinal() >= minTier.ordinal())
 		{
-			return COLOR_RAPID_SAFE;
+			return safeRapidsColor;
 		}
 
 		return COLOR_RAPID_DANGER;

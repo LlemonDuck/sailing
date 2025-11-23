@@ -23,7 +23,7 @@ public interface SailingConfig extends Config
 	String SECTION_NAVIGATION = "navigation";
 
 	@ConfigSection(
-		name = "Facilities",
+		name = "Ship & Facilities",
 		description = "Settings for your ship facilities and components.",
 		position = 200,
 		closedByDefault = true
@@ -81,6 +81,44 @@ public interface SailingConfig extends Config
 	default boolean highlightRapids()
 	{
 		return true;
+	}
+
+	@ConfigItem(
+			keyName = "safeRapidsColor",
+			name = "Safe Rapids Color",
+			description = "Color to highlight the rapids that are safe and you are able to sail through",
+			section = SECTION_NAVIGATION,
+			position = 2
+	)
+	@Alpha
+	default Color safeRapidsColor()
+	{
+		return Color.CYAN;
+	}
+
+	@ConfigItem(
+			keyName = "highlightLightningCloudStrikes",
+			name = "Highlight Lightning Cloud Strikes",
+			description = "Highlights the lightning clouds that are about to strike and should be avoided",
+			section = SECTION_NAVIGATION,
+			position = 3
+	)
+	default boolean highlightLightningCloudStrikes()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+			keyName = "lightningCloudStrikeColor",
+			name = "Lightning Strike Color",
+			description = "Color to highlight lightning cloud strikes. Color will appear darker when about to strike.",
+			section = SECTION_NAVIGATION,
+			position = 4
+	)
+	@Alpha
+	default Color lightningCloudStrikeColor()
+	{
+		return new Color(234, 234, 234);
 	}
 
 	// 2. Facilities
