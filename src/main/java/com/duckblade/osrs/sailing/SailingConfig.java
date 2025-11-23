@@ -197,8 +197,19 @@ public interface SailingConfig extends Config
 		section = SECTION_SEA_CHARTING,
 		position = 4
 	)
-	@Alpha
 	default boolean chartingWeatherSolver()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "chartingDuckSolver",
+		name = "Current Duck Solver",
+		description = "Whether to provide a helper for current duck trails.",
+		section = SECTION_SEA_CHARTING,
+		position = 4
+	)
+	default boolean chartingDuckSolver()
 	{
 		return true;
 	}
