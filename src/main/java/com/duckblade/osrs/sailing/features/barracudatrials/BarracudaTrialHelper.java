@@ -225,7 +225,7 @@ public class BarracudaTrialHelper
 	private final SailingConfig config;
 
 	private boolean inTrial;
-	private Set<GameObject> lostCargo = new HashSet<>();
+	private final Set<GameObject> lostCargo = new HashSet<>();
 	private Color crateColour;
 
 	@Inject
@@ -310,7 +310,7 @@ public class BarracudaTrialHelper
 	@Override
 	public Dimension render(Graphics2D g)
 	{
-		if (!SailingUtil.isSailing(client) || !config.highlightRapids())
+		if (!SailingUtil.isSailing(client) || !config.barracudaHighlightLostCrates() || !inTrial)
 		{
 			return null;
 		}
