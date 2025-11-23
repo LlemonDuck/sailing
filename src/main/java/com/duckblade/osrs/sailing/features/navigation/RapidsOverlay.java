@@ -156,6 +156,12 @@ public class RapidsOverlay
 	public void onGameObjectSpawned(GameObjectSpawned e)
 	{
 		GameObject o = e.getGameObject();
+
+		if (o == null || o.getWorldView() == null)
+		{
+			return;
+		}
+		
 		if (RAPIDS_IDS.contains(o.getId()))
 		{
 			rapids.add(o);
@@ -165,6 +171,11 @@ public class RapidsOverlay
 	@Subscribe
 	public void onGameObjectDespawned(GameObjectDespawned e)
 	{
+		if (e.getGameObject() == null)
+		{
+			return;
+		}
+
 		rapids.remove(e.getGameObject());
 	}
 
@@ -190,15 +201,15 @@ public class RapidsOverlay
 			ObjectComposition def = SailingUtil.getTransformedObject(client, rapid);
 			if (def != null)
 			{
-				Color colour = getHighlightColour(def.getId());
-				OverlayUtil.renderTileOverlay(graphics, rapid, "", colour);
+				Color color = getHighlightColor(def.getId());
+				OverlayUtil.renderTileOverlay(graphics, rapid, "", color);
 			}
 		}
 
 		return null;
 	}
 
-	private Color getHighlightColour(int objId)
+	private Color getHighlightColor(int objId)
 	{
 		HelmTier minTier = MIN_HELM_TIER_BY_RAPID_TYPE.get(objId);
 		if (minTier == null)

@@ -242,7 +242,7 @@ public class LostCratesOverlay
 	@Override
 	public boolean isEnabled(SailingConfig config)
 	{
-		crateColor = config.barracudaHighlightLostCratesColour();
+		crateColor = config.barracudaHighlightLostCratesColor();
 		return config.barracudaHighlightLostCrates();
 	}
 

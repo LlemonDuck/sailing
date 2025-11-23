@@ -14,7 +14,6 @@ import java.util.Set;
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class SailingUtil
 {
-
 	public static final int WORLD_ENTITY_TYPE_BOAT = 2;
 	public static final int ACCOUNT_TYPE_UIM = 2;
 

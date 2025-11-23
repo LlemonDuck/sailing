@@ -106,11 +106,11 @@ public class CargoHoldTracker
 			.sum();
 
 		String text = usedCapacity + "/" + (maxCapacity != -1 ? String.valueOf(maxCapacity) : "???");
-		Color textColour = ColorUtil.colorLerp(Color.GREEN, Color.RED, (double) usedCapacity / maxCapacity);
+		Color textColor = ColorUtil.colorLerp(Color.GREEN, Color.RED, (double) usedCapacity / maxCapacity);
 		Point textLocation = cargoHold.getCanvasTextLocation(g, text, 0);
 		if (textLocation != null)
 		{
-			OverlayUtil.renderTextLocation(g, textLocation, text, textColour);
+			OverlayUtil.renderTextLocation(g, textLocation, text, textColor);
 		}
 
 		return null;

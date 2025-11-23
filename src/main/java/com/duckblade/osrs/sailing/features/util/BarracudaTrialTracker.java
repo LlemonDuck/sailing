@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.GameState;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.gameval.VarbitID;
@@ -71,11 +73,15 @@ public class BarracudaTrialTracker implements PluginLifecycleComponent
                 }
                 else
                 {
+                    // When `SAILING_BT_IN_TRIAL` is fired and set to `0`, consider a course exit and reset.
+                    log.debug("exited course: " + getDebugString());
                     inTrial = false;
+                    reset();
                 }
                 break;
             }
 
+            // Master states are fired AFTER `SAILING_BT_IN_TRIAL` is fired.
             case VarbitID.SAILING_BT_TEMPOR_TANTRUM_MASTER_STATE:
             {
                 determineState(Course.TEMPOR_TANTRUM, e.getValue());
@@ -134,17 +140,21 @@ public class BarracudaTrialTracker implements PluginLifecycleComponent
         }
     }
 
+    @Subscribe
+    private void onGameStateChanged(GameStateChanged e)
+    {
+        if (e.getGameState() == GameState.LOGIN_SCREEN || e.getGameState() == GameState.HOPPING)
+        {
+            reset();
+        }
+    }
+
     private void determineState(Course course, int value)
     {
         if (value == 2)
         {
             this.course = course;
             log.debug("entered course: " + getDebugString());
-        }
-        else
-        {
-            log.debug("exited course: " + getDebugString());
-            reset();
         }
     }
 

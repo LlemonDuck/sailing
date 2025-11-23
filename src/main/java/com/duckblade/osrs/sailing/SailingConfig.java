@@ -204,8 +204,8 @@ public interface SailingConfig extends Config
 
 	@ConfigItem(
 		keyName = "chartingUnchartedColor",
-		name = "Uncharted Colour",
-		description = "Colour to highlight nearby uncharted locations.",
+		name = "Uncharted Color",
+		description = "Color to highlight nearby uncharted locations.",
 		section = SECTION_SEA_CHARTING,
 		position = 2
 	)
@@ -217,8 +217,8 @@ public interface SailingConfig extends Config
 
 	@ConfigItem(
 		keyName = "chartingChartedColor",
-		name = "Charted Colour",
-		description = "Colour to highlight nearby charted locations.",
+		name = "Charted Color",
+		description = "Color to highlight nearby charted locations.",
 		section = SECTION_SEA_CHARTING,
 		position = 3
 	)
@@ -255,14 +255,14 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "barracudaHighlightLostCratesColour",
-		name = "Crate Colour",
-		description = "The colour to highlight lost crates.",
+		keyName = "barracudaHighlightLostCratesColor",
+		name = "Crate Color",
+		description = "The color to highlight lost crates.",
 		section = SECTION_BARRACUDA_TRIALS,
 		position = 2
 	)
 	@Alpha
-	default Color barracudaHighlightLostCratesColour()
+	default Color barracudaHighlightLostCratesColor()
 	{
 		return Color.ORANGE;
 	}
