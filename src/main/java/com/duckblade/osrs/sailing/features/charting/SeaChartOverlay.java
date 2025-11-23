@@ -16,6 +16,7 @@ import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.NPC;
 import net.runelite.api.Perspective;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
@@ -106,7 +107,7 @@ public class SeaChartOverlay
 			Polygon poly = obj.getCanvasTilePoly();
 			if (poly != null)
 			{
-				Color color = completed ? colorCharted : colorUncharted;
+				Color color = getColor(completed, hasTaskRequirement(task));
 				OverlayUtil.renderPolygon(g, poly, color);
 			}
 			OverlayUtil.renderImageLocation(client, g, obj.getLocalLocation(), taskIndex.getTaskSprite(task), 0);
@@ -201,5 +202,25 @@ public class SeaChartOverlay
 	private boolean isTaskCompleted(SeaChartTask task)
 	{
 		return client.getVarbitValue(task.getCompletionVarb()) != 0;
+	}
+
+	private boolean hasTaskRequirement(SeaChartTask task)
+	{
+		return client.getBoostedSkillLevel(Skill.SAILING) >= task.getLevel();
+	}
+
+	private Color getColor(boolean isTaskCompleted, boolean hasTaskRequirement)
+	{
+		if (isTaskCompleted)
+		{
+			return colorCharted;
+		}
+
+		if (hasTaskRequirement)
+		{
+			return colorUncharted;
+		}
+
+		return Color.RED;
 	}
 }
