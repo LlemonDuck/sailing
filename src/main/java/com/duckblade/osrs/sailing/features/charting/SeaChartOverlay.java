@@ -98,8 +98,8 @@ public class SeaChartOverlay
 			SeaChartTask task = tracked.getValue();
 
 			boolean completed = isTaskCompleted(task);
-			if ((completed && mode == SailingConfig.ShowChartsMode.UNCHARTED) ||
-				(!completed && mode == SailingConfig.ShowChartsMode.CHARTED))
+			boolean meetsRequirements = hasTaskRequirement(task);
+			if (!shouldRenderOverlay(mode, completed, meetsRequirements))
 			{
 				continue;
 			}
@@ -107,7 +107,7 @@ public class SeaChartOverlay
 			Polygon poly = obj.getCanvasTilePoly();
 			if (poly != null)
 			{
-				Color color = getColor(completed, hasTaskRequirement(task));
+				Color color = getColor(completed, meetsRequirements);
 				OverlayUtil.renderPolygon(g, poly, color);
 			}
 			OverlayUtil.renderImageLocation(client, g, obj.getLocalLocation(), taskIndex.getTaskSprite(task), 0);
@@ -119,13 +119,13 @@ public class SeaChartOverlay
 			SeaChartTask task = tracked.getValue();
 
 			boolean completed = isTaskCompleted(task);
-			if ((completed && mode == SailingConfig.ShowChartsMode.UNCHARTED) ||
-				(!completed && mode == SailingConfig.ShowChartsMode.CHARTED))
+			boolean meetsRequirements = hasTaskRequirement(task);
+			if (!shouldRenderOverlay(mode, completed, meetsRequirements))
 			{
 				continue;
 			}
 
-			Color color = completed ? colorCharted : colorUncharted;
+			Color color = getColor(completed, meetsRequirements);
 			OverlayUtil.renderActorOverlayImage(g, npc, taskIndex.getTaskSprite(task), color, npc.getLogicalHeight() / 2);
 		}
 
@@ -222,5 +222,23 @@ public class SeaChartOverlay
 		}
 
 		return Color.RED;
+	}
+
+	private boolean shouldRenderOverlay(SailingConfig.ShowChartsMode mode, boolean completed, boolean meetsRequirements)
+	{
+		switch (mode)
+		{
+			case ALL:
+				return true;
+			case CHARTED:
+				return completed;
+			case UNCHARTED:
+				return !completed;
+			case REQUIREMENTS_MET:
+				return !completed && meetsRequirements;
+			case NONE:
+			default:
+				return false;
+		}
 	}
 }

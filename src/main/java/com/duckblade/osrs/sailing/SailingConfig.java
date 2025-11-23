@@ -149,6 +149,7 @@ public interface SailingConfig extends Config
 	enum ShowChartsMode
 	{
 		NONE,
+		REQUIREMENTS_MET,
 		UNCHARTED,
 		CHARTED,
 		ALL,
