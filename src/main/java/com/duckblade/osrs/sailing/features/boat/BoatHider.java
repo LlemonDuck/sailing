@@ -5,6 +5,7 @@ import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.model.Boat;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import net.runelite.api.Client;
 import net.runelite.api.Scene;
 import net.runelite.api.TileObject;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.WorldEntityDespawned;
 import net.runelite.client.callback.RenderCallback;
 import net.runelite.client.callback.RenderCallbackManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -29,6 +31,7 @@ public class BoatHider implements PluginLifecycleComponent, RenderCallback
 	@Inject
 	private RenderCallbackManager renderCallbackManager;
 
+	@Nullable
 	private Boat boat;
 
 	@Override
@@ -47,6 +50,16 @@ public class BoatHider implements PluginLifecycleComponent, RenderCallback
 	public void shutDown()
 	{
 		renderCallbackManager.unregister(this);
+		boat = null;
+	}
+
+	@Subscribe
+	public void onWorldEntityDespawned(final WorldEntityDespawned e)
+	{
+		if (boat != null && e.getWorldEntity() == boat.getWorldEntity())
+		{
+			boat = null;
+		}
 	}
 
 	@Subscribe
