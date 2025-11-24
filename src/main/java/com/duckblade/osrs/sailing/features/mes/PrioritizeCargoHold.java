@@ -4,12 +4,6 @@ import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.model.CargoHoldTier;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -17,6 +11,13 @@ import net.runelite.api.Menu;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.events.PostMenuSort;
 import net.runelite.client.eventbus.Subscribe;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton

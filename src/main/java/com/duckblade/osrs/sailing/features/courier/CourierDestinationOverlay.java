@@ -3,20 +3,19 @@ package com.duckblade.osrs.sailing.features.courier;
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.model.Port;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
 import net.runelite.client.ui.overlay.components.TextComponent;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.awt.*;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton

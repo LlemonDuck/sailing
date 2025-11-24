@@ -2,20 +2,14 @@ package com.duckblade.osrs.sailing.features.util;
 
 import com.duckblade.osrs.sailing.model.Boat;
 import com.google.common.collect.ImmutableSet;
-
-import javax.inject.Inject;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Actor;
-import net.runelite.api.Client;
-import net.runelite.api.GameObject;
-import net.runelite.api.ObjectComposition;
-import net.runelite.api.Player;
-import net.runelite.api.WorldView;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarbitID;
+
+import javax.inject.Inject;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = @Inject)

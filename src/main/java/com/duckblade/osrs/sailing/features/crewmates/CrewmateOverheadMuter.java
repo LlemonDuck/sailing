@@ -2,8 +2,6 @@ package com.duckblade.osrs.sailing.features.crewmates;
 
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Actor;
@@ -11,6 +9,9 @@ import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.events.OverheadTextChanged;
 import net.runelite.client.eventbus.Subscribe;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Slf4j
 @Singleton

@@ -1,8 +1,9 @@
 package com.duckblade.osrs.sailing.features.charting;
 
-import java.awt.image.BufferedImage;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
+
+import java.awt.image.BufferedImage;
 
 public class CurrentDuckWorldMapPoint extends WorldMapPoint
 {

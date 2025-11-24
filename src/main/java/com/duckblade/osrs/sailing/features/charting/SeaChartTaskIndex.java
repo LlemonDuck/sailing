@@ -1,14 +1,6 @@
 package com.duckblade.osrs.sailing.features.charting;
 
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.GameObject;
 import net.runelite.api.NPC;
@@ -17,6 +9,15 @@ import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.NpcID;
 import net.runelite.api.gameval.ObjectID;
 import net.runelite.client.game.ItemManager;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 
 @Slf4j
 @Singleton

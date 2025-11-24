@@ -1,11 +1,8 @@
 package com.duckblade.osrs.sailing;
 
-import java.awt.Color;
-import net.runelite.client.config.Alpha;
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.*;
+
+import java.awt.*;
 
 @ConfigGroup(SailingConfig.CONFIG_GROUP)
 public interface SailingConfig extends Config

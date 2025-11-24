@@ -2,14 +2,12 @@ package com.duckblade.osrs.sailing.features.charting;
 
 import com.duckblade.osrs.sailing.SailingPlugin;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
-
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.components.LineComponent;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.awt.*;
 
 @Singleton
 public class SeaChartPanelOverlay

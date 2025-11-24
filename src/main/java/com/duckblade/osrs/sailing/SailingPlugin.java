@@ -3,10 +3,11 @@ package com.duckblade.osrs.sailing;
 import com.duckblade.osrs.sailing.module.ComponentManager;
 import com.duckblade.osrs.sailing.module.SailingModule;
 import com.google.inject.Binder;
-import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+
+import javax.inject.Inject;
 
 @Slf4j
 @PluginDescriptor(
