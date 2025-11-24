@@ -345,7 +345,7 @@ public interface SailingConfig extends Config
 	@ConfigItem(
 			keyName = "enableLowDetail",
 			name = "Low Detail",
-			description = "Removes objects from the scene that hinder FPS",
+			description = "Removes objects from the scene that hinder FPS (Especially in Jubbly Jive course)",
 			position = 999
 	)
 	default boolean enableLowDetail()
