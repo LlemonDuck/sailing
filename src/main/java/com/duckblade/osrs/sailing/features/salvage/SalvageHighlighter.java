@@ -16,12 +16,11 @@ import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
-import net.runelite.api.GameState;
 import static net.runelite.api.Skill.SAILING;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
-import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.StatChanged;
+import net.runelite.api.events.WorldViewUnloaded;
 import net.runelite.api.gameval.ObjectID;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.Overlay;
@@ -140,9 +139,9 @@ public class SalvageHighlighter
 	}
 
 	@Subscribe
-	public void onGameStateChanged(GameStateChanged e)
+	public void onWorldViewUnloaded(WorldViewUnloaded e)
 	{
-		if (e.getGameState() == GameState.LOADING)
+		if (e.getWorldView().isTopLevel())
 		{
 			salvage.clear();
 			salvageStump.clear();
