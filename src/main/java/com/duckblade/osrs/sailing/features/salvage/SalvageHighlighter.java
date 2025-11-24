@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.GameState;
@@ -28,6 +29,7 @@ import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
+@Slf4j
 @Singleton
 public class SalvageHighlighter
 	extends Overlay
@@ -120,10 +122,12 @@ public class SalvageHighlighter
 		GameObject o = e.getGameObject();
 		if (SALVAGE_LEVEL_REQ.containsKey(o.getId()))
 		{
+			log.debug("Salvage spawned at {}", o.getWorldLocation());
 			salvage.add(o);
 		}
 		else if (SALVAGE_STUMP.contains(o.getId()))
 		{
+			log.debug("Salvage stump spawned at {}", o.getWorldLocation());
 			salvageStump.add(o);
 		}
 	}
