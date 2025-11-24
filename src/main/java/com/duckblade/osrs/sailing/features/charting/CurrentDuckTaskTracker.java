@@ -1,7 +1,6 @@
 package com.duckblade.osrs.sailing.features.charting;
 
 import com.duckblade.osrs.sailing.SailingConfig;
-import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +40,6 @@ public class CurrentDuckTaskTracker
 	private final ChatMessageManager chatMessageManager;
 	private final ItemManager itemManager;
 	private final WorldMapPointManager worldMapPointManager;
-	private final BoatTracker boatTracker;
 	private final SeaChartTaskIndex taskIndex;
 
 	private BufferedImage sprite;
@@ -75,7 +73,7 @@ public class CurrentDuckTaskTracker
 
 		if (event.getMessage().contains(MSG_DUCK_BEGIN))
 		{
-			WorldPoint playerLoc = SailingUtil.getTopLevelWorldPoint(client, boatTracker);
+			WorldPoint playerLoc = SailingUtil.getTopLevelWorldPoint(client);
 			SeaChartTask task = taskIndex.findTask(playerLoc, 10, t -> t.getObjectId() == ObjectID.SAILING_CHARTING_HINT_MARKER_DUCK);
 			if (task != null)
 			{
@@ -99,7 +97,7 @@ public class CurrentDuckTaskTracker
 
 		if (activeTask.isComplete(client))
 		{
-			activeTask = null;
+			setActiveTask(null);
 		}
 	}
 

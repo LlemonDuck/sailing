@@ -1,6 +1,5 @@
 package com.duckblade.osrs.sailing.features.util;
 
-import com.duckblade.osrs.sailing.model.Boat;
 import com.google.common.collect.ImmutableSet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +21,7 @@ public class SailingUtil
 	);
 	public static final int ACCOUNT_TYPE_UIM = 2;
 
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public static boolean isSailing(Client client)
 	{
 		return client.getLocalPlayer() != null && !client.getLocalPlayer().getWorldView().isTopLevel();
@@ -51,7 +51,7 @@ public class SailingUtil
 		return def.getImpostor();
 	}
 
-	public static LocalPoint getTopLevelLocalPoint(Client client, BoatTracker boatTracker)
+	public static LocalPoint getTopLevelLocalPoint(Client client)
 	{
 		Player player = client.getLocalPlayer();
 		WorldView wv = player.getWorldView();
@@ -60,22 +60,17 @@ public class SailingUtil
 			return player.getLocalLocation();
 		}
 
-		Boat boat = boatTracker.getBoat();
-		if (boat == null)
-		{
-			log.warn("getClosestWorldPoint failed due to lack of boat");
-			return player.getLocalLocation();
-		}
-
-		return boat.getWorldEntity()
-				.transformToMainWorld(client.getLocalPlayer().getLocalLocation());
+		return client.getTopLevelWorldView()
+			.worldEntities()
+			.byIndex(wv.getId())
+			.transformToMainWorld(client.getLocalPlayer().getLocalLocation());
 	}
 
-	public static WorldPoint getTopLevelWorldPoint(Client client, BoatTracker boatTracker)
+	public static WorldPoint getTopLevelWorldPoint(Client client)
 	{
 		return WorldPoint.fromLocal(
-				client,
-				getTopLevelLocalPoint(client, boatTracker)
+			client,
+			getTopLevelLocalPoint(client)
 		);
 	}
 

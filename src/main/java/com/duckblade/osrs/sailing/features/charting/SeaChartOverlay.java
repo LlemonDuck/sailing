@@ -112,12 +112,13 @@ public class SeaChartOverlay
 			SeaChartTask task = tracked.getValue();
 
 			boolean completed = isTaskCompleted(task);
-			if (completed && mode == SailingConfig.ShowChartsMode.UNCHARTED)
+			if ((completed && mode == SailingConfig.ShowChartsMode.UNCHARTED) ||
+				(!completed && mode == SailingConfig.ShowChartsMode.CHARTED))
 			{
 				continue;
 			}
 
-			Color color = isTaskCompleted(task) ? Color.YELLOW : Color.GREEN;
+			Color color = completed ? colorCharted : colorUncharted;
 			OverlayUtil.renderActorOverlayImage(g, npc, taskIndex.getTaskSprite(task), color, npc.getLogicalHeight() / 2);
 		}
 

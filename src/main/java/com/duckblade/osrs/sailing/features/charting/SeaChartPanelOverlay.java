@@ -11,8 +11,8 @@ import java.awt.*;
 
 @Singleton
 public class SeaChartPanelOverlay
-		extends OverlayPanel
-		implements PluginLifecycleComponent
+	extends OverlayPanel
+	implements PluginLifecycleComponent
 {
 
 	private final WeatherTaskTracker weatherTaskTracker;
@@ -30,21 +30,21 @@ public class SeaChartPanelOverlay
 		if (weatherTaskTracker.getActiveTask() != null)
 		{
 			panelComponent.getChildren().add(LineComponent.builder()
-					.left("Weather pattern charting")
-					.build());
+				.left("Weather pattern charting")
+				.build());
 			panelComponent.getChildren().add(LineComponent.builder().left("").build());
 
 			if (weatherTaskTracker.isTaskComplete())
 			{
 				panelComponent.getChildren().add(LineComponent.builder()
-						.left("Return to the meteorologist marked on your world map.")
-						.build());
+					.left("Return to the meteorologist marked on your world map.")
+					.build());
 			}
 			else
 			{
 				panelComponent.getChildren().add(LineComponent.builder()
-						.left("Navigate to the marked point on your world map and use the weather device.")
-						.build());
+					.left("Navigate to the marked point on your world map and use the weather device.")
+					.build());
 			}
 		}
 
