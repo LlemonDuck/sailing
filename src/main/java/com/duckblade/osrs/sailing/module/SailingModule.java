@@ -70,6 +70,7 @@ public class SailingModule extends AbstractModule
 			.add(luffOverlay)
 			.add(prioritizeCargoHold)
 			.add(rapidsOverlay)
+			.add(lightningCloudsOverlay)
 			.add(seaChartOverlay)
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
