@@ -148,7 +148,7 @@ public class SalvageHighlighter
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		if (!SailingUtil.isSailing(client) || !config.salvagingHighlightEnabled())
+		if (!SailingUtil.isSailing(client))
 		{
 			return null;
 		}
