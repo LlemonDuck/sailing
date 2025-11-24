@@ -2,7 +2,9 @@ package com.duckblade.osrs.sailing.features.util;
 
 import com.duckblade.osrs.sailing.model.Boat;
 import com.google.common.collect.ImmutableSet;
+
 import javax.inject.Inject;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Actor;
@@ -20,9 +22,9 @@ import net.runelite.api.gameval.VarbitID;
 public class SailingUtil
 {
 	public static final ImmutableSet<Integer> WORLD_ENTITY_TYPE_BOAT = ImmutableSet.of(
-		1, // raft
-		2,
-		3 // 3? confirm sloop?
+			1, // raft
+			2,
+			3 // 3? confirm sloop?
 	);
 	public static final int ACCOUNT_TYPE_UIM = 2;
 
@@ -47,7 +49,8 @@ public class SailingUtil
 	public static ObjectComposition getTransformedObject(Client client, GameObject o)
 	{
 		ObjectComposition def = client.getObjectDefinition(o.getId());
-		if (def == null || def.getImpostorIds() == null) {
+		if (def == null || def.getImpostorIds() == null)
+		{
 			return def;
 		}
 
@@ -71,14 +74,14 @@ public class SailingUtil
 		}
 
 		return boat.getWorldEntity()
-			.transformToMainWorld(client.getLocalPlayer().getLocalLocation());
+				.transformToMainWorld(client.getLocalPlayer().getLocalLocation());
 	}
 
 	public static WorldPoint getTopLevelWorldPoint(Client client, BoatTracker boatTracker)
 	{
 		return WorldPoint.fromLocal(
-			client,
-			getTopLevelLocalPoint(client, boatTracker)
+				client,
+				getTopLevelLocalPoint(client, boatTracker)
 		);
 	}
 
