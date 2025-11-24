@@ -79,7 +79,6 @@ public class SalvageHighlighter
 	@Override
 	public void startUp()
 	{
-
 		sailingLevel = client.getRealSkillLevel(SAILING);
 	}
 
@@ -97,7 +96,6 @@ public class SalvageHighlighter
 	{
 		salvage.clear();
 		salvageStump.clear();
-		sailingLevel = client.getRealSkillLevel(SAILING);
 	}
 
 	@Subscribe
