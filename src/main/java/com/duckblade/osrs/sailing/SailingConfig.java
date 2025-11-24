@@ -78,6 +78,14 @@ public interface SailingConfig extends Config
 	)
 	String SECTION_CARGO_HOLD_TRACKING = "cargoHoldTracking";
 
+	@ConfigSection(
+		name = "Boat Hider",
+		description = "Settings for hiding parts of the boat.",
+		position = 900,
+		closedByDefault = true
+	)
+	String SECTION_BOAT_HIDER = "boatHider";
+
 	@ConfigItem(
 		keyName = "highlightRapids",
 		name = "Highlight Rapids",
@@ -100,6 +108,30 @@ public interface SailingConfig extends Config
 	default boolean highlightTrimmableSails()
 	{
 		return true;
+	}
+
+	@ConfigItem(
+		keyName = "highlightSail",
+		name = "Highlight Sail",
+		description = "Highlight outline of the sail.",
+		section = SECTION_FACILITIES,
+		position = 2
+	)
+	default boolean highlightSail()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "colorSailOutline",
+		name = "Sail",
+		description = "Outline color of the sail.",
+		section = SECTION_FACILITIES,
+		position = 3
+	)
+	default Color colorSailOutline()
+	{
+		return Color.BLACK;
 	}
 
 	enum CrewmateMuteMode
@@ -267,4 +299,15 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
+	@ConfigItem(
+		keyName = "hideBoatSail",
+		name = "Hide Boat Sail",
+		description = "Hides the sail of the boat.",
+		section = SECTION_BOAT_HIDER,
+		position = 1
+	)
+	default boolean hideBoatSail()
+	{
+		return false;
+	}
 }

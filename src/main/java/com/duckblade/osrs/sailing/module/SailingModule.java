@@ -2,9 +2,11 @@ package com.duckblade.osrs.sailing.module;
 
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.CargoHoldTracker;
-import com.duckblade.osrs.sailing.features.LuffOverlay;
+import com.duckblade.osrs.sailing.features.boat.BoatHider;
+import com.duckblade.osrs.sailing.features.boat.LuffOverlay;
 import com.duckblade.osrs.sailing.features.RapidsOverlay;
 import com.duckblade.osrs.sailing.features.barracudatrials.BarracudaTrialHelper;
+import com.duckblade.osrs.sailing.features.boat.SailOverlay;
 import com.duckblade.osrs.sailing.features.charting.CurrentDuckTaskTracker;
 import com.duckblade.osrs.sailing.features.charting.SeaChartOverlay;
 import com.duckblade.osrs.sailing.features.charting.SeaChartPanelOverlay;
@@ -46,12 +48,14 @@ public class SailingModule extends AbstractModule
 		CurrentDuckTaskTracker currentDuckTaskTracker,
 		DeprioSailsOffHelm deprioSailsOffHelm,
 		LuffOverlay luffOverlay,
+		SailOverlay sailOverlay,
 		PrioritizeCargoHold prioritizeCargoHold,
 		RapidsOverlay rapidsOverlay,
 		SeaChartOverlay seaChartOverlay,
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
-		WeatherTaskTracker weatherTaskTracker
+		WeatherTaskTracker weatherTaskTracker,
+		BoatHider boatHider
 	)
 	{
 		var builder = ImmutableSet.<PluginLifecycleComponent>builder()
@@ -62,12 +66,14 @@ public class SailingModule extends AbstractModule
 			.add(currentDuckTaskTracker)
 			.add(deprioSailsOffHelm)
 			.add(luffOverlay)
+			.add(sailOverlay)
 			.add(prioritizeCargoHold)
 			.add(rapidsOverlay)
 			.add(seaChartOverlay)
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
-			.add(weatherTaskTracker);
+			.add(weatherTaskTracker)
+			.add(boatHider);
 
 		// features still in development
 		if (developerMode)

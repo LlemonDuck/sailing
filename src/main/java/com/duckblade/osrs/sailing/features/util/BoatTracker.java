@@ -1,5 +1,6 @@
 package com.duckblade.osrs.sailing.features.util;
 
+import com.duckblade.osrs.sailing.features.boat.SailOverlay;
 import com.duckblade.osrs.sailing.model.Boat;
 import com.duckblade.osrs.sailing.model.CargoHoldTier;
 import com.duckblade.osrs.sailing.model.HelmTier;
@@ -15,11 +16,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
+import net.runelite.api.GameState;
 import net.runelite.api.WorldEntity;
+import net.runelite.api.WorldView;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.WorldEntityDespawned;
 import net.runelite.api.events.WorldEntitySpawned;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 
 @Slf4j
@@ -31,6 +35,23 @@ public class BoatTracker
 
 	private final Map<Integer, Boat> trackedBoats = new HashMap<>();
 	private final Client client;
+	private final ClientThread clientThread;
+
+	@Override
+	public void startUp()
+	{
+		clientThread.invokeLater(() -> {
+			if (client.getGameState() == GameState.LOGGED_IN)
+			{
+				// check if plugin was turned on after WorldEntitySpawned event
+				if (SailingUtil.isSailing(client) &&
+					trackedBoats.get(client.getLocalPlayer().getWorldView().getId()) == null)
+				{
+					simulateWorldEntitySpawned(client.getTopLevelWorldView());
+				}
+			}
+		});
+	}
 
 	public void shutDown()
 	{
@@ -129,6 +150,19 @@ public class BoatTracker
 		{
 			boat.setCargoHold(null);
 			log.trace("unsetting cargo hold for boat in wv {}", boat.getWorldViewId());
+		}
+	}
+
+	private void simulateWorldEntitySpawned(final WorldView worldView)
+	{
+		for (final var we : worldView.worldEntities())
+		{
+			onWorldEntitySpawned(new WorldEntitySpawned(we));
+		}
+
+		for (final var wv : worldView.worldViews())
+		{
+			simulateWorldEntitySpawned(wv);
 		}
 	}
 

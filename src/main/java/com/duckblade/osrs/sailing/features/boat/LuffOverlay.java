@@ -1,4 +1,4 @@
-package com.duckblade.osrs.sailing.features;
+package com.duckblade.osrs.sailing.features.boat;
 
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
