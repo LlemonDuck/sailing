@@ -1,6 +1,7 @@
 package com.duckblade.osrs.sailing.features.util;
 
 import com.duckblade.osrs.sailing.model.Boat;
+import com.google.common.collect.ImmutableSet;
 import javax.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,11 @@ import net.runelite.api.gameval.VarbitID;
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class SailingUtil
 {
-	public static final int WORLD_ENTITY_TYPE_BOAT = 2;
+	public static final ImmutableSet<Integer> WORLD_ENTITY_TYPE_BOAT = ImmutableSet.of(
+		1, // raft
+		2,
+		3 // 3? confirm sloop?
+	);
 	public static final int ACCOUNT_TYPE_UIM = 2;
 
 	public static boolean isSailing(Client client)

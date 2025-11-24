@@ -17,10 +17,10 @@ repositories {
 
 def runeLiteVersion = 'latest.release'
 
-sourceSets.create("generateSeaChartTasks")
+def generateSeaChartTasksSources = sourceSets.create("generateSeaChartTasks")
 configurations.create("generateSeaChartTasks") {
     sourceSets {
-        file("src/generateSeaChartTasks")
+        add(generateSeaChartTasksSources)
     }
 }
 

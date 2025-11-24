@@ -321,6 +321,7 @@ public interface SailingConfig extends Config
 		keyName = "courierItemIdentification",
 		name = "Destination on Items",
 		description = "Show the destination port on cargo crates in your inventory and cargo hold.",
+		section = SECTION_COURIER_TASKS,
 		position = 1
 	)
 	default boolean courierItemIdentification()

@@ -30,7 +30,7 @@ public class GenerateSeaChartTasks
 		System.out.println("import lombok.Getter;");
 		System.out.println("import lombok.RequiredArgsConstructor;");
 		System.out.println("import net.runelite.api.Client;");
-		System.out.println("import net.runelite.api.gameval.VarbitID;");
+		System.out.println("import net.runelite.api.coords.WorldPoint;");
 		System.out.println("import net.runelite.api.gameval.VarbitID;");
 		System.out.println("import net.runelite.api.gameval.ObjectID;");
 		System.out.println("import net.runelite.api.gameval.NpcID;");

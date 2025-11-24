@@ -8,7 +8,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +37,6 @@ public class CurrentDuckTaskTracker
 {
 
 	private static final String MSG_DUCK_BEGIN = "You release your current duck and he begins tracking the currents...";
-	private static final String MSG_DUCK_END = "Your current duck comes to a stop.";
 
 	private final Client client;
 	private final ChatMessageManager chatMessageManager;
@@ -76,24 +74,19 @@ public class CurrentDuckTaskTracker
 			return;
 		}
 
-		if (Objects.equals(event.getMessage(), MSG_DUCK_BEGIN))
+		if (event.getMessage().contains(MSG_DUCK_BEGIN))
 		{
 			WorldPoint playerLoc = SailingUtil.getTopLevelWorldPoint(client, boatTracker);
 			SeaChartTask task = taskIndex.findTask(playerLoc, 10, t -> t.getObjectId() == ObjectID.SAILING_CHARTING_HINT_MARKER_DUCK);
 			if (task != null)
 			{
+				log.debug("beginning duck task {}", task);
 				setActiveTask(task);
 			}
 			else
 			{
 				log.warn("Current duck task began, but no nearby task was found at playerLoc={}", playerLoc);
 			}
-			return;
-		}
-
-		if (Objects.equals(event.getMessage(), MSG_DUCK_END))
-		{
-
 		}
 	}
 
@@ -145,6 +138,7 @@ public class CurrentDuckTaskTracker
 		WorldPoint dest = activeTask.getDestination();
 		assert dest != null;
 
+		// todo proper height mapping of polygon
 		LocalPoint destLp = LocalPoint.fromWorld(client.getTopLevelWorldView(), dest);
 		if (destLp != null)
 		{

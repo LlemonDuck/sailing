@@ -50,12 +50,6 @@ public class CourierDestinationOverlay
 	}
 
 	@Override
-	protected void showOnInterfaces(int... ids)
-	{
-		super.showOnInterfaces(ids);
-	}
-
-	@Override
 	public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem widgetItem)
 	{
 		Port port = ITEM_DESTINATIONS.get(itemId);
@@ -68,6 +62,7 @@ public class CourierDestinationOverlay
 
 		Rectangle bounds = widgetItem.getCanvasBounds();
 		TextComponent textComponent = new TextComponent();
+		textComponent.setText(port.getShortCode());
 		textComponent.setPosition(new Point(bounds.x - 1, bounds.y + bounds.height - 1));
 		textComponent.render(graphics);
 	}

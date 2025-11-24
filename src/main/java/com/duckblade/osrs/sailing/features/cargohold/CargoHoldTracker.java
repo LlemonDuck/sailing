@@ -17,6 +17,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -28,10 +29,11 @@ import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.NPC;
 import net.runelite.api.Point;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.OverheadTextChanged;
-import net.runelite.api.events.PostClientTick;
+import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
@@ -39,6 +41,7 @@ import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.RuneScapeProfileChanged;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -56,8 +59,12 @@ public class CargoHoldTracker
 
 	private static final int UNKNOWN_ITEM = -1;
 
+	// todo cargo pickup and dropoff
+	private static final String MES_CARGO_PACK_PERSONAL = "You deposit some cargo into the cargo hold."; // always 1
+	private static final String MES_CARGO_PACK_CREW = "Your crew pack the cargo they were holding into the cargo hold."; // todo determine amount?
 	private static final String MSG_CREWMATE_SALVAGES = "Managed to hook some salvage! I'll put it in the cargo hold.";
-	private static final String MSG_CREWMATE_SALVAGE_FULL = ""; // todo
+	private static final String MSG_CREWMATE_SALVAGE_FULL = "The cargo hold is full. I can't salvage anything.";
+	private static final String WIDGET_TEXT_CARGO_HOLD_EMPTY = "This cargo hold has no items to show here.";
 
 	private static final Set<Integer> CARGO_INVENTORY_IDS = ImmutableSet.of(
 		InventoryID.SAILING_BOAT_1_CARGOHOLD,
@@ -74,6 +81,8 @@ public class CargoHoldTracker
 	private static final Joiner.MapJoiner CONFIG_JOINER = Joiner.on(CONFIG_DELIMITER_PAIRS)
 		.withKeyValueSeparator(CONFIG_DELIMITER_KV);
 
+	private static final int INVENTORY_DELTA_MAX_DELAY = 2;
+
 	private final Client client;
 	private final ConfigManager configManager;
 	private final BoatTracker boatTracker;
@@ -83,8 +92,9 @@ public class CargoHoldTracker
 	private Multiset<Integer> memoizedInventory;
 
 	private boolean overlayEnabled;
-	private boolean pendingInventoryAction;
+	private int pendingInventoryAction;
 	private boolean sawItemContainerUpdate;
+	private boolean sawInventoryContainerUpdate;
 
 	@Inject
 	public CargoHoldTracker(Client client, ConfigManager configManager, BoatTracker boatTracker)
@@ -100,10 +110,7 @@ public class CargoHoldTracker
 	@Override
 	public void startUp()
 	{
-		for (int boatSlot = 0; boatSlot < 5; boatSlot++)
-		{
-			loadFromConfig(boatSlot);
-		}
+		loadAllFromConfig();
 	}
 
 	@Override
@@ -150,6 +157,12 @@ public class CargoHoldTracker
 	}
 
 	@Subscribe
+	public void onRuneScapeProfileChanged(RuneScapeProfileChanged e)
+	{
+		loadAllFromConfig();
+	}
+
+	@Subscribe
 	public void onOverheadTextChanged(OverheadTextChanged e)
 	{
 		Actor actor = e.getActor();
@@ -177,6 +190,12 @@ public class CargoHoldTracker
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged e)
 	{
+		if (e.getContainerId() == InventoryID.INV)
+		{
+			sawInventoryContainerUpdate = true;
+			return;
+		}
+
 		if (!CARGO_INVENTORY_IDS.contains(e.getContainerId() & 0x4FFF))
 		{
 			return;
@@ -194,47 +213,93 @@ public class CargoHoldTracker
 				trackedInv.add(item.getId(), item.getQuantity());
 			}
 		}
+
+		log.debug("read cargo hold inventory from event {}", trackedInv);
 		writeToConfig();
 	}
 
 	@Subscribe
-	public void onPostClientTick(PostClientTick e)
+	public void onGameTick(GameTick e)
 	{
-		Multiset<Integer> oldInventory = memoizedInventory;
-		boolean shouldInfer = !sawItemContainerUpdate && pendingInventoryAction && memoizedInventory != null;
-		pendingInventoryAction = false;
-		sawItemContainerUpdate = false;
-		memoizedInventory = null;
-
-		if (!shouldInfer)
+		if (--pendingInventoryAction < 0)
 		{
+			sawItemContainerUpdate = false;
 			return;
 		}
 
-		Multiset<Integer> newInventory = getInventoryMap();
-		Multiset<Integer> withdrawn = Multisets.difference(newInventory, oldInventory);
-		Multiset<Integer> deposited = Multisets.difference(oldInventory, newInventory);
+		if (sawItemContainerUpdate)
+		{
+			// trust the item container event over any guesswork
+			resetInventoryDeltaState();
+			return;
+		}
 
-		Multiset<Integer> cargoHold = cargoHold();
-		Multisets.removeOccurrences(cargoHold, withdrawn);
-		deposited.entrySet().forEach(entry -> cargoHold.add(entry.getElement(), entry.getCount()));
+		if (!sawInventoryContainerUpdate || memoizedInventory == null)
+		{
+			// inventory change might be delayed an extra tick if action was clicked near the tick boundary
+			return;
+		}
+
+		Multiset<Integer> oldInventory = memoizedInventory;
+		resetInventoryDeltaState();
+
+		Multiset<Integer> cargoHoldToUpdate = cargoHold();
+
+		Multiset<Integer> newInventory = getInventoryMap();
+		log.trace("new inventory {}", newInventory);
+
+		Multiset<Integer> withdrawn = Multisets.difference(newInventory, oldInventory); // items found in inv that weren't in prior snapshot
+		log.trace("withdrawn: {}", withdrawn);
+
+		Multiset<Integer> deposited = Multisets.difference(oldInventory, newInventory); // items missing from inv that were in prior snapshot
+		log.trace("deposited: {}", deposited);
+
+		Multisets.removeOccurrences(cargoHoldToUpdate, withdrawn);
+		deposited.entrySet().forEach(entry -> cargoHoldToUpdate.add(entry.getElement(), entry.getCount()));
+
+		log.debug("updated cargo hold from inventory delta {}", cargoHoldToUpdate);
 		writeToConfig();
 	}
 
 	@Subscribe
 	public void onMenuOptionClicked(MenuOptionClicked e)
 	{
-		if (!e.getMenuTarget().contains("Withdraw") && !e.getMenuTarget().contains("Deposit"))
+		if (!e.getMenuOption().contains("Withdraw") && !e.getMenuOption().contains("Deposit"))
 		{
 			return;
 		}
 
-		Widget cargoHoldWidget = client.getWidget(InterfaceID.SAILING_BOAT_CARGOHOLD); // todo confirm
+		Widget cargoHoldWidget = client.getWidget(InterfaceID.SailingBoatCargohold.UNIVERSE); // todo confirm
 		if (cargoHoldWidget != null && !cargoHoldWidget.isHidden())
 		{
-			pendingInventoryAction = true;
+			pendingInventoryAction = INVENTORY_DELTA_MAX_DELAY;
 			memoizedInventory = getInventoryMap();
+			log.debug("queued pendingInventoryAction with inventory {}", memoizedInventory);
 		}
+	}
+
+	@Subscribe
+	public void onWidgetLoaded(WidgetLoaded e)
+	{
+		if (e.getGroupId() != InterfaceID.SAILING_BOAT_CARGOHOLD)
+		{
+			return;
+		}
+
+		Widget itemsParent = client.getWidget(InterfaceID.SailingBoatCargohold.ITEMS);
+		Widget itemsChild = itemsParent != null ? itemsParent.getChild(0) : null;
+		if (itemsChild != null && Objects.equals(itemsChild.getText(), WIDGET_TEXT_CARGO_HOLD_EMPTY))
+		{
+			cargoHold().clear();
+		}
+	}
+
+	private void resetInventoryDeltaState()
+	{
+		pendingInventoryAction = 0;
+		sawItemContainerUpdate = false;
+		sawInventoryContainerUpdate = false;
+		memoizedInventory = null;
 	}
 
 	private Multiset<Integer> cargoHold()
@@ -284,8 +349,8 @@ public class CargoHoldTracker
 				continue;
 			}
 
-			int quantity = item.getQuantity();
-			ret.add(item.getId(), quantity);
+			// todo fix stackable items
+			ret.add(item.getId());
 		}
 
 		return ret;
@@ -294,6 +359,17 @@ public class CargoHoldTracker
 	private String configKey(int boatSlot)
 	{
 		return CONFIG_PREFIX + boatSlot;
+	}
+
+	private void loadAllFromConfig()
+	{
+		if (configManager.getRSProfileKey() != null)
+		{
+			for (int boatSlot = 0; boatSlot < 5; boatSlot++)
+			{
+				loadFromConfig(boatSlot);
+			}
+		}
 	}
 
 	private void loadFromConfig(int boatSlot)
@@ -305,6 +381,7 @@ public class CargoHoldTracker
 			Multiset<Integer> hold = cargoHold(boatSlot);
 			CONFIG_SPLITTER.split(savedInventory).forEach((k, v) ->
 				hold.add(Integer.parseInt(k), Integer.parseInt(v)));
+			log.debug("read cargoHold {} from config {} = {}", boatSlot, key, hold);
 		}
 	}
 
@@ -323,6 +400,7 @@ public class CargoHoldTracker
 			.iterator());
 
 		configManager.setRSProfileConfiguration(SailingConfig.CONFIG_GROUP, key, configValue);
+		log.trace("wrote cargoHold {} to config {} = {}", boatSlot, key, configValue);
 	}
 
 }

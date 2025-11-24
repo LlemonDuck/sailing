@@ -50,7 +50,7 @@ public class Boat
 
 	public SizeClass getSizeClass()
 	{
-		return SizeClass.fromGameObjectId(hull.getId());
+		return hull != null ? SizeClass.fromGameObjectId(hull.getId()) : null;
 	}
 
 	public int getCargoCapacity(boolean uim)

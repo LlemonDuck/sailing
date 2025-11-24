@@ -44,13 +44,13 @@ public class SailingDebugTlwpOverlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		if (SailingUtil.isSailing(client))
+		if (SailingUtil.isSailing(client) && boatTracker.getBoat() != null)
 		{
 			WorldPoint tlwp = SailingUtil.getTopLevelWorldPoint(client, boatTracker);
 			Polygon poly = Perspective.getCanvasTilePoly(client, Objects.requireNonNull(LocalPoint.fromWorld(client, tlwp)));
 			if (poly != null)
 			{
-				OverlayUtil.renderPolygon(graphics, poly, Color.cyan);
+				OverlayUtil.renderPolygon(graphics, poly, Color.magenta);
 			}
 		}
 

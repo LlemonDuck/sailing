@@ -47,37 +47,37 @@ public class SailingDebugLocalBoatInfoOverlayPanel
 		getPanelComponent().getChildren()
 			.add(LineComponent.builder()
 				.left("Size")
-				.right(boat.getSizeClass().toString())
+				.right(String.valueOf(boat.getSizeClass()))
 				.build());
 
 		getPanelComponent().getChildren()
 			.add(LineComponent.builder()
 				.left("Hull")
-				.right(boat.getHullTier().toString())
+				.right(String.valueOf(boat.getHullTier()))
 				.build());
 
 		getPanelComponent().getChildren()
 			.add(LineComponent.builder()
 				.left("Sail")
-				.right(boat.getSailTier().toString())
+				.right(String.valueOf(boat.getSailTier()))
 				.build());
 
 		getPanelComponent().getChildren()
 			.add(LineComponent.builder()
 				.left("Helm")
-				.right(boat.getHelmTier().toString())
+				.right(String.valueOf(boat.getHelmTier()))
 				.build());
 
 		getPanelComponent().getChildren()
 			.add(LineComponent.builder()
 				.left("Hook")
-				.right(boat.getSalvagingHookTier().toString())
+				.right(String.valueOf(boat.getSalvagingHookTier()))
 				.build());
 
 		getPanelComponent().getChildren()
 			.add(LineComponent.builder()
 				.left("Cargo")
-				.right(boat.getCargoHoldTier().toString())
+				.right(String.valueOf(boat.getCargoHoldTier()))
 				.build());
 
 		return super.render(graphics);
