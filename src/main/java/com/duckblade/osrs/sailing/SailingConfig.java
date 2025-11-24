@@ -317,7 +317,6 @@ public interface SailingConfig extends Config
 		return new Color(205, 57, 72);
 	}
 
-	// 7. Cargo Hold Tracking
 	@ConfigItem(
 		keyName = "courierItemIdentification",
 		name = "Destination on Items",
@@ -342,4 +341,14 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
+	@ConfigItem(
+			keyName = "enableLowDetail",
+			name = "Low Detail",
+			description = "Removes objects from the scene that hinder FPS",
+			position = 999
+	)
+	default boolean enableLowDetail()
+	{
+		return false;
+	}
 }

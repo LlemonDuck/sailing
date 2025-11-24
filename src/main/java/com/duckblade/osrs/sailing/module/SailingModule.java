@@ -1,6 +1,7 @@
 package com.duckblade.osrs.sailing.module;
 
 import com.duckblade.osrs.sailing.SailingConfig;
+import com.duckblade.osrs.sailing.features.LowDetail;
 import com.duckblade.osrs.sailing.features.barracudatrials.LostCratesOverlay;
 import com.duckblade.osrs.sailing.features.barracudatrials.RumBoatOverlay;
 import com.duckblade.osrs.sailing.features.cargohold.CargoHoldTracker;
@@ -54,7 +55,8 @@ public class SailingModule extends AbstractModule
 		SeaChartOverlay seaChartOverlay,
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
-		WeatherTaskTracker weatherTaskTracker
+		WeatherTaskTracker weatherTaskTracker,
+		LowDetail lowDetail
 	)
 	{
 		var builder = ImmutableSet.<PluginLifecycleComponent>builder()
@@ -74,7 +76,9 @@ public class SailingModule extends AbstractModule
 			.add(seaChartOverlay)
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
-			.add(weatherTaskTracker);
+			.add(weatherTaskTracker)
+			.add(lowDetail)
+			;
 
 		// features still in development
 		if (developerMode)
