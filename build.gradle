@@ -17,6 +17,13 @@ repositories {
 
 def runeLiteVersion = 'latest.release'
 
+sourceSets.create("generateSeaChartTasks")
+configurations.create("generateSeaChartTasks") {
+    sourceSets {
+        file("src/generateSeaChartTasks")
+    }
+}
+
 dependencies {
 	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
 

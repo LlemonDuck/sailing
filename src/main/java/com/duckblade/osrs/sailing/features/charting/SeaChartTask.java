@@ -2,6 +2,7 @@ package com.duckblade.osrs.sailing.features.charting;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.runelite.api.Client;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.gameval.ObjectID;
@@ -378,5 +379,10 @@ public enum SeaChartTask
 	private final int npcId;
 	private final WorldPoint location;
 	private final WorldPoint destination;
+
+	public boolean isComplete(Client client)
+	{
+		return client.getVarbitValue(getCompletionVarb()) != 0;
+	}
 
 }

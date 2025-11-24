@@ -14,13 +14,13 @@ import net.runelite.api.WorldEntity;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
-import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
 @Singleton
-public class SailingDebugBoatInfoOverlay extends OverlayPanel
+public class SailingDebugBoatInfoOverlay extends Overlay
 {
 
 	private final Client client;
@@ -29,10 +29,11 @@ public class SailingDebugBoatInfoOverlay extends OverlayPanel
 	private boolean active;
 
 	@Inject
-	public SailingDebugBoatInfoOverlay(Client client, BoatTracker boatTracker)
+	public SailingDebugBoatInfoOverlay(Client client, BoatTracker boatTracker, SailingDebugConfig config)
 	{
 		this.client = client;
 		this.boatTracker = boatTracker;
+		active = config.boatInfoDefaultOn();
 
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ALWAYS_ON_TOP);

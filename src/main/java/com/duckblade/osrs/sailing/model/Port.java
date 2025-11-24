@@ -1,0 +1,45 @@
+package com.duckblade.osrs.sailing.model;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+public enum Port
+{
+
+	ALDARIN("ALDRN"),
+	ARDOUGNE("ARDY"),
+	BRIMHAVEN("BRIM"),
+	CAIRN_ISLE("CAIRN"),
+	CATHERBY("CATH"),
+	CIVITAS_ILLA_FORTIS("FORTS"),
+	CORSAIR_COVE("CORSR"),
+	DEEPFIN_POINT("DPFIN"),
+	ENTRANA("ENTR"),
+	ETCETERIA("ETC"),
+	HOSIDIUS("HOSDS"),
+	JATIZSO("JATIZ"),
+	LANDS_END("LANDS"),
+	LUNAR_ISLE("LUNAR"),
+	MUSA_POINT("MUSA"),
+	NEITIZNOT("NEITZ"),
+	PISCATORIS("PSCTR"),
+	PORT_KHAZARD("KHZRD"),
+	PORT_PISCARILIUS("PSCRL"),
+	PORT_ROBERTS("ROBRT"),
+	PORT_SARIM("SARIM"),
+	PORT_TYRAS("TYRAS"),
+	PRIFDDINAS("PRIF"),
+	RED_ROCK("REDRK"),
+	RELLEKKA("RELL"),
+	RUINS_OF_UNKAH("UNKAH"),
+	SUNSET_COAST("SUNST"),
+	THE_PANDEMONIUM("PAND"),
+	THE_SUMMER_SHORE("SUMMR"),
+	VOID_KNIGHTS_OUTPOST("VOID"),
+	;
+
+	private final String shortCode;
+
+}

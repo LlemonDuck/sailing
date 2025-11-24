@@ -63,14 +63,21 @@ public interface SailingConfig extends Config
 	String SECTION_BARRACUDA_TRIALS = "barracudaTrials";
 
 	@ConfigSection(
+		name = "Courier Tasks",
+		description = "Settings for courier tasks (aka port tasks)",
+		position = 700,
+		closedByDefault = true
+	)
+	String SECTION_COURIER_TASKS = "courier";
+
+	@ConfigSection(
 		name = "Cargo Hold Tracking",
 		description = "Settings for tracking the contents of your cargo hold.",
-		position = 700,
+		position = 800,
 		closedByDefault = true
 	)
 	String SECTION_CARGO_HOLD_TRACKING = "cargoHoldTracking";
 
-	// 1. Navigation
 	@ConfigItem(
 		keyName = "highlightRapids",
 		name = "Highlight Rapids",
@@ -121,7 +128,6 @@ public interface SailingConfig extends Config
 		return new Color(234, 234, 234);
 	}
 
-	// 2. Facilities
 	@ConfigItem(
 		keyName = "highlightTrimmableSails",
 		name = "Highlight Trimmable Sails",
@@ -134,7 +140,6 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
-	// 3. Crewmates
 	enum CrewmateMuteMode
 	{
 		NONE,
@@ -155,7 +160,6 @@ public interface SailingConfig extends Config
 		return CrewmateMuteMode.NONE;
 	}
 
-	// 4. MES
 	@ConfigItem(
 		keyName = "disableSailsWhenNotAtHelm",
 		name = "Sails At Helm Only",
@@ -180,7 +184,6 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
-	// 5. Charting
 	enum ShowChartsMode
 	{
 		NONE,
@@ -235,13 +238,23 @@ public interface SailingConfig extends Config
 		section = SECTION_SEA_CHARTING,
 		position = 4
 	)
-	@Alpha
 	default boolean chartingWeatherSolver()
 	{
 		return true;
 	}
 
-	// 6. Barracuda Trials
+	@ConfigItem(
+		keyName = "chartingDuckSolver",
+		name = "Current Duck Solver",
+		description = "Whether to provide a helper for current duck trails.",
+		section = SECTION_SEA_CHARTING,
+		position = 4
+	)
+	default boolean chartingDuckSolver()
+	{
+		return true;
+	}
+
 	@ConfigItem(
 		keyName = "barracudaHighlightLostCrates",
 		name = "Highlight Crates",
@@ -305,6 +318,17 @@ public interface SailingConfig extends Config
 	}
 
 	// 7. Cargo Hold Tracking
+	@ConfigItem(
+		keyName = "courierItemIdentification",
+		name = "Destination on Items",
+		description = "Show the destination port on cargo crates in your inventory and cargo hold.",
+		position = 1
+	)
+	default boolean courierItemIdentification()
+	{
+		return true;
+	}
+
 	@ConfigItem(
 		keyName = "cargoHoldShowCounts",
 		name = "Show Item Count",
