@@ -3,6 +3,7 @@ package com.duckblade.osrs.sailing.module;
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.facilities.CargoHoldTracker;
 import com.duckblade.osrs.sailing.features.facilities.LuffOverlay;
+import com.duckblade.osrs.sailing.features.facilities.SpeedBoostInfoBox;
 import com.duckblade.osrs.sailing.features.navigation.RapidsOverlay;
 import com.duckblade.osrs.sailing.features.barracudatrials.BarracudaTrialHelper;
 import com.duckblade.osrs.sailing.features.charting.CurrentDuckTaskTracker;
@@ -53,6 +54,7 @@ public class SailingModule extends AbstractModule
 		SeaChartOverlay seaChartOverlay,
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
+		SpeedBoostInfoBox speedBoostInfoBox,
 		WeatherTaskTracker weatherTaskTracker
 	)
 	{
@@ -70,6 +72,7 @@ public class SailingModule extends AbstractModule
 			.add(seaChartOverlay)
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
+			.add(speedBoostInfoBox)
 			.add(weatherTaskTracker);
 
 		// features still in development

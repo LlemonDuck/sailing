@@ -69,6 +69,17 @@ public class Boat
 		return getCargoCapacity(SailingUtil.isUim(client));
 	}
 
+	public int getSpeedBoostDuration()
+	{
+		SailTier sailTier = getSailTier();
+		if (sailTier == null)
+		{
+			return 0;
+		}
+
+		return sailTier.getSpeedBoostDuration(getSizeClass());
+	}
+
 	public String getDebugString()
 	{
 		return String.format(

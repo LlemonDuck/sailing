@@ -102,6 +102,18 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
+	@ConfigItem(
+			keyName = "showSpeedBoostInfoBox",
+			name = "Show Speed Boost InfoBox",
+			description = "Show an InfoBox with the duration of your active speed boost.",
+			section = SECTION_FACILITIES,
+			position = 2
+	)
+	default boolean showSpeedBoostInfoBox()
+	{
+		return true;
+	}
+
 	enum CrewmateMuteMode
 	{
 		NONE,
