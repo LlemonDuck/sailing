@@ -51,6 +51,7 @@ public class SeaChartOverlay
 
 	private Color colorCharted;
 	private Color colorUncharted;
+	private Color colorRequirementsUnmet;
 
 	@Inject
 	public SeaChartOverlay(
@@ -76,6 +77,7 @@ public class SeaChartOverlay
 	{
 		colorCharted = config.chartingChartedColor();
 		colorUncharted = config.chartingUnchartedColor();
+		colorRequirementsUnmet = config.chartingRequirementsUnmetColor();
 		return config.showCharts() != SailingConfig.ShowChartsMode.NONE;
 	}
 
@@ -229,7 +231,7 @@ public class SeaChartOverlay
 			return colorUncharted;
 		}
 
-		return Color.RED;
+		return colorRequirementsUnmet;
 	}
 
 	private boolean shouldRenderOverlay(SailingConfig.ShowChartsMode mode, boolean completed, boolean meetsRequirements)
