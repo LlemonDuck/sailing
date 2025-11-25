@@ -23,6 +23,7 @@ import com.duckblade.osrs.sailing.features.oceanencounters.GiantClam;
 import com.duckblade.osrs.sailing.features.oceanencounters.LostShipment;
 import com.duckblade.osrs.sailing.features.oceanencounters.MysteriousGlow;
 import com.duckblade.osrs.sailing.features.oceanencounters.OceanMan;
+import com.duckblade.osrs.sailing.features.navigation.TrueTileIndicator;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -69,6 +70,7 @@ public class SailingModule extends AbstractModule
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
 		SpeedBoostInfoBox speedBoostInfoBox,
+		TrueTileIndicator trueTileIndicator,
 		WeatherTaskTracker weatherTaskTracker
 	)
 	{
@@ -94,6 +96,7 @@ public class SailingModule extends AbstractModule
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
 			.add(speedBoostInfoBox)
+			.add(trueTileIndicator)
 			.add(weatherTaskTracker);
 
 		// features still in development

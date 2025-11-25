@@ -100,6 +100,30 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "navigationTrueTileIndicator",
+		name = "True \"Tile\"",
+		description = "Shows the location of your boat according to the server.<br>NOTE: Boats use sub-tile positioning.",
+		section = SECTION_NAVIGATION,
+		position = 2
+	)
+	default boolean navigationTrueTileIndicator()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "navigationTrueTileIndicatorColor",
+		name = "True \"Tile\" Colour",
+		description = "The colour to use for indicating your true \"tile\".",
+		section = SECTION_NAVIGATION,
+		position = 3
+	)
+	default Color navigationTrueTileIndicatorColor()
+	{
+		return Color.CYAN;
+	}
+
+	@ConfigItem(
 		keyName = "highlightTrimmableSails",
 		name = "Highlight Trimmable Sails",
 		description = "Highlight sails when they require trimming.",
