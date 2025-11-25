@@ -257,6 +257,31 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+			keyName = "barracudaHighlightTemporTantrumRumBoat",
+			name = "Highlight Rum Boat",
+			description = "Highlight the rum boat in the Tempor Tantrum Barracuda Trial depending on current state",
+			section = SECTION_BARRACUDA_TRIALS,
+			position = 3
+	)
+	default boolean barracudaHighlightTemporTantrumRumBoat()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+			keyName = "barracudaHighlightTemporTantrumRumBoatColour",
+			name = "Rum Boat Colour",
+			description = "The colour to highlight the Tempor Tantrum Trial rum boat",
+			section = SECTION_BARRACUDA_TRIALS,
+			position = 4
+	)
+	@Alpha
+	default Color barracudaHighlightTemporTantrumRumBoatColour()
+	{
+		return new Color(205, 57, 72);
+	}
+
+	@ConfigItem(
 		keyName = "courierItemIdentification",
 		name = "Destination on Items",
 		description = "Show the destination port on cargo crates in your inventory and cargo hold.",
