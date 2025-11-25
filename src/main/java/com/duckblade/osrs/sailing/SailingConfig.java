@@ -91,6 +91,31 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+			keyName = "highlightLightningCloudStrikes",
+			name = "Highlight Lightning Cloud Strikes",
+			description = "Highlights the lightning clouds that are about to strike and should be avoided",
+			section = SECTION_NAVIGATION,
+			position = 4
+	)
+	default boolean highlightLightningCloudStrikes()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+			keyName = "lightningCloudStrikeColour",
+			name = "Lightning Strike Colour",
+			description = "Colour to highlight lightning cloud strikes. Colour will appear darker when about to strike.",
+			section = SECTION_NAVIGATION,
+			position = 5
+	)
+	@Alpha
+	default Color lightningCloudStrikeColour()
+	{
+		return new Color(234, 234, 234);
+	}
+
+	@ConfigItem(
 		keyName = "highlightTrimmableSails",
 		name = "Highlight Trimmable Sails",
 		description = "Highlight sails when they require trimming.",
