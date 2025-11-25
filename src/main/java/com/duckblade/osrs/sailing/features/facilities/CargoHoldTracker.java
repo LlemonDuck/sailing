@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/com/duckblade/osrs/sailing/features/cargohold/CargoHoldTracker.java
-package com.duckblade.osrs.sailing.features.cargohold;
-========
 package com.duckblade.osrs.sailing.features.facilities;
->>>>>>>> LlemonDuck/main:src/main/java/com/duckblade/osrs/sailing/features/facilities/CargoHoldTracker.java
 
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
