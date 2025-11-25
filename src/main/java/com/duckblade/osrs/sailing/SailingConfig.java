@@ -101,6 +101,32 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+			keyName = "dangerousRapidsColor",
+			name = "Dangerous Rapids Color",
+			description = "Color to highlight the rapids that are dangerous and you cannot safely sail through",
+			section = SECTION_NAVIGATION,
+			position = 3
+	)
+	@Alpha
+	default Color dangerousRapidsColor()
+	{
+		return Color.RED;
+	}
+
+	@ConfigItem(
+			keyName = "unknownRapidsColor",
+			name = "Unknown Rapids Color",
+			description = "Color to highlight the rapids that are unknown whether or not you can safely sail through",
+			section = SECTION_NAVIGATION,
+			position = 4
+	)
+	@Alpha
+	default Color unknownRapidsColor()
+	{
+		return Color.YELLOW;
+	}
+
+	@ConfigItem(
 			keyName = "highlightLightningCloudStrikes",
 			name = "Highlight Lightning Cloud Strikes",
 			description = "Highlights the lightning clouds that are about to strike and should be avoided",
