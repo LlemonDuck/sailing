@@ -1,9 +1,9 @@
 package com.duckblade.osrs.sailing.module;
 
 import com.duckblade.osrs.sailing.SailingConfig;
-import com.duckblade.osrs.sailing.features.CargoHoldTracker;
-import com.duckblade.osrs.sailing.features.LuffOverlay;
-import com.duckblade.osrs.sailing.features.RapidsOverlay;
+import com.duckblade.osrs.sailing.features.facilities.CargoHoldTracker;
+import com.duckblade.osrs.sailing.features.facilities.LuffOverlay;
+import com.duckblade.osrs.sailing.features.navigation.RapidsOverlay;
 import com.duckblade.osrs.sailing.features.barracudatrials.BarracudaTrialHelper;
 import com.duckblade.osrs.sailing.features.charting.CurrentDuckTaskTracker;
 import com.duckblade.osrs.sailing.features.charting.SeaChartOverlay;
