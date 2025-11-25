@@ -1,7 +1,6 @@
 package com.duckblade.osrs.sailing.features.charting;
 
 import com.duckblade.osrs.sailing.SailingConfig;
-import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -17,6 +16,8 @@ import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.NPC;
 import net.runelite.api.Perspective;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
@@ -49,6 +50,7 @@ public class SeaChartOverlay
 
 	private Color colorCharted;
 	private Color colorUncharted;
+	private Color colorRequirementsUnmet;
 
 	@Inject
 	public SeaChartOverlay(
@@ -74,6 +76,7 @@ public class SeaChartOverlay
 	{
 		colorCharted = config.chartingChartedColor();
 		colorUncharted = config.chartingUnchartedColor();
+		colorRequirementsUnmet = config.chartingRequirementsUnmetColor();
 		return config.showCharts() != SailingConfig.ShowChartsMode.NONE;
 	}
 
@@ -97,9 +100,9 @@ public class SeaChartOverlay
 			GameObject obj = tracked.getKey();
 			SeaChartTask task = tracked.getValue();
 
-			boolean completed = isTaskCompleted(task);
-			if ((completed && mode == SailingConfig.ShowChartsMode.UNCHARTED) ||
-				(!completed && mode == SailingConfig.ShowChartsMode.CHARTED))
+			boolean completed = task.isComplete(client);
+			boolean meetsRequirements = hasTaskRequirement(task);
+			if (taskIsHidden(mode, completed, meetsRequirements))
 			{
 				continue;
 			}
@@ -107,7 +110,7 @@ public class SeaChartOverlay
 			Polygon poly = obj.getCanvasTilePoly();
 			if (poly != null)
 			{
-				Color color = completed ? colorCharted : colorUncharted;
+				Color color = getColor(completed, meetsRequirements);
 				OverlayUtil.renderPolygon(g, poly, color);
 			}
 			OverlayUtil.renderImageLocation(client, g, obj.getLocalLocation(), taskIndex.getTaskSprite(task), 0);
@@ -118,14 +121,14 @@ public class SeaChartOverlay
 			NPC npc = tracked.getKey();
 			SeaChartTask task = tracked.getValue();
 
-			boolean completed = isTaskCompleted(task);
-			if ((completed && mode == SailingConfig.ShowChartsMode.UNCHARTED) ||
-				(!completed && mode == SailingConfig.ShowChartsMode.CHARTED))
+			boolean completed = task.isComplete(client);
+			boolean meetsRequirements = hasTaskRequirement(task);
+			if (taskIsHidden(mode, completed, meetsRequirements))
 			{
 				continue;
 			}
 
-			Color color = completed ? colorCharted : colorUncharted;
+			Color color = getColor(completed, meetsRequirements);
 			OverlayUtil.renderActorOverlayImage(g, npc, taskIndex.getTaskSprite(task), color, npc.getLogicalHeight() / 2);
 		}
 
@@ -199,8 +202,50 @@ public class SeaChartOverlay
 		}
 	}
 
-	private boolean isTaskCompleted(SeaChartTask task)
+	private boolean hasTaskRequirement(SeaChartTask task)
 	{
-		return client.getVarbitValue(task.getCompletionVarb()) != 0;
+		var questRequirement = taskIndex.getTaskQuestRequirement(task);
+		if (questRequirement.getState(client) != QuestState.FINISHED)
+		{
+			return false;
+		}
+
+		return client.getRealSkillLevel(Skill.SAILING) >= task.getLevel();
+	}
+
+	private Color getColor(boolean isTaskCompleted, boolean hasTaskRequirement)
+	{
+		if (isTaskCompleted)
+		{
+			return colorCharted;
+		}
+
+		if (hasTaskRequirement)
+		{
+			return colorUncharted;
+		}
+
+		return colorRequirementsUnmet;
+	}
+
+	private boolean taskIsHidden(SailingConfig.ShowChartsMode mode, boolean completed, boolean meetsRequirements)
+	{
+		switch (mode)
+		{
+			case ALL:
+				return false;
+
+			case CHARTED:
+				return !completed;
+
+			case UNCHARTED:
+				return completed;
+
+			case REQUIREMENTS_MET:
+				return completed || !meetsRequirements;
+
+			default:
+				return true;
+		}
 	}
 }

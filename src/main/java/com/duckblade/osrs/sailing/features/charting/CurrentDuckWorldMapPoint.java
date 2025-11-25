@@ -4,10 +4,10 @@ import java.awt.image.BufferedImage;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 
-public class WeatherChartingWorldMapPoint extends WorldMapPoint
+public class CurrentDuckWorldMapPoint extends WorldMapPoint
 {
 
-	public WeatherChartingWorldMapPoint(final WorldPoint worldPoint, BufferedImage icon, String name)
+	public CurrentDuckWorldMapPoint(final WorldPoint worldPoint, BufferedImage icon, String name)
 	{
 		super(worldPoint, icon);
 

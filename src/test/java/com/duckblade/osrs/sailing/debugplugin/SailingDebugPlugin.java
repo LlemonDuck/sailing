@@ -32,13 +32,21 @@ public class SailingDebugPlugin extends Plugin
 	@Inject
 	private SailingDebugBoatInfoOverlay boatInfoOverlayPanel;
 
+	@Inject
+	private SailingDebugLocalBoatInfoOverlayPanel localBoatInfoOverlayPanel;
+
+	@Inject
+	private SailingDebugTlwpOverlay tlwpOverlay;
+
 	private List<?> components;
 
 	@Override
 	protected void startUp() throws Exception
 	{
 		components = Arrays.asList(
-			boatInfoOverlayPanel
+			boatInfoOverlayPanel,
+			localBoatInfoOverlayPanel,
+			tlwpOverlay
 		);
 
 		components.forEach(c ->

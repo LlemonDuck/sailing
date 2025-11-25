@@ -50,7 +50,7 @@ public class CrewmateOverheadMuter
 			return;
 		}
 
-		log.debug("muting npc {}={} in wv {}", ((NPC) npc).getId(), npc.getName(), npc.getWorldView().getId());
+		log.trace("muting npc {}={} in wv {}", ((NPC) npc).getId(), npc.getName(), npc.getWorldView().getId());
 		npc.setOverheadCycle(-1);
 		npc.setOverheadText("");
 	}

@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
-import org.junit.Ignore;
-import org.junit.Test;
 
 public class GenerateSeaChartTasks
 {
@@ -19,9 +17,7 @@ public class GenerateSeaChartTasks
 	private static final String OBJECT_ID_1_URL = "https://github.com/runelite/runelite/raw/refs/heads/master/runelite-api/src/main/java/net/runelite/api/gameval/ObjectID1.java";
 	private static final String NPC_ID_URL = "https://github.com/runelite/runelite/raw/refs/heads/master/runelite-api/src/main/java/net/runelite/api/gameval/NpcID.java";
 
-	@Ignore("TODO")
-	@Test
-	public void generateSeaChartTasksFromCsv() throws Exception
+	public static void main(String[] main) throws Exception
 	{
 		Map<Integer, String> varbNames = readConstants(VARBIT_ID_URL);
 		Map<Integer, String> objectNames = readConstants(OBJECT_ID_URL);
@@ -33,6 +29,7 @@ public class GenerateSeaChartTasks
 		System.out.println();
 		System.out.println("import lombok.Getter;");
 		System.out.println("import lombok.RequiredArgsConstructor;");
+		System.out.println("import net.runelite.api.Client;");
 		System.out.println("import net.runelite.api.coords.WorldPoint;");
 		System.out.println("import net.runelite.api.gameval.VarbitID;");
 		System.out.println("import net.runelite.api.gameval.ObjectID;");
@@ -44,7 +41,7 @@ public class GenerateSeaChartTasks
 		System.out.println("{");
 		System.out.println();
 
-		try (Scanner scanner = new Scanner(Objects.requireNonNull(getClass().getResourceAsStream("/chartables.tsv"))))
+		try (Scanner scanner = new Scanner(Objects.requireNonNull(GenerateSeaChartTasks.class.getResourceAsStream("/chartables.tsv"))))
 		{
 			scanner.nextLine(); // skip header
 			while (scanner.hasNextLine())
@@ -58,6 +55,7 @@ public class GenerateSeaChartTasks
 				int y = Integer.parseInt(parts[5]);
 				int dstX = Integer.parseInt(parts[6]);
 				int dstY = Integer.parseInt(parts[7]);
+				int level = Integer.parseInt(parts[8]);
 
 				System.out.print("\t");
 				System.out.print("TASK_");
@@ -110,6 +108,8 @@ public class GenerateSeaChartTasks
 				{
 					System.out.print("null");
 				}
+				System.out.print(", ");
+				System.out.print(level);
 				System.out.println("),");
 			}
 		}
@@ -122,11 +122,17 @@ public class GenerateSeaChartTasks
 		System.out.println("\tprivate final int npcId;");
 		System.out.println("\tprivate final WorldPoint location;");
 		System.out.println("\tprivate final WorldPoint destination;");
+		System.out.println("\tprivate final int level;");
+		System.out.println();
+		System.out.println("\tpublic boolean isComplete(Client client)");
+		System.out.println("\t{");
+		System.out.println("\t\treturn client.getVarbitValue(getCompletionVarb()) != 0;");
+		System.out.println("\t}");
 		System.out.println();
 		System.out.println("}");
 	}
 
-	private Map<Integer, String> readConstants(String url) throws IOException
+	private static Map<Integer, String> readConstants(String url) throws IOException
 	{
 		Map<Integer, String> values = new HashMap<>();
 		try (Scanner scanner = new Scanner(Objects.requireNonNull(new URL(url).openStream())))

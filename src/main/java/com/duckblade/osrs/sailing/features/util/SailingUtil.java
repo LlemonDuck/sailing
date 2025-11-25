@@ -1,21 +1,32 @@
 package com.duckblade.osrs.sailing.features.util;
 
+import com.google.common.collect.ImmutableSet;
 import javax.inject.Inject;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Actor;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.ObjectComposition;
 import net.runelite.api.Player;
+import net.runelite.api.WorldView;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarbitID;
 
+@Slf4j
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class SailingUtil
 {
 
-	public static final int WORLD_ENTITY_TYPE_BOAT = 2;
+	public static final ImmutableSet<Integer> WORLD_ENTITY_TYPE_BOAT = ImmutableSet.of(
+		1, // raft
+		2,
+		3 // 3? confirm sloop?
+	);
 	public static final int ACCOUNT_TYPE_UIM = 2;
 
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public static boolean isSailing(Client client)
 	{
 		return client.getLocalPlayer() != null &&
@@ -46,4 +57,26 @@ public class SailingUtil
 		return def.getImpostor();
 	}
 
+	public static LocalPoint getTopLevelLocalPoint(Client client)
+	{
+		Player player = client.getLocalPlayer();
+		WorldView wv = player.getWorldView();
+		if (wv.isTopLevel())
+		{
+			return player.getLocalLocation();
+		}
+
+		return client.getTopLevelWorldView()
+			.worldEntities()
+			.byIndex(wv.getId())
+			.transformToMainWorld(client.getLocalPlayer().getLocalLocation());
+	}
+
+	public static WorldPoint getTopLevelWorldPoint(Client client)
+	{
+		return WorldPoint.fromLocal(
+			client,
+			getTopLevelLocalPoint(client)
+		);
+	}
 }

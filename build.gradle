@@ -17,6 +17,13 @@ repositories {
 
 def runeLiteVersion = 'latest.release'
 
+def generateSeaChartTasksSources = sourceSets.create("generateSeaChartTasks")
+configurations.create("generateSeaChartTasks") {
+    sourceSets {
+        add(generateSeaChartTasksSources)
+    }
+}
+
 dependencies {
 	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
 
@@ -32,7 +39,7 @@ dependencies {
 }
 
 group = 'com.example'
-version = '1.0-SNAPSHOT'
+version = '1.1.0'
 
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'

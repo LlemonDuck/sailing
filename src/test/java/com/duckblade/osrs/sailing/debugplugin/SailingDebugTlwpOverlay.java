@@ -1,17 +1,19 @@
 package com.duckblade.osrs.sailing.debugplugin;
 
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
-import com.duckblade.osrs.sailing.model.Boat;
+import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
+import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;
-import net.runelite.api.WorldEntity;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.Overlay;
@@ -20,7 +22,8 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
 @Singleton
-public class SailingDebugBoatInfoOverlay extends Overlay
+public class SailingDebugTlwpOverlay
+	extends Overlay
 {
 
 	private final Client client;
@@ -29,11 +32,11 @@ public class SailingDebugBoatInfoOverlay extends Overlay
 	private boolean active;
 
 	@Inject
-	public SailingDebugBoatInfoOverlay(Client client, BoatTracker boatTracker, SailingDebugConfig config)
+	public SailingDebugTlwpOverlay(Client client, BoatTracker boatTracker, SailingDebugConfig config)
 	{
 		this.client = client;
 		this.boatTracker = boatTracker;
-		active = config.boatInfoDefaultOn();
+		active = config.tlwpOverlayDefaultOn();
 
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ALWAYS_ON_TOP);
@@ -42,37 +45,27 @@ public class SailingDebugBoatInfoOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		if (!active)
+		if (!active || !SailingUtil.isSailing(client))
 		{
 			return null;
 		}
 
-		for (WorldEntity we : client.getTopLevelWorldView().worldEntities())
+		LocalPoint tllp = boatTracker.getBoat()
+			.getWorldEntity()
+			.transformToMainWorld(boatTracker.getBoat().getHull().getLocalLocation());
+		Point canvasPoint = Perspective.localToCanvas(client, tllp, 0);
+		if (canvasPoint != null)
 		{
-			LocalPoint location = we.getLocalLocation();
-			if (we.isHiddenForOverlap())
-			{
-				continue;
-			}
+			graphics.setColor(Color.PINK);
+			graphics.drawRect(canvasPoint.getX() - 5, canvasPoint.getY() - 5, 10, 10);
+			graphics.drawRect(canvasPoint.getX(), canvasPoint.getY(), 1, 1);
+		}
 
-			Boat boat = boatTracker.getBoat(we.getWorldView().getId());
-			if (boat == null)
-			{
-				String text = "UNTRACKED BOAT: " + we.getWorldView().getId();
-				Point p = Perspective.getCanvasTextLocation(client, graphics, location, text, 0);
-				if (p != null)
-				{
-					OverlayUtil.renderTextLocation(graphics, p, text, Color.YELLOW);
-				}
-				continue;
-			}
-
-			String text = boat.getDebugString();
-			Point p = Perspective.getCanvasTextLocation(client, graphics, location, text, 0);
-			if (p != null)
-			{
-				OverlayUtil.renderTextLocation(graphics, p, text, Color.BLUE);
-			}
+		WorldPoint tlwp = SailingUtil.getTopLevelWorldPoint(client);
+		Polygon poly = Perspective.getCanvasTilePoly(client, Objects.requireNonNull(LocalPoint.fromWorld(client, tlwp)));
+		if (poly != null)
+		{
+			OverlayUtil.renderPolygon(graphics, poly, Color.magenta);
 		}
 
 		return null;
@@ -81,10 +74,9 @@ public class SailingDebugBoatInfoOverlay extends Overlay
 	@Subscribe
 	public void onCommandExecuted(CommandExecuted e)
 	{
-		if (e.getCommand().equals("boats"))
+		if (e.getCommand().equals("tlwp"))
 		{
 			active = !active;
 		}
 	}
-
 }

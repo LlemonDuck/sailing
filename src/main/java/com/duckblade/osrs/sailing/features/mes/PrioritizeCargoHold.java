@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Menu;
+import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.events.PostMenuSort;
 import net.runelite.client.eventbus.Subscribe;
@@ -32,7 +33,7 @@ public class PrioritizeCargoHold
 		.collect(Collectors.toUnmodifiableSet());
 
 	private static final Comparator<MenuEntry> MENU_ENTRY_COMPARATOR =
-		Comparator.comparing((me) -> CARGO_HOLD_IDS.contains(me.getIdentifier()));
+		Comparator.comparing((me) -> CARGO_HOLD_IDS.contains(me.getIdentifier()) && me.getType() != MenuAction.EXAMINE_OBJECT);
 
 	private final Client client;
 
