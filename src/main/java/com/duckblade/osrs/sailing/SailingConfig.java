@@ -106,7 +106,7 @@ public interface SailingConfig extends Config
 	@ConfigItem(
 			keyName = "dangerousRapidsColour",
 			name = "Dangerous Rapids Colour",
-			description = "Colour to highlight the rapids that are dangerous and you cannot safely sail through",
+			description = "Colour to highlight unnavigable dangerous rapids.",
 			section = SECTION_NAVIGATION,
 			position = 3
 	)
@@ -119,7 +119,7 @@ public interface SailingConfig extends Config
 	@ConfigItem(
 			keyName = "unknownRapidsColour",
 			name = "Unknown Rapids Colour",
-			description = "Colour to highlight the rapids that are unknown whether or not you can safely sail through",
+			description = "Colour to highlight rapids rapids unknown to be navigable or not.",
 			section = SECTION_NAVIGATION,
 			position = 4
 	)
