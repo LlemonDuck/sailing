@@ -31,6 +31,7 @@ public class SpeedBoostInfoBox
 	private final Client client;
 	private final BoatTracker boatTracker;
 
+	private boolean startCountdown;
 	private int speedBoostDuration;
 
 	@Inject
@@ -45,6 +46,7 @@ public class SpeedBoostInfoBox
 	@Override
 	public void shutDown()
 	{
+		startCountdown = false;
 		speedBoostDuration = 0;
 	}
 
@@ -59,15 +61,19 @@ public class SpeedBoostInfoBox
 		String msg = e.getMessage();
 		if (CHAT_LUFF_SAIL.equals(msg) || CHAT_LUFF_STORED.equals(msg))
 		{
-			// offset by 1, onGameTick runs _after_ onChatMessage
-			speedBoostDuration = boatTracker.getBoat().getSpeedBoostDuration() + 1;
+			startCountdown = true;
+			speedBoostDuration = boatTracker.getBoat().getSpeedBoostDuration();
 		}
 	}
 
 	@Subscribe
 	public void onGameTick(GameTick e)
 	{
-		if (speedBoostDuration > 0)
+		if (startCountdown)
+		{
+			startCountdown = false;
+		}
+		else if (speedBoostDuration > 0)
 		{
 			--speedBoostDuration;
 		}
