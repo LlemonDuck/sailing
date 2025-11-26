@@ -61,13 +61,13 @@ public class SailingDebugRouteOverlay
 
 		LocalPoint currentLocation = we.getLocalLocation();
 		int currentOrientation = we.getOrientation();
-		TrueTileIndicator.renderBoatArea(client, g, boat, currentLocation, currentOrientation);
+		TrueTileIndicator.renderBoatArea(client, g, we.getConfig(), currentLocation, currentOrientation);
 
 		LocalPoint targetLocation = we.getTargetLocation();
 		int targetOrientation = we.getTargetOrientation();
 		if (!targetLocation.equals(we.getLocalLocation()) || targetOrientation != currentOrientation)
 		{
-			TrueTileIndicator.renderBoatArea(client, g, boat, targetLocation, targetOrientation);
+			TrueTileIndicator.renderBoatArea(client, g, we.getConfig(), targetLocation, targetOrientation);
 		}
 
 		// boat centre tiles and delta line

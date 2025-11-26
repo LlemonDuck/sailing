@@ -13,6 +13,7 @@ import java.awt.Polygon;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
 import net.runelite.api.WorldEntity;
+import net.runelite.api.WorldEntityConfig;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -76,7 +77,7 @@ public class TrueTileIndicator
 			lastPoint = lp;
 		}
 
-		renderBoatArea(client, g, boat, lp, angle);
+		renderBoatArea(client, g, we.getConfig(), lp, angle);
 
 		var pt = Perspective.localToCanvas(client, we.getLocalLocation(), 0);
 		OverlayUtil.renderTextLocation(g, pt, "(" + dx + ", " + dy + ") d=" + Math.hypot(dx, dy) + " θ=" + angle, indicatorColor);
@@ -84,23 +85,23 @@ public class TrueTileIndicator
 	}
 
 	// public static so it can be used in SailingDebugRouteOverlay
-	public static void renderBoatArea(Client client, Graphics2D g, Boat boat, LocalPoint lp, int angle)
+	public static void renderBoatArea(Client client, Graphics2D g, WorldEntityConfig wec, LocalPoint lp, int angle)
 	{
-		int boatHalfWidth = boat.getSizeClass().getSizeX() * Perspective.LOCAL_HALF_TILE_SIZE;
-		int boatHalfHeight = boat.getSizeClass().getSizeY() * Perspective.LOCAL_HALF_TILE_SIZE;
+		int boatHalfWidth = wec.getBoundsWidth() / 2;
+		int boatHalfHeight = wec.getBoundsHeight() / 2;
 
 		float[] localCoordsX = new float[]{
-			boatHalfWidth,
-			boatHalfWidth,
-			-boatHalfWidth,
-			-boatHalfWidth
+			wec.getBoundsX() + boatHalfWidth,
+			wec.getBoundsX() + boatHalfWidth,
+			wec.getBoundsX() - boatHalfWidth,
+			wec.getBoundsX() - boatHalfWidth
 		};
 
 		float[] localCoordsY = new float[]{
-			-boatHalfHeight,
-			+boatHalfHeight,
-			+boatHalfHeight,
-			-boatHalfHeight
+			wec.getBoundsY() - boatHalfHeight,
+			wec.getBoundsY() + boatHalfHeight,
+			wec.getBoundsY() + boatHalfHeight,
+			wec.getBoundsY() - boatHalfHeight
 		};
 
 		float[] localCoordsZ = new float[]{0, 0, 0, 0};
