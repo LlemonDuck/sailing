@@ -12,7 +12,6 @@ import static net.runelite.api.Perspective.LOCAL_TILE_SIZE;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.gameval.ItemID;
 
 public class SailingGraphicsUtil
 {
