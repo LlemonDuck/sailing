@@ -74,7 +74,7 @@ public class Boat
 		SailTier sailTier = getSailTier();
 		if (sailTier == null)
 		{
-			return 0;
+			return -1;
 		}
 
 		return sailTier.getSpeedBoostDuration(getSizeClass());
