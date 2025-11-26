@@ -29,7 +29,7 @@ public class SpeedBoostInfoBox
 	private final Client client;
 	private final BoatTracker boatTracker;
 
-	private int speedBoostDuration = -1;
+	private int speedBoostDuration;
 
 	@Inject
 	public SpeedBoostInfoBox(SailingPlugin plugin, Client client, SpriteManager spriteManager, BoatTracker boatTracker)
@@ -50,7 +50,7 @@ public class SpeedBoostInfoBox
 	@Override
 	public void shutDown()
 	{
-		speedBoostDuration = -1;
+		speedBoostDuration = 0;
 	}
 
 	@Subscribe
