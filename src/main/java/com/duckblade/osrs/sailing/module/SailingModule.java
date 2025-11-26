@@ -15,6 +15,13 @@ import com.duckblade.osrs.sailing.features.courier.CourierDestinationOverlay;
 import com.duckblade.osrs.sailing.features.crewmates.CrewmateOverheadMuter;
 import com.duckblade.osrs.sailing.features.mes.DeprioSailsOffHelm;
 import com.duckblade.osrs.sailing.features.mes.PrioritizeCargoHold;
+import com.duckblade.osrs.sailing.features.oceanencounters.Castaway;
+import com.duckblade.osrs.sailing.features.oceanencounters.ClueCasket;
+import com.duckblade.osrs.sailing.features.oceanencounters.ClueTurtle;
+import com.duckblade.osrs.sailing.features.oceanencounters.GiantClam;
+import com.duckblade.osrs.sailing.features.oceanencounters.LostShipment;
+import com.duckblade.osrs.sailing.features.oceanencounters.MysteriousGlow;
+import com.duckblade.osrs.sailing.features.oceanencounters.OceanMan;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -42,12 +49,19 @@ public class SailingModule extends AbstractModule
 		BarracudaTrialHelper barracudaTrialHelper,
 		BoatTracker boatTracker,
 		CargoHoldTracker cargoHoldTracker,
+		Castaway castaway,
+		ClueCasket clueCasket,
+		ClueTurtle clueTurtle,
 		CourierDestinationOverlay courierDestinationOverlay,
 		CrewmateOverheadMuter crewmateOverheadMuter,
 		CurrentDuckTaskTracker currentDuckTaskTracker,
 		DeprioSailsOffHelm deprioSailsOffHelm,
+		GiantClam giantClam,
+		LostShipment lostShipment,
 		LuffOverlay luffOverlay,
 		MermaidTaskSolver mermaidTaskSolver,
+		MysteriousGlow mysteriousGlow,
+		OceanMan oceanMan,
 		PrioritizeCargoHold prioritizeCargoHold,
 		RapidsOverlay rapidsOverlay,
 		SeaChartOverlay seaChartOverlay,
@@ -59,12 +73,19 @@ public class SailingModule extends AbstractModule
 		var builder = ImmutableSet.<PluginLifecycleComponent>builder()
 			.add(barracudaTrialHelper)
 			.add(boatTracker)
+			.add(castaway)
+			.add(clueCasket)
+			.add(clueTurtle)
 			.add(courierDestinationOverlay)
 			.add(crewmateOverheadMuter)
 			.add(currentDuckTaskTracker)
 			.add(deprioSailsOffHelm)
+			.add(giantClam)
+			.add(lostShipment)
 			.add(luffOverlay)
 			.add(mermaidTaskSolver)
+			.add(mysteriousGlow)
+			.add(oceanMan)
 			.add(prioritizeCargoHold)
 			.add(rapidsOverlay)
 			.add(seaChartOverlay)
