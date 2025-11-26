@@ -93,7 +93,7 @@ public interface SailingConfig extends Config
 	@ConfigItem(
 			keyName = "safeRapidsColour",
 			name = "Safe Rapids Colour",
-			description = "Colour to highlight the rapids that are safe and you are able to sail through",
+			description = "Colour to highlight safely navigable rapids.",
 			section = SECTION_NAVIGATION,
 			position = 2
 	)
