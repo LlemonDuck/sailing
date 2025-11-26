@@ -441,6 +441,7 @@ public class MermaidTaskSolver
 	private SeaChartTask task;
 	private Multiset<Integer> solution;
 	private int pendingInput = -1;
+	private int pendingCount = 0;
 
 	@Override
 	public boolean isEnabled(SailingConfig config)
@@ -485,9 +486,11 @@ public class MermaidTaskSolver
 
 		if (pendingInput != -1)
 		{
-			log.debug("Committing input {} with implicit count 1 due to ge prompt reappearing", pendingInput);
-			inputs.add(pendingInput);
+			int countToAdd = pendingCount > 0 ? pendingCount : 1;
+			log.debug("Committing input {} with count {} due to ge prompt reappearing", pendingInput, countToAdd);
+			inputs.add(pendingInput, countToAdd);
 			pendingInput = -1;
+			pendingCount = 0;
 		}
 
 		Multiset<Integer> notYetEntered = Multisets.difference(solution, inputs);
@@ -538,9 +541,11 @@ public class MermaidTaskSolver
 		{
 			clientThread.invokeLater(() ->
 			{
-				int desiredCount = solution.count(pendingInput);
+				Multiset<Integer> notYetEntered = Multisets.difference(solution, inputs);
+				int desiredCount = notYetEntered.count(pendingInput);
 				if (desiredCount != 0)
 				{
+					pendingCount = desiredCount;
 					client.setVarcStrValue(VarClientID.MESLAYERINPUT, String.valueOf(desiredCount)); // set the value
 					client.runScript(client.getWidget(InterfaceID.Chatbox.MES_TEXT2).getOnKeyListener()); // make ui refresh to pick up the value
 				}
@@ -602,5 +607,6 @@ public class MermaidTaskSolver
 		solution = null;
 		inputs.clear();
 		pendingInput = -1;
+		pendingCount = 0;
 	}
 }
