@@ -6,6 +6,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.Notification;
 
 @ConfigGroup(SailingConfig.CONFIG_GROUP)
 public interface SailingConfig extends Config
@@ -78,6 +79,14 @@ public interface SailingConfig extends Config
 	)
 	String SECTION_CARGO_HOLD_TRACKING = "cargoHoldTracking";
 
+	@ConfigSection(
+		name = "Ocean Encounters",
+		description = "Settings for the ocean encounter random events.",
+		position = 900,
+		closedByDefault = true
+	)
+	String SECTION_OCEAN_ENCOUNTERS = "oceanEncounters";
+
 	@ConfigItem(
 		keyName = "highlightRapids",
 		name = "Highlight Rapids",
@@ -123,6 +132,18 @@ public interface SailingConfig extends Config
 		position = 1
 	)
 	default boolean highlightTrimmableSails()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+			keyName = "showSpeedBoostInfoBox",
+			name = "Show Speed Boost InfoBox",
+			description = "Show an InfoBox with the duration of your active speed boost.",
+			section = SECTION_FACILITIES,
+			position = 2
+	)
+	default boolean showSpeedBoostInfoBox()
 	{
 		return true;
 	}
@@ -257,6 +278,18 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "chartingMermaidSolver",
+		name = "Mermaid Task Solver",
+		description = "Whether to provide a helper for mermaid charting tasks.",
+		section = SECTION_SEA_CHARTING,
+		position = 7
+	)
+	default boolean chartingMermaidSolver()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "barracudaHighlightLostCrates",
 		name = "Highlight Crates",
 		description = "Highlight lost crates that need to be collected during Barracuda Trials.",
@@ -306,4 +339,87 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
+	@ConfigItem(
+		keyName = "notifyGiantClamSpawn",
+		name = "Notify on Giant clam",
+		description = "Notify when a giant clam spawns.",
+		section = SECTION_OCEAN_ENCOUNTERS,
+		position = 1
+	)
+	default Notification notifyGiantClamSpawn()
+	{
+		return Notification.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "notifyClueTurtleSpawn",
+		name = "Notify on Clue turtle",
+		description = "Notify when a clue turtle spawns.",
+		section = SECTION_OCEAN_ENCOUNTERS,
+		position = 2
+	)
+	default Notification notifyClueTurtleSpawn()
+	{
+		return Notification.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "notifyCastawaySpawn",
+		name = "Notify on Castaway",
+		description = "Notify when a castaway spawns.",
+		section = SECTION_OCEAN_ENCOUNTERS,
+		position = 3
+	)
+	default Notification notifyCastawaySpawn()
+	{
+		return Notification.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "notifyClueCasketSpawn",
+		name = "Notify on Clue casket",
+		description = "Notify when a clue casket spawns.",
+		section = SECTION_OCEAN_ENCOUNTERS,
+		position = 4
+	)
+	default Notification notifyClueCasketSpawn()
+	{
+		return Notification.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "notifyLostShipmentSpawn",
+		name = "Notify on Lost shipment",
+		description = "Notify when a lost shipment spawns.",
+		section = SECTION_OCEAN_ENCOUNTERS,
+		position = 5
+	)
+	default Notification notifyLostShipmentSpawn()
+	{
+		return Notification.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "notifyMysteriousGlowSpawn",
+		name = "Notify on Mysterious glow",
+		description = "Notify when a mysterious glow spawns.",
+		section = SECTION_OCEAN_ENCOUNTERS,
+		position = 6
+	)
+	default Notification notifyMysteriousGlowSpawn()
+	{
+		return Notification.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "notifyOceanManSpawn",
+		name = "Notify on Ocean man",
+		description = "Notify when an ocean man spawns.",
+		section = SECTION_OCEAN_ENCOUNTERS,
+		position = 7
+	)
+	default Notification notifyOceanManSpawn()
+	{
+		return Notification.OFF;
+	}
 }

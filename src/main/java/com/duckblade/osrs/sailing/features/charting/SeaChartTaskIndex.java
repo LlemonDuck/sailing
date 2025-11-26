@@ -144,9 +144,9 @@ public class SeaChartTaskIndex implements PluginLifecycleComponent
 
 	public SeaChartTask findTask(WorldPoint wp, int distance, Predicate<SeaChartTask> filter)
 	{
-		for (int x = -5; x <= 5; x++)
+		for (int x = -distance; x <= distance; x++)
 		{
-			for (int y = -5; y <= 5; y++)
+			for (int y = -distance; y <= distance; y++)
 			{
 				SeaChartTask nearby = tasksByLocation.get(new WorldPoint(wp.getX() + x, wp.getY() + y, 0));
 				if (nearby != null && filter.test(nearby))

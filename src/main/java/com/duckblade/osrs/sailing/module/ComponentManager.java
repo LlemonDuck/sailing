@@ -13,6 +13,8 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.ui.overlay.infobox.InfoBox;
+import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
 import net.runelite.client.util.GameEventManager;
 
 /**
@@ -29,6 +31,7 @@ public class ComponentManager
 
 	private final EventBus eventBus;
 	private final OverlayManager overlayManager;
+	private final InfoBoxManager infoBoxManager;
 	private final GameEventManager gameEventManager;
 	private final SailingConfig config;
 	private final Set<PluginLifecycleComponent> components;
@@ -104,6 +107,10 @@ public class ComponentManager
 			{
 				overlayManager.add((Overlay) component);
 			}
+			if (component instanceof InfoBox)
+			{
+				infoBoxManager.addInfoBox((InfoBox) component);
+			}
 
 			gameEventManager.simulateGameEvents(component);
 			states.put(component, true);
@@ -120,6 +127,10 @@ public class ComponentManager
 		if (component instanceof Overlay)
 		{
 			overlayManager.remove((Overlay) component);
+		}
+		if (component instanceof InfoBox)
+		{
+			infoBoxManager.removeInfoBox((InfoBox) component);
 		}
 
 		if (!states.get(component))

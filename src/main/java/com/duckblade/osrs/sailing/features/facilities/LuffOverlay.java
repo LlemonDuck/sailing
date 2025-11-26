@@ -12,6 +12,7 @@ import java.awt.Shape;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.events.ChatMessage;
@@ -59,7 +60,7 @@ public class LuffOverlay
 	@Subscribe
 	public void onChatMessage(ChatMessage e)
 	{
-		if (!SailingUtil.isSailing(client))
+		if (!SailingUtil.isSailing(client) || e.getType() != ChatMessageType.GAMEMESSAGE)
 		{
 			return;
 		}

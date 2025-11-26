@@ -1,41 +1,47 @@
 package com.duckblade.osrs.sailing.features.charting;
 
 import com.duckblade.osrs.sailing.SailingConfig;
+import com.duckblade.osrs.sailing.features.util.BoatTracker;
+import com.duckblade.osrs.sailing.features.util.SailingGraphicsUtil;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Actor;
 import net.runelite.api.Client;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.NPC;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.InteractingChanged;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayLayer;
+import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.awt.image.BufferedImage;
-
+@Slf4j
 @Singleton
 public class WeatherTaskTracker
+	extends Overlay
 	implements PluginLifecycleComponent
 {
 
-	@Inject
-	private Client client;
 
-	@Inject
-	private ItemManager itemManager;
-
-	@Inject
-	private WorldMapPointManager worldMapPointManager;
-
-	@Inject
-	private SeaChartTaskIndex taskIndex;
+	private final Client client;
+	private final ItemManager itemManager;
+	private final WorldMapPointManager worldMapPointManager;
+	private final SeaChartTaskIndex taskIndex;
+	private final BoatTracker boatTracker;
 
 	@Getter
 	private SeaChartTask activeTask;
@@ -47,6 +53,19 @@ public class WeatherTaskTracker
 
 	// the active task state as indicated by the ID of the last weather device we had in the inventory
 	private int lastState = -1;
+
+	@Inject
+	public WeatherTaskTracker(Client client, ItemManager itemManager, WorldMapPointManager worldMapPointManager, SeaChartTaskIndex taskIndex, BoatTracker boatTracker)
+	{
+		this.client = client;
+		this.itemManager = itemManager;
+		this.worldMapPointManager = worldMapPointManager;
+		this.taskIndex = taskIndex;
+		this.boatTracker = boatTracker;
+
+		setPosition(OverlayPosition.DYNAMIC);
+		setLayer(OverlayLayer.ABOVE_SCENE);
+	}
 
 	@Override
 	public boolean isEnabled(SailingConfig config)
@@ -133,5 +152,25 @@ public class WeatherTaskTracker
 		}
 
 		lastState = newState;
+	}
+
+	@Override
+	public Dimension render(Graphics2D g)
+	{
+		if (activeTask == null)
+		{
+			return null;
+		}
+
+		WorldPoint dest = lastState == ItemID.SAILING_CHARTING_WEATHER_STATION_EMPTY ? activeTask.getDestination() : activeTask.getLocation();
+		SailingGraphicsUtil.renderBoatArrowTowardPoint(
+			g,
+			client,
+			boatTracker,
+			dest,
+			Color.ORANGE
+		);
+
+		return null;
 	}
 }

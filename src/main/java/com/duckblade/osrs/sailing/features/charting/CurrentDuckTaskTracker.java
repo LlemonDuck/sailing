@@ -1,6 +1,8 @@
 package com.duckblade.osrs.sailing.features.charting;
 
 import com.duckblade.osrs.sailing.SailingConfig;
+import com.duckblade.osrs.sailing.features.util.BoatTracker;
+import com.duckblade.osrs.sailing.features.util.SailingGraphicsUtil;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import java.awt.Color;
@@ -42,6 +44,7 @@ public class CurrentDuckTaskTracker
 	private final ItemManager itemManager;
 	private final WorldMapPointManager worldMapPointManager;
 	private final SeaChartTaskIndex taskIndex;
+	private final BoatTracker boatTracker;
 
 	private BufferedImage sprite;
 	private SeaChartTask activeTask;
@@ -143,8 +146,13 @@ public class CurrentDuckTaskTracker
 			OverlayUtil.renderTileOverlay(client, graphics, destLp, sprite, Color.GREEN);
 		}
 
-		// todo directional arrow?
-		// todo offscreen handling?
+		SailingGraphicsUtil.renderBoatArrowTowardPoint(
+			graphics,
+			client,
+			boatTracker,
+			dest,
+			Color.ORANGE
+		);
 
 		return null;
 	}
