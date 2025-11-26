@@ -5,6 +5,7 @@ import com.duckblade.osrs.sailing.SailingPlugin;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameTick;
@@ -56,7 +57,7 @@ public class SpeedBoostInfoBox
 	@Subscribe
 	public void onChatMessage(ChatMessage e)
 	{
-		if (!SailingUtil.isSailing(client))
+		if (e.getType() != ChatMessageType.GAMEMESSAGE || !SailingUtil.isSailing(client))
 		{
 			return;
 		}
