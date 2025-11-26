@@ -11,6 +11,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import net.runelite.api.Client;
+import net.runelite.api.Constants;
 import net.runelite.api.Perspective;
 import net.runelite.api.WorldEntity;
 import net.runelite.api.WorldEntityConfig;
@@ -55,6 +56,11 @@ public class TrueTileIndicator
 	public Dimension render(Graphics2D g)
 	{
 		if (!SailingUtil.isSailing(client))
+		{
+			return null;
+		}
+
+		if (client.getTopLevelWorldView().getYellowClickAction() != Constants.CLICK_ACTION_SET_HEADING)
 		{
 			return null;
 		}
