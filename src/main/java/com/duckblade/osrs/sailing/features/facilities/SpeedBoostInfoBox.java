@@ -9,12 +9,11 @@ import net.runelite.api.Client;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.game.SpriteManager;
 import net.runelite.client.ui.overlay.infobox.InfoBox;
-import net.runelite.client.util.ImageUtil;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.Color;
-import java.awt.image.BufferedImage;
 
 @Singleton
 public class SpeedBoostInfoBox
@@ -22,32 +21,36 @@ public class SpeedBoostInfoBox
 	implements PluginLifecycleComponent
 {
 
-	private static final BufferedImage ICON_LUFF = ImageUtil.loadImageResource(SpeedBoostInfoBox.class, "speed-boost-info-box.png");
+	private static final int ICON_ID_LUFF = 7075;
 
 	private static final String CHAT_LUFF_SAIL = "You trim the sails, catching the wind for a burst of speed!";
 	private static final String CHAT_LUFF_STORED = "You release the wind mote for a burst of speed!";
 
-	private final SailingConfig config;
 	private final Client client;
 	private final BoatTracker boatTracker;
 
-	private boolean startCountdown;
-	private int speedBoostDuration;
+	private int speedBoostDuration = -1;
 
 	@Inject
-	public SpeedBoostInfoBox(SailingPlugin plugin, SailingConfig config, Client client, BoatTracker boatTracker)
+	public SpeedBoostInfoBox(SailingPlugin plugin, Client client, SpriteManager spriteManager, BoatTracker boatTracker)
 	{
-		super(ICON_LUFF, plugin);
-		this.config = config;
+		super(null, plugin);
+		spriteManager.getSpriteAsync(ICON_ID_LUFF, 0, this);
+
 		this.client = client;
 		this.boatTracker = boatTracker;
 	}
 
 	@Override
+	public boolean isEnabled(SailingConfig config)
+	{
+		return config.showSpeedBoostInfoBox();
+	}
+
+	@Override
 	public void shutDown()
 	{
-		startCountdown = false;
-		speedBoostDuration = 0;
+		speedBoostDuration = -1;
 	}
 
 	@Subscribe
@@ -61,19 +64,15 @@ public class SpeedBoostInfoBox
 		String msg = e.getMessage();
 		if (CHAT_LUFF_SAIL.equals(msg) || CHAT_LUFF_STORED.equals(msg))
 		{
-			startCountdown = true;
-			speedBoostDuration = boatTracker.getBoat().getSpeedBoostDuration();
+			// offset by 1, onGameTick fires _after_ onChatMessage
+			speedBoostDuration = boatTracker.getBoat().getSpeedBoostDuration() + 1;
 		}
 	}
 
 	@Subscribe
 	public void onGameTick(GameTick e)
 	{
-		if (startCountdown)
-		{
-			startCountdown = false;
-		}
-		else if (speedBoostDuration > 0)
+		if (speedBoostDuration > 0)
 		{
 			--speedBoostDuration;
 		}
@@ -82,7 +81,7 @@ public class SpeedBoostInfoBox
 	@Override
 	public boolean render()
 	{
-		return config.showSpeedBoostInfoBox() && speedBoostDuration > 0;
+		return speedBoostDuration > 0;
 	}
 
 	@Override
