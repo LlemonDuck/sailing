@@ -6,6 +6,8 @@ import com.duckblade.osrs.sailing.features.facilities.LuffOverlay;
 import com.duckblade.osrs.sailing.features.facilities.SpeedBoostInfoBox;
 import com.duckblade.osrs.sailing.features.navigation.RapidsOverlay;
 import com.duckblade.osrs.sailing.features.barracudatrials.BarracudaTrialHelper;
+import com.duckblade.osrs.sailing.features.barracudatrials.BarracudaTrialTracker;
+import com.duckblade.osrs.sailing.features.barracudatrials.RumBoatOverlay;
 import com.duckblade.osrs.sailing.features.charting.CurrentDuckTaskTracker;
 import com.duckblade.osrs.sailing.features.charting.SeaChartOverlay;
 import com.duckblade.osrs.sailing.features.charting.SeaChartPanelOverlay;
@@ -48,6 +50,7 @@ public class SailingModule extends AbstractModule
 		@Named("developerMode") boolean developerMode,
 
 		BarracudaTrialHelper barracudaTrialHelper,
+		BarracudaTrialTracker barracudaTrialTracker,
 		BoatTracker boatTracker,
 		CargoHoldTracker cargoHoldTracker,
 		Castaway castaway,
@@ -65,6 +68,7 @@ public class SailingModule extends AbstractModule
 		OceanMan oceanMan,
 		PrioritizeCargoHold prioritizeCargoHold,
 		RapidsOverlay rapidsOverlay,
+		RumBoatOverlay rumBoatOverlay,
 		SeaChartOverlay seaChartOverlay,
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
@@ -74,6 +78,7 @@ public class SailingModule extends AbstractModule
 	{
 		var builder = ImmutableSet.<PluginLifecycleComponent>builder()
 			.add(barracudaTrialHelper)
+			.add(barracudaTrialTracker)
 			.add(boatTracker)
 			.add(castaway)
 			.add(clueCasket)
@@ -90,6 +95,7 @@ public class SailingModule extends AbstractModule
 			.add(oceanMan)
 			.add(prioritizeCargoHold)
 			.add(rapidsOverlay)
+			.add(rumBoatOverlay)
 			.add(seaChartOverlay)
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
