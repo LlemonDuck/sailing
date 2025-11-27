@@ -39,6 +39,7 @@ Sailing quality-of-life for charting, navigation, facilities, and more.
 ## Barracuda Trials
 - Highlight Crates: Highlights lost crates to collect during Barracuda Trials.
   - Crate Colour: Customize the highlight colour (default orange).
+- Hide Portal Transitions: Hides the transition animation when taking a portal in The Gwenith Glide.
 
 ## Courier Tasks
 - Destination on Items: Shows the destination port directly on cargo crates in your inventory and cargo hold.
