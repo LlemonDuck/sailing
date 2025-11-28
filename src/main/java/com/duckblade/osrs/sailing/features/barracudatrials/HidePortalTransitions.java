@@ -30,16 +30,18 @@ public class HidePortalTransitions
 	@Subscribe
 	public void onScriptPreFired(ScriptPreFired event)
 	{
+		if (event.getScriptId() != FADE_OUT_TRANSITION_SCRIPT_ID)
+		{
+			return;
+		}
+
 		if (!SailingUtil.isSailing(client))
 		{
 			return;
 		}
 
-		if (event.getScriptId() == FADE_OUT_TRANSITION_SCRIPT_ID)
-		{
-			event.getScriptEvent().getArguments()[4] = 255;
-			event.getScriptEvent().getArguments()[5] = 0;
-		}
+		event.getScriptEvent().getArguments()[4] = 255;
+		event.getScriptEvent().getArguments()[5] = 0;
 	}
 
 }
