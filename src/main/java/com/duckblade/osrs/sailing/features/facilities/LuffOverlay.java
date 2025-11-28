@@ -24,6 +24,7 @@ import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
+import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
 import java.util.Set;
 
 @Slf4j
@@ -49,15 +50,17 @@ public class LuffOverlay
 	private final Client client;
 	private final SailingConfig config;
 	private final BoatTracker boatTracker;
+	private final ModelOutlineRenderer modelOutlineRenderer;
 
 	private boolean needLuff = false;
 
 	@Inject
-	public LuffOverlay(Client client, SailingConfig config, BoatTracker boatTracker)
+	public LuffOverlay(Client client, SailingConfig config, BoatTracker boatTracker, ModelOutlineRenderer modelOutlineRenderer)
 	{
 		this.client = client;
 		this.config = config;
 		this.boatTracker = boatTracker;
+		this.modelOutlineRenderer = modelOutlineRenderer;
 
 		setLayer(OverlayLayer.ABOVE_SCENE);
 		setPosition(OverlayPosition.DYNAMIC);
@@ -114,10 +117,24 @@ public class LuffOverlay
 
 		Boat boat = boatTracker.getBoat();
 		GameObject sail = boat != null ? boat.getSail() : null;
-		Shape convextHull = sail != null ? sail.getConvexHull() : null;
-		if (convextHull != null)
+		if (sail == null)
 		{
-			OverlayUtil.renderPolygon(g, convextHull, Color.green);
+			return null;
+		}
+
+		SailingConfig.SailHighlightMode mode = config.sailHighlightMode();
+
+		if (mode == SailingConfig.SailHighlightMode.AREA)
+		{
+			Shape shape = sail.getConvexHull();
+			if (shape != null)
+			{
+				OverlayUtil.renderPolygon(g, shape, Color.green);
+			}
+		}
+		else if (mode == SailingConfig.SailHighlightMode.SAIL)
+		{
+			modelOutlineRenderer.drawOutline(sail, 2, Color.green, 250);
 		}
 
 		return null;
