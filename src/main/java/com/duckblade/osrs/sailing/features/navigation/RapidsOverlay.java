@@ -35,10 +35,6 @@ public class RapidsOverlay
 	implements PluginLifecycleComponent
 {
 
-	private static final Color COLOR_RAPID_SAFE = Color.CYAN;
-	private static final Color COLOR_RAPID_DANGER = Color.RED;
-	private static final Color COLOR_RAPID_UNKNOWN = Color.YELLOW;
-
 	private static final Set<Integer> RAPIDS_IDS = ImmutableSet.of(
 		ObjectID.SAILING_RAPIDS,
 		ObjectID.SAILING_RAPIDS_STRONG,
@@ -128,6 +124,10 @@ public class RapidsOverlay
 
 	private final Set<GameObject> rapids = new HashSet<>();
 
+	private Color safeRapidsColour;
+	private Color dangerousRapidsColour;
+	private Color unknownRapidsColour;
+
 	@Inject
 	public RapidsOverlay(Client client, SailingConfig config, BoatTracker boatTracker)
 	{
@@ -142,6 +142,9 @@ public class RapidsOverlay
 	@Override
 	public boolean isEnabled(SailingConfig config)
 	{
+		safeRapidsColour = config.safeRapidsColor();
+		dangerousRapidsColour = config.dangerousRapidsColour();
+		unknownRapidsColour = config.unknownRapidsColour();
 		return config.highlightRapids();
 	}
 
@@ -201,26 +204,26 @@ public class RapidsOverlay
 		HelmTier minTier = MIN_HELM_TIER_BY_RAPID_TYPE.get(objId);
 		if (minTier == null)
 		{
-			return COLOR_RAPID_UNKNOWN;
+			return unknownRapidsColour;
 		}
 
 		Boat boat = boatTracker.getBoat();
 		if (boat == null)
 		{
-			return COLOR_RAPID_UNKNOWN;
+			return unknownRapidsColour;
 		}
 
 		HelmTier helmTier = boat.getHelmTier();
 		if (helmTier == null)
 		{
-			return COLOR_RAPID_UNKNOWN;
+			return unknownRapidsColour;
 		}
 
 		if (helmTier.ordinal() >= minTier.ordinal())
 		{
-			return COLOR_RAPID_SAFE;
+			return safeRapidsColour;
 		}
 
-		return COLOR_RAPID_DANGER;
+		return dangerousRapidsColour;
 	}
 }

@@ -109,6 +109,70 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+			keyName = "safeRapidsColour",
+			name = "Safe Rapids Colour",
+			description = "Colour to highlight safely navigable rapids.",
+			section = SECTION_NAVIGATION,
+			position = 2
+	)
+	@Alpha
+	default Color safeRapidsColor()
+	{
+		return Color.CYAN;
+	}
+
+	@ConfigItem(
+			keyName = "dangerousRapidsColour",
+			name = "Dangerous Rapids Colour",
+			description = "Colour to highlight unnavigable dangerous rapids.",
+			section = SECTION_NAVIGATION,
+			position = 3
+	)
+	@Alpha
+	default Color dangerousRapidsColour()
+	{
+		return Color.RED;
+	}
+
+	@ConfigItem(
+			keyName = "unknownRapidsColour",
+			name = "Unknown Rapids Colour",
+			description = "Colour to highlight rapids rapids unknown to be navigable or not.",
+			section = SECTION_NAVIGATION,
+			position = 4
+	)
+	@Alpha
+	default Color unknownRapidsColour()
+	{
+		return Color.YELLOW;
+	}
+
+	@ConfigItem(
+			keyName = "highlightLightningCloudStrikes",
+			name = "Highlight Lightning Cloud Strikes",
+			description = "Highlights the lightning clouds that are about to strike and should be avoided",
+			section = SECTION_NAVIGATION,
+			position = 5
+	)
+	default boolean highlightLightningCloudStrikes()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+			keyName = "lightningCloudStrikeColour",
+			name = "Lightning Strike Colour",
+			description = "Colour to highlight lightning cloud strikes. Colour will appear darker when about to strike.",
+			section = SECTION_NAVIGATION,
+			position = 6
+	)
+	@Alpha
+	default Color lightningCloudStrikeColour()
+	{
+		return new Color(210, 109, 3);
+	}
+
+	@ConfigItem(
 		keyName = "highlightTrimmableSails",
 		name = "Highlight Trimmable Sails",
 		description = "Highlight sails when they require trimming.",
