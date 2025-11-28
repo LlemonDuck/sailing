@@ -375,6 +375,18 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+			keyName = "barracudaJubblyJiveShowToadyTargets",
+			name = "JJ: Show Toady Targets",
+			description = "Show which outcrops need toadies thrown at them in the Jubbly Jive course.",
+			section = SECTION_BARRACUDA_TRIALS,
+			position = 4
+	)
+	default boolean barracudaJubblyJiveShowToadyTargets()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "courierItemIdentification",
 		name = "Destination on Items",
 		description = "Show the destination port on cargo crates in your inventory and cargo hold.",
