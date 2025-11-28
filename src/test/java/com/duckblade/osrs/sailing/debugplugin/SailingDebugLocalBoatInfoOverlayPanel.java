@@ -2,8 +2,10 @@ package com.duckblade.osrs.sailing.debugplugin;
 
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.model.Boat;
+import com.duckblade.osrs.sailing.model.SalvagingHookTier;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -71,7 +73,11 @@ public class SailingDebugLocalBoatInfoOverlayPanel
 		getPanelComponent().getChildren()
 			.add(LineComponent.builder()
 				.left("Hook")
-				.right(String.valueOf(boat.getSalvagingHookTier()))
+				.right(boat
+					.getSalvagingHookTiers()
+					.stream()
+					.map(SalvagingHookTier::toString)
+					.collect(Collectors.joining(", ", "[", "]")))
 				.build());
 
 		getPanelComponent().getChildren()

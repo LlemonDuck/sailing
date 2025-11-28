@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.ObjectComposition;
+import net.runelite.api.Perspective;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.WorldViewUnloaded;
@@ -27,7 +28,7 @@ import net.runelite.client.ui.overlay.OverlayUtil;
 
 @Slf4j
 @Singleton
-public class BarracudaTrialHelper
+public class LostCargoHighlighter
 	extends Overlay
 	implements PluginLifecycleComponent
 {
@@ -229,7 +230,7 @@ public class BarracudaTrialHelper
 	private Color crateColour;
 
 	@Inject
-	public BarracudaTrialHelper(Client client)
+	public LostCargoHighlighter(Client client)
 	{
 		this.client = client;
 
@@ -283,7 +284,11 @@ public class BarracudaTrialHelper
 			ObjectComposition def = SailingUtil.getTransformedObject(client, o);
 			if (def != null)
 			{
-				OverlayUtil.renderTileOverlay(g, o, "", crateColour);
+				var poly = Perspective.getCanvasTileAreaPoly(client, o.getLocalLocation(), 5);
+				if (poly != null)
+				{
+					OverlayUtil.renderPolygon(g, poly, crateColour);
+				}
 			}
 		}
 

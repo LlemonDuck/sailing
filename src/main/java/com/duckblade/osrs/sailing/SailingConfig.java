@@ -7,6 +7,7 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 import net.runelite.client.config.Notification;
+import net.runelite.client.util.ColorUtil;
 
 @ConfigGroup(SailingConfig.CONFIG_GROUP)
 public interface SailingConfig extends Config
@@ -65,16 +66,24 @@ public interface SailingConfig extends Config
 
 	@ConfigSection(
 		name = "Courier Tasks",
-		description = "Settings for courier tasks (aka port tasks)",
+		description = "Settings for courier tasks (AKA port tasks).",
 		position = 700,
 		closedByDefault = true
 	)
 	String SECTION_COURIER_TASKS = "courier";
 
 	@ConfigSection(
+		name = "Salvaging",
+		description = "Settings for shipwreck salvaging.",
+		position = 800,
+		closedByDefault = true
+	)
+	String SECTION_SALVAGING = "salvaging";
+
+	@ConfigSection(
 		name = "Cargo Hold Tracking",
 		description = "Settings for tracking the contents of your cargo hold.",
-		position = 800,
+		position = 900,
 		closedByDefault = true
 	)
 	String SECTION_CARGO_HOLD_TRACKING = "cargoHoldTracking";
@@ -82,7 +91,7 @@ public interface SailingConfig extends Config
 	@ConfigSection(
 		name = "Ocean Encounters",
 		description = "Settings for the ocean encounter random events.",
-		position = 900,
+		position = 1000,
 		closedByDefault = true
 	)
 	String SECTION_OCEAN_ENCOUNTERS = "oceanEncounters";
@@ -309,6 +318,93 @@ public interface SailingConfig extends Config
 		position = 1
 	)
 	default boolean courierItemIdentification()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "salvagingHighlightActiveWrecks",
+		name = "Highlight Active Locations",
+		description = "Whether to highlight active shipwrecks.",
+		section = SECTION_SALVAGING,
+		position = 1
+	)
+	default boolean salvagingHighlightActiveWrecks()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "salvagingHighlightActiveWrecksColour",
+		name = "Active Colour",
+		description = "Colour to highlight active shipwrecks.",
+		section = SECTION_SALVAGING,
+		position = 2
+	)
+	@Alpha
+	default Color salvagingHighlightActiveWrecksColour()
+	{
+		return Color.GREEN;
+	}
+
+	@ConfigItem(
+		keyName = "salvagingHighlightInactiveWrecks",
+		name = "Highlight Inactive Locations",
+		description = "Whether to highlight inactive shipwrecks.",
+		section = SECTION_SALVAGING,
+		position = 3
+	)
+	default boolean salvagingHighlightInactiveWrecks()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "salvagingHighlightInactiveWrecksColour",
+		name = "Active Colour",
+		description = "Colour to highlight active shipwrecks.",
+		section = SECTION_SALVAGING,
+		position = 4
+	)
+	@Alpha
+	default Color salvagingHighlightInactiveWrecksColour()
+	{
+		return Color.DARK_GRAY;
+	}
+
+	@ConfigItem(
+		keyName = "salvagingHideHighLevelWrecks",
+		name = "High-Level Wrecks",
+		description = "Hide wrecks for which you do not have the required level to salvage.",
+		section = SECTION_SALVAGING,
+		position = 5
+	)
+	default boolean salvagingHighlightHighLevelWrecks()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "salvagingHideHighLevelWrecksColour",
+		name = "High-Level Colour",
+		description = "Colour to highlight wrecks for which you do not have the required level to salvage.",
+		section = SECTION_SALVAGING,
+		position = 6
+	)
+	@Alpha
+	default Color salvagingHighLevelWrecksColour()
+	{
+		return ColorUtil.colorWithAlpha(Color.RED, 64);
+	}
+
+	@ConfigItem(
+		keyName = "cargoHoldDummy",
+		name = "Under Development",
+		description = "This feature is still under development and will be released soon.",
+		section = SECTION_CARGO_HOLD_TRACKING,
+		position = -999
+	)
+	default boolean cargoHoldDummy()
 	{
 		return true;
 	}

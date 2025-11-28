@@ -1,8 +1,14 @@
 package com.duckblade.osrs.sailing.model;
 
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.WorldEntity;
@@ -18,8 +24,10 @@ public class Boat
 	GameObject hull;
 	GameObject sail;
 	GameObject helm;
-	GameObject salvagingHook;
 	GameObject cargoHold;
+
+	@Setter(AccessLevel.NONE)
+	Set<GameObject> salvagingHooks = new HashSet<>();
 
 	// these are intentionally not cached in case the object is transformed without respawning
 	// e.g. helms have a different idle vs in-use id
@@ -38,9 +46,12 @@ public class Boat
 		return helm != null ? HelmTier.fromGameObjectId(helm.getId()) : null;
 	}
 
-	public SalvagingHookTier getSalvagingHookTier()
+	public List<SalvagingHookTier> getSalvagingHookTiers()
 	{
-		return salvagingHook != null ? SalvagingHookTier.fromGameObjectId(salvagingHook.getId()) : null;
+		return salvagingHooks.stream()
+			.mapToInt(GameObject::getId)
+			.mapToObj(SalvagingHookTier::fromGameObjectId)
+			.collect(Collectors.toList());
 	}
 
 	public CargoHoldTier getCargoHoldTier()
@@ -51,6 +62,17 @@ public class Boat
 	public SizeClass getSizeClass()
 	{
 		return hull != null ? SizeClass.fromGameObjectId(hull.getId()) : null;
+	}
+
+	public Set<GameObject> getAllFacilities()
+	{
+		Set<GameObject> facilities = new HashSet<>();
+		facilities.add(hull);
+		facilities.add(sail);
+		facilities.add(helm);
+		facilities.addAll(salvagingHooks);
+		facilities.add(cargoHold);
+		return facilities;
 	}
 
 	public int getCargoCapacity(boolean uim)
@@ -88,7 +110,10 @@ public class Boat
 			getHullTier(),
 			getSailTier(),
 			getHelmTier(),
-			getSalvagingHookTier(),
+			getSalvagingHookTiers()
+				.stream()
+				.map(SalvagingHookTier::toString)
+				.collect(Collectors.joining(", ", "[", "]")),
 			getCargoHoldTier()
 		);
 	}
