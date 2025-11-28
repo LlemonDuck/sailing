@@ -13,7 +13,6 @@ import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
-import net.runelite.api.coords.WorldArea;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
@@ -35,8 +34,6 @@ public class TemporTantrumHelper
 {
 
 	private static final int SPRITE_ID_RUM = 7022;
-
-	private static final WorldArea TEMPOR_TANTRUM_AREA = new WorldArea(2944, 2751, 3136 - 2944, 2943 - 2751, 0);
 
 	private static final Color COLOUR_RUM = new Color(0xB24727);
 
@@ -67,7 +64,7 @@ public class TemporTantrumHelper
 	{
 		boolean nowActive = client.getVarbitValue(VarbitID.SAILING_BT_IN_TRIAL) != 0 &&
 			SailingUtil.isSailing(client) &&
-			TEMPOR_TANTRUM_AREA.contains(SailingUtil.getTopLevelWorldPoint(client));
+			BarracudaTrial.TEMPOR_TANTRUM.getArea().contains(SailingUtil.getTopLevelWorldPoint(client));
 
 		if (active != nowActive)
 		{

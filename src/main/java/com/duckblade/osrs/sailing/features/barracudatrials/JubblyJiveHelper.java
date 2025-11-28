@@ -18,7 +18,6 @@ import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
-import net.runelite.api.coords.WorldArea;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
@@ -44,8 +43,6 @@ public class JubblyJiveHelper
 		SPRITE_ID_JUBBLY, // jubbly
 		6999 // toady
 	);
-
-	private static final WorldArea JUBBLY_JIVE_AREA = new WorldArea(2210, 2880, 2488 - 2210, 3072 - 2880, 0);
 
 	// game object to highlight -> dynamic child id to check for state
 	private static final Map<Integer, Integer> OUTCROP_WIDGET_CHILDREN_IDS = ImmutableMap.<Integer, Integer>builder()
@@ -95,7 +92,7 @@ public class JubblyJiveHelper
 	{
 		boolean nowActive = client.getVarbitValue(VarbitID.SAILING_BT_IN_TRIAL) != 0 &&
 			SailingUtil.isSailing(client) &&
-			JUBBLY_JIVE_AREA.contains(SailingUtil.getTopLevelWorldPoint(client));
+			BarracudaTrial.JUBBLY_JIVE.getArea().contains(SailingUtil.getTopLevelWorldPoint(client));
 
 		if (active != nowActive)
 		{
