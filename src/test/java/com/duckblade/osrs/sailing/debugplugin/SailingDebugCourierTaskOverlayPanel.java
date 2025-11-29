@@ -6,8 +6,8 @@ import com.google.inject.Inject;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -18,14 +18,14 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 public class SailingDebugCourierTaskOverlayPanel extends OverlayPanel
 {
 
-	private final Client client;
 	private final CourierTaskTracker taskTracker;
+	private final SailingDebugConfig config;
 
 	@Inject
-	public SailingDebugCourierTaskOverlayPanel(Client client, CourierTaskTracker taskTracker)
+	public SailingDebugCourierTaskOverlayPanel(SailingDebugConfig config, CourierTaskTracker taskTracker)
 	{
-		this.client = client;
 		this.taskTracker = taskTracker;
+		this.config = config;
 
 		setPreferredPosition(OverlayPosition.ABOVE_CHATBOX_RIGHT);
 		setLayer(OverlayLayer.ALWAYS_ON_TOP);
@@ -34,14 +34,19 @@ public class SailingDebugCourierTaskOverlayPanel extends OverlayPanel
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
+		Set<CourierTask> tasks = taskTracker.getTasks();
+		if (!config.courierTaskInfo() || tasks.isEmpty())
+		{
+			return null;
+		}
+
 		getPanelComponent().getChildren()
 			.add(TitleComponent.builder()
 				.text("Courier Tasks")
 				.build());
 
-		for (CourierTask task : taskTracker.getTasks())
+		for (CourierTask task : tasks)
 		{
-			log.debug("{}", task);
 			getPanelComponent().getChildren()
 				.add(LineComponent.builder()
 					.left(task.getFromPort().getShortCode())

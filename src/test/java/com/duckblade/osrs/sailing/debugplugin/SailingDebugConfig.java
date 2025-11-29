@@ -38,4 +38,14 @@ public interface SailingDebugConfig extends Config
 		return true;
 	}
 
+	@ConfigItem(
+		keyName = "courierTaskInfo",
+		name = "Courier Task Info Panel",
+		description = ""
+	)
+	default boolean courierTaskInfo()
+	{
+		return true;
+	}
+
 }

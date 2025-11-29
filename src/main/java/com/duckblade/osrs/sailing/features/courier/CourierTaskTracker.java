@@ -28,9 +28,8 @@ import net.runelite.client.eventbus.Subscribe;
 public class CourierTaskTracker
 	implements PluginLifecycleComponent
 {
-	private final Client client;
-
 	private static final Set<Integer> LEDGER_TABLE_IDS = Arrays.stream(Port.values()).map(Port::getLedgerTableID).collect(Collectors.toSet());
+	private final Client client;
 	@Getter
 	private final Set<CourierTask> tasks = new HashSet<>();
 	@Getter
@@ -48,7 +47,6 @@ public class CourierTaskTracker
 	@Subscribe
 	public void onGameObjectSpawned(GameObjectSpawned e)
 	{
-		log.debug("{}", e);
 		int id = e.getGameObject().getId();
 		if (LEDGER_TABLE_IDS.contains(id))
 		{
@@ -79,7 +77,6 @@ public class CourierTaskTracker
 
 	private void updateTasks()
 	{
-		log.debug("updating tasks");
 		tasks.clear();
 		for (int i = 0; i < CourierTaskUtil.TASK_SLOT_IDS.size(); i++)
 		{
@@ -89,7 +86,6 @@ public class CourierTaskTracker
 				tasks.add(task);
 			}
 		}
-		log.debug("{}", tasks);
 	}
 
 	public CourierTask getTaskInfo(int taskIndex)

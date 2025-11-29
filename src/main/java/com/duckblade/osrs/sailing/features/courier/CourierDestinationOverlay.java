@@ -1,7 +1,6 @@
 package com.duckblade.osrs.sailing.features.courier;
 
 import com.duckblade.osrs.sailing.SailingConfig;
-import com.duckblade.osrs.sailing.features.util.CourierTaskUtil;
 import com.duckblade.osrs.sailing.model.CourierTask;
 import com.duckblade.osrs.sailing.model.Port;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
@@ -11,7 +10,6 @@ import java.awt.Rectangle;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.ui.FontManager;
@@ -25,14 +23,12 @@ public class CourierDestinationOverlay
 	implements PluginLifecycleComponent
 {
 
-	private final Client client;
 	private final CourierTaskTracker taskTracker;
 
 	@Inject
-	public CourierDestinationOverlay(Client client, CourierTaskTracker taskTracker)
+	public CourierDestinationOverlay(CourierTaskTracker taskTracker)
 	{
 		super();
-		this.client = client;
 		this.taskTracker = taskTracker;
 
 		showOnInventory();

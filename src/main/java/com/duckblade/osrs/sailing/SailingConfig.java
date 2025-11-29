@@ -432,7 +432,7 @@ public interface SailingConfig extends Config
 	default Color courierItemPickupOverlayColor()
 	{
 		return Color.GREEN;
-	};
+	}
 
 	@ConfigItem(
 		keyName = "courierItemShowDropOffOverlay",
@@ -444,7 +444,7 @@ public interface SailingConfig extends Config
 	default boolean courierItemShowDropOffOverlay()
 	{
 		return true;
-	};
+	}
 
 	@ConfigItem(
 		keyName = "courierItemDropOffOverlayColor",
@@ -456,7 +456,7 @@ public interface SailingConfig extends Config
 	default Color courierItemDropOffOverlayColor()
 	{
 		return Color.RED;
-	};
+	}
 
 	@ConfigItem(
 		keyName = "salvagingHighlightActiveWrecks",

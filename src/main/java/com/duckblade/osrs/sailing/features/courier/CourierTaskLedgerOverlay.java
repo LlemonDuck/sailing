@@ -24,7 +24,7 @@ public class CourierTaskLedgerOverlay
 {
 	private final SailingConfig config;
 
-	private CourierTaskTracker taskTracker;
+	private final CourierTaskTracker taskTracker;
 	private Color ledgerPickupColour;
 	private Color ledgerDropOffColour;
 
