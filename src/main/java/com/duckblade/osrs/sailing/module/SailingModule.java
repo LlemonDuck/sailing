@@ -1,15 +1,12 @@
 package com.duckblade.osrs.sailing.module;
 
 import com.duckblade.osrs.sailing.SailingConfig;
-import com.duckblade.osrs.sailing.features.barracudatrials.HidePortalTransitions;
-import com.duckblade.osrs.sailing.features.barracudatrials.JubblyJiveHelper;
+import com.duckblade.osrs.sailing.features.barracudatrials.*;
 import com.duckblade.osrs.sailing.features.facilities.CargoHoldTracker;
 import com.duckblade.osrs.sailing.features.facilities.LuffOverlay;
 import com.duckblade.osrs.sailing.features.facilities.SpeedBoostInfoBox;
 import com.duckblade.osrs.sailing.features.navigation.LightningCloudsOverlay;
 import com.duckblade.osrs.sailing.features.navigation.RapidsOverlay;
-import com.duckblade.osrs.sailing.features.barracudatrials.LostCargoHighlighter;
-import com.duckblade.osrs.sailing.features.barracudatrials.TemporTantrumHelper;
 import com.duckblade.osrs.sailing.features.charting.CurrentDuckTaskTracker;
 import com.duckblade.osrs.sailing.features.charting.SeaChartOverlay;
 import com.duckblade.osrs.sailing.features.charting.SeaChartPanelOverlay;
@@ -79,7 +76,8 @@ public class SailingModule extends AbstractModule
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
 		SpeedBoostInfoBox speedBoostInfoBox,
-		WeatherTaskTracker weatherTaskTracker
+		WeatherTaskTracker weatherTaskTracker,
+		GwenithGlideSplits gwenithGlideSplits
 	)
 	{
 		var builder = ImmutableSet.<PluginLifecycleComponent>builder()
@@ -93,6 +91,7 @@ public class SailingModule extends AbstractModule
 			.add(deprioSailsOffHelm)
 			.add(giantClam)
 			.add(hidePortalTransitions)
+			.add(gwenithGlideSplits)
 			.add(jubblyJiveHelper)
 			.add(temporTantrumHelper)
 			.add(lightningCloudsOverlay)
