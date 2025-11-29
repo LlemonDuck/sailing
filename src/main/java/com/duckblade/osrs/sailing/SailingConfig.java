@@ -449,8 +449,8 @@ public interface SailingConfig extends Config
 
 	@ConfigItem(
 		keyName = "salvagingHighlightInactiveWrecksColour",
-		name = "Active Colour",
-		description = "Colour to highlight active shipwrecks.",
+		name = "Inactive Colour",
+		description = "Colour to highlight inactive shipwrecks.",
 		section = SECTION_SALVAGING,
 		position = 4
 	)
