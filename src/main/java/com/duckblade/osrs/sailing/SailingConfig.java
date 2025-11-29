@@ -399,6 +399,18 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+			keyName = "barracudaGwenithGlideSplits",
+			name = "GG: Save splits",
+			description = "Save splits for Gwenith Glide",
+			section = SECTION_BARRACUDA_TRIALS,
+			position = 6
+	)
+	default boolean barracudaGwenithGlideSplits()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "courierItemIdentification",
 		name = "Destination on Items",
 		description = "Show the destination port on cargo crates in your inventory and cargo hold.",
