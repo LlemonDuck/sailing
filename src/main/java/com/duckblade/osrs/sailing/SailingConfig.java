@@ -407,7 +407,7 @@ public interface SailingConfig extends Config
 	)
 	default boolean barracudaGwenithGlideSplits()
 	{
-		return true;
+		return false;
 	}
 
 	@ConfigItem(
