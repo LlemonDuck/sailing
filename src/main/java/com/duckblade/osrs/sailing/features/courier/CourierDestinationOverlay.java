@@ -47,14 +47,12 @@ public class CourierDestinationOverlay
 	public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem widgetItem)
 	{
 		CourierTask task = taskTracker.getTaskForItemID(itemId);
-
 		if (task == null)
 		{
 			return;
 		}
 
 		Port port = task.getToPort();
-
 		if (port == null)
 		{
 			return;

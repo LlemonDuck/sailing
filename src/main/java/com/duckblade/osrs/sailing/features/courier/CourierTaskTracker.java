@@ -28,12 +28,17 @@ import net.runelite.client.eventbus.Subscribe;
 public class CourierTaskTracker
 	implements PluginLifecycleComponent
 {
+
 	private static final Set<Integer> LEDGER_TABLE_IDS = Arrays.stream(Port.values()).map(Port::getLedgerTableID).collect(Collectors.toSet());
+
 	private final Client client;
+
 	@Getter
 	private final Set<CourierTask> tasks = new HashSet<>();
+
 	@Getter
 	private GameObject activeLedger;
+
 	@Getter
 	private Port activePort;
 

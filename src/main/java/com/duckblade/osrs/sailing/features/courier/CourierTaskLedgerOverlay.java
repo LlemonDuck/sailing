@@ -22,9 +22,10 @@ public class CourierTaskLedgerOverlay
 	extends Overlay
 	implements PluginLifecycleComponent
 {
-	private final SailingConfig config;
 
+	private final SailingConfig config;
 	private final CourierTaskTracker taskTracker;
+
 	private Color ledgerPickupColour;
 	private Color ledgerDropOffColour;
 
@@ -44,13 +45,11 @@ public class CourierTaskLedgerOverlay
 		return config.courierItemShowDropOffOverlay() || config.courierItemShowPickupOverlay();
 	}
 
-
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
 		Port activePort = taskTracker.getActivePort();
 		GameObject activeLedger = taskTracker.getActiveLedger();
-
 		if (activePort == null || activeLedger == null)
 		{
 			return null;
