@@ -19,6 +19,7 @@ import net.runelite.api.GameObject;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.api.events.WorldViewUnloaded;
 import net.runelite.api.gameval.DBTableID;
 import net.runelite.client.eventbus.Subscribe;
 
@@ -65,6 +66,16 @@ public class CourierTaskTracker
 	{
 		int id = e.getGameObject().getId();
 		if (LEDGER_TABLE_IDS.contains(id))
+		{
+			activeLedger = null;
+			activePort = null;
+		}
+	}
+
+	@Subscribe
+	public void onWorldViewUnloaded(WorldViewUnloaded e)
+	{
+		if (e.getWorldView().isTopLevel())
 		{
 			activeLedger = null;
 			activePort = null;
