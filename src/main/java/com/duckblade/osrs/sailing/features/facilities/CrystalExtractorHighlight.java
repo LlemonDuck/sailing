@@ -20,6 +20,8 @@ import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.WorldViewUnloaded;
 import net.runelite.api.gameval.ObjectID;
+import net.runelite.client.Notifier;
+import net.runelite.client.config.Notification;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -36,19 +38,24 @@ public class CrystalExtractorHighlight
 	private static final int ANIMATION_CRYSTAL_EXTRACTOR_CRYSTAL_HARVESTABLE = 13177;
 
 	private final Client client;
+	private final Notifier notifier;
 
 	private final Map<Integer, GameObject> extractors = new HashMap<>();
 
 	private boolean highlightHarvestable;
 	private Color harvestableColour;
+	private Notification harvestableNotification;
 
 	private boolean highlightInactive;
 	private Color inactiveColour;
 
+	private boolean notified = false;
+
 	@Inject
-	public CrystalExtractorHighlight(Client client)
+	public CrystalExtractorHighlight(Client client, Notifier notifier)
 	{
 		this.client = client;
+		this.notifier = notifier;
 
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_SCENE);
@@ -59,6 +66,7 @@ public class CrystalExtractorHighlight
 	{
 		highlightHarvestable = config.highlightCrystalExtractorHarvestable();
 		harvestableColour = config.highlightCrystalExtractorHarvestableColour();
+		harvestableNotification = config.notifyCrystalExtractorHarvestable();
 
 		highlightInactive = config.highlightCrystalExtractorInactive();
 		inactiveColour = config.highlightCrystalExtractorInactiveColour();
@@ -131,8 +139,17 @@ public class CrystalExtractorHighlight
 
 			DynamicObject dyn = (DynamicObject) r;
 			int anim = dyn.getAnimation() != null ? dyn.getAnimation().getId() : -1;
-			if (anim != ANIMATION_CRYSTAL_EXTRACTOR_CRYSTAL_HARVESTABLE)
+			if (anim == ANIMATION_CRYSTAL_EXTRACTOR_CRYSTAL_HARVESTABLE)
 			{
+				if (!notified)
+				{
+					notified = true;
+					notifier.notify(harvestableNotification, "Your crystal extractor has extracted a crystal mote!");
+				}
+			}
+			else
+			{
+				notified = false;
 				return null;
 			}
 		}

@@ -222,11 +222,23 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "notifyCrystalExtractorHarvestable",
+		name = "Notify Harvestable Extractor",
+		description = "Notify you when the crystal extractor has a mote available.",
+		section = SECTION_FACILITIES,
+		position = 5
+	)
+	default Notification notifyCrystalExtractorHarvestable()
+	{
+		return Notification.OFF;
+	}
+
+	@ConfigItem(
 		keyName = "highlightCrystalExtractorInactive",
 		name = "Highlight Deactivated Extractor Deactivated",
 		description = "Highlight the activated crystal extractor when it is animating.",
 		section = SECTION_FACILITIES,
-		position = 5
+		position = 6
 	)
 	default boolean highlightCrystalExtractorInactive()
 	{
@@ -238,7 +250,7 @@ public interface SailingConfig extends Config
 		name = "Deactivated Colour",
 		description = "Colour to highlight the crystal extractor when it is deactivated.",
 		section = SECTION_FACILITIES,
-		position = 6
+		position = 7
 	)
 	@Alpha
 	default Color highlightCrystalExtractorInactiveColour()
