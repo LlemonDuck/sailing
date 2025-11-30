@@ -96,6 +96,14 @@ public interface SailingConfig extends Config
 	)
 	String SECTION_OCEAN_ENCOUNTERS = "oceanEncounters";
 
+	@ConfigSection(
+		name = "Ship Combat",
+		description = "Settings for ship combat and health monitoring.",
+		position = 1100,
+		closedByDefault = true
+	)
+	String SECTION_SHIP_COMBAT = "shipCombat";
+
 	@ConfigItem(
 		keyName = "highlightRapids",
 		name = "Highlight Rapids",
@@ -758,5 +766,29 @@ public interface SailingConfig extends Config
 	default Notification notifyOceanManSpawn()
 	{
 		return Notification.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "notifyLowBoatHP",
+		name = "Notify on Low Boat HP",
+		description = "Notify when your boat's hitpoints drop below the threshold.",
+		section = SECTION_SHIP_COMBAT,
+		position = 1
+	)
+	default Notification notifyLowBoatHP()
+	{
+		return Notification.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "lowBoatHPThreshold",
+		name = "Low HP Threshold",
+		description = "The hitpoint threshold at which to notify you. Notification will trigger when boat HP drops below this value.",
+		section = SECTION_SHIP_COMBAT,
+		position = 2
+	)
+	default int lowBoatHPThreshold()
+	{
+		return 50;
 	}
 }
