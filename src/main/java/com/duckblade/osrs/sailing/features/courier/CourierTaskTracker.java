@@ -56,6 +56,7 @@ public class CourierTaskTracker
 		int id = e.getGameObject().getId();
 		if (LEDGER_TABLE_IDS.contains(id))
 		{
+			log.debug("Found ledger table at {}", e.getGameObject().getLocalLocation());
 			activeLedger = e.getGameObject();
 			activePort = Port.findByLedgerTableID(id);
 		}
@@ -99,6 +100,7 @@ public class CourierTaskTracker
 			CourierTask task = this.getTaskInfo(i);
 			if (task != null)
 			{
+				log.debug("Tracking task {}: {}", i, task);
 				tasks.add(task);
 			}
 		}
@@ -137,16 +139,23 @@ public class CourierTaskTracker
 
 	public List<CourierTask> getDropOffTasksForPort(Port port)
 	{
-		return tasks.stream().filter(task -> task.getToPort() == port).collect(Collectors.toList());
+		return tasks.stream()
+			.filter(task -> task.getToPort() == port)
+			.collect(Collectors.toList());
 	}
 
 	public List<CourierTask> getPickupTasksForPort(Port port)
 	{
-		return tasks.stream().filter(task -> task.getFromPort() == port).collect(Collectors.toList());
+		return tasks.stream()
+			.filter(task -> task.getFromPort() == port)
+			.collect(Collectors.toList());
 	}
 
 	public CourierTask getTaskForItemID(int itemID)
 	{
-		return tasks.stream().filter(task -> task.getCargoCrateItemID() == itemID).findFirst().orElse(null);
+		return tasks.stream()
+			.filter(task -> task.getCargoCrateItemID() == itemID)
+			.findFirst()
+			.orElse(null);
 	}
 }

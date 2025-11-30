@@ -45,5 +45,6 @@ public class CourierTaskUtil
 		TASK_SLOT_IDS,
 		CARGO_RETRIEVED_VARBITS,
 		CARGO_DELIVERED_VARBITS
-	).flatMap(List::stream).collect(Collectors.toUnmodifiableSet());
+	).flatMap(List::stream)
+		.collect(Collectors.toUnmodifiableSet());
 }
