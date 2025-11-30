@@ -17,6 +17,7 @@ import net.runelite.api.Menu;
 import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.events.PostMenuSort;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.eventbus.Subscribe;
 
 @Slf4j
@@ -47,6 +48,12 @@ public class PrioritizeCargoHold
 	public void onPostMenuSort(PostMenuSort e)
 	{
 		if (!SailingUtil.isSailing(client))
+		{
+			return;
+		}
+
+		// Don't prioritize during Barracuda Trials
+		if (client.getVarbitValue(VarbitID.SAILING_BT_IN_TRIAL) != 0)
 		{
 			return;
 		}

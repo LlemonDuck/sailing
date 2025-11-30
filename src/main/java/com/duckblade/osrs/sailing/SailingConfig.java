@@ -185,15 +185,65 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
-			keyName = "showSpeedBoostInfoBox",
-			name = "Show Speed Boost InfoBox",
-			description = "Show an InfoBox with the duration of your active speed boost.",
-			section = SECTION_FACILITIES,
-			position = 2
+		keyName = "showSpeedBoostInfoBox",
+		name = "Show Speed Boost InfoBox",
+		description = "Show an InfoBox with the duration of your active speed boost.",
+		section = SECTION_FACILITIES,
+		position = 2
 	)
 	default boolean showSpeedBoostInfoBox()
 	{
 		return true;
+	}
+
+	@ConfigItem(
+		keyName = "highlightCrystalExtractorHarvestable",
+		name = "Highlight Harvestable Extractor",
+		description = "Highlight the activated crystal extractor when it has a mote available.",
+		section = SECTION_FACILITIES,
+		position = 3
+	)
+	default boolean highlightCrystalExtractorHarvestable()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "highlightCrystalExtractorHarvestableColour",
+		name = "Harvestable Colour",
+		description = "Colour to highlight the crystal extractor while animating.",
+		section = SECTION_FACILITIES,
+		position = 4
+	)
+	@Alpha
+	default Color highlightCrystalExtractorHarvestableColour()
+	{
+		return new Color(0xFF3FC4F0);
+	}
+
+	@ConfigItem(
+		keyName = "highlightCrystalExtractorInactive",
+		name = "Highlight Deactivated Extractor Deactivated",
+		description = "Highlight the activated crystal extractor when it is animating.",
+		section = SECTION_FACILITIES,
+		position = 5
+	)
+	default boolean highlightCrystalExtractorInactive()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "highlightCrystalExtractorInactiveColour",
+		name = "Deactivated Colour",
+		description = "Colour to highlight the crystal extractor when it is deactivated.",
+		section = SECTION_FACILITIES,
+		position = 6
+	)
+	@Alpha
+	default Color highlightCrystalExtractorInactiveColour()
+	{
+		return Color.YELLOW;
 	}
 
 	enum CrewmateMuteMode
@@ -231,11 +281,23 @@ public interface SailingConfig extends Config
 	@ConfigItem(
 		keyName = "prioritizeCargoHold",
 		name = "Prioritize Cargo Hold",
-		description = "Make the Cargo Hold easier to click on by prioritizing it over other objects.",
+		description = "Make the Cargo Hold easier to click on by prioritizing it over other objects. Does not apply during Barracuda Trials.",
 		section = SECTION_MES,
 		position = 2
 	)
 	default boolean prioritizeCargoHold()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "hideStopNavigatingDuringTrials",
+		name = "Deprio Stop-navigating During BT",
+		description = "Deprioritizes the 'Stop-navigating' and 'Escape' option while you are in a Barracuda Trial.",
+		section = SECTION_MES,
+		position = 3
+	)
+	default boolean hideStopNavigatingDuringTrials()
 	{
 		return true;
 	}
@@ -497,8 +559,8 @@ public interface SailingConfig extends Config
 
 	@ConfigItem(
 		keyName = "salvagingHighlightInactiveWrecksColour",
-		name = "Active Colour",
-		description = "Colour to highlight active shipwrecks.",
+		name = "Inactive Colour",
+		description = "Colour to highlight inactive shipwrecks.",
 		section = SECTION_SALVAGING,
 		position = 4
 	)
