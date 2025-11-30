@@ -49,8 +49,8 @@ public class SailingDebugCourierTaskOverlayPanel extends OverlayPanel
 		{
 			getPanelComponent().getChildren()
 				.add(LineComponent.builder()
-					.left(task.getFromPort().getShortCode())
-					.right(task.getToPort().getShortCode())
+					.left(task.getFromPort().toString())
+					.right(task.getToPort().toString())
 					.build());
 
 			boolean isRetrieved = task.getNumCargoRetrieved() == task.getCargoAmount();
@@ -62,10 +62,8 @@ public class SailingDebugCourierTaskOverlayPanel extends OverlayPanel
 					.right("DELIVERED")
 					.rightColor(isDelivered ? Color.GREEN : Color.RED)
 					.build());
-
 		}
 
-		super.render(graphics);
-		return null;
+		return super.render(graphics);
 	}
 }
