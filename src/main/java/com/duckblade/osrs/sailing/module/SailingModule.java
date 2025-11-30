@@ -6,6 +6,7 @@ import com.duckblade.osrs.sailing.features.barracudatrials.JubblyJiveHelper;
 import com.duckblade.osrs.sailing.features.facilities.CargoHoldTracker;
 import com.duckblade.osrs.sailing.features.facilities.LuffOverlay;
 import com.duckblade.osrs.sailing.features.facilities.SpeedBoostInfoBox;
+import com.duckblade.osrs.sailing.features.facilities.SpeedOverlay;
 import com.duckblade.osrs.sailing.features.navigation.LightningCloudsOverlay;
 import com.duckblade.osrs.sailing.features.navigation.RapidsOverlay;
 import com.duckblade.osrs.sailing.features.barracudatrials.LostCargoHighlighter;
@@ -79,7 +80,8 @@ public class SailingModule extends AbstractModule
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
 		SpeedBoostInfoBox speedBoostInfoBox,
-		WeatherTaskTracker weatherTaskTracker
+		WeatherTaskTracker weatherTaskTracker,
+		SpeedOverlay speedOverlay
 	)
 	{
 		var builder = ImmutableSet.<PluginLifecycleComponent>builder()
@@ -109,7 +111,8 @@ public class SailingModule extends AbstractModule
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
 			.add(speedBoostInfoBox)
-			.add(weatherTaskTracker);
+			.add(weatherTaskTracker)
+			.add(speedOverlay);
 
 		// features still in development
 		if (developerMode)

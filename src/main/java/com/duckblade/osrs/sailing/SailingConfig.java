@@ -196,6 +196,18 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
+	@ConfigItem(
+			keyName = "showSpeedOverlay",
+			name = "Show Speed Overlay",
+			description = "Show an overlay that displays the current speed of your boat.",
+			section = SECTION_FACILITIES,
+			position = 3
+	)
+	default boolean showSpeedOverlay()
+	{
+		return true;
+	}
+
 	enum CrewmateMuteMode
 	{
 		NONE,
