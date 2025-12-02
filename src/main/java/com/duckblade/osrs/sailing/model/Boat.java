@@ -54,7 +54,7 @@ public class Boat
 			.mapToObj(SalvagingHookTier::fromGameObjectId)
 			.collect(Collectors.toList());
 	}
-    
+
     public List<FishingNetTier> getNetTiers()
     {
         return fishingNets.stream()
@@ -81,6 +81,7 @@ public class Boat
 		facilities.add(helm);
 		facilities.addAll(salvagingHooks);
 		facilities.add(cargoHold);
+        facilities.addAll(fishingNets);
 		return facilities;
 	}
 
@@ -99,6 +100,21 @@ public class Boat
 	{
 		return getCargoCapacity(SailingUtil.isUim(client));
 	}
+
+    public int getNetCapacity()
+    {
+        int totalCapacity = 0;
+        List<FishingNetTier> netTiers = getNetTiers();
+        SizeClass sizeClass = getSizeClass();
+        for (FishingNetTier netTier : netTiers)
+        {
+            if (netTier != null)
+            {
+                totalCapacity += netTier.getCapacity();
+            }
+        }
+        return totalCapacity;
+    }
 
 	public int getSpeedBoostDuration()
 	{
