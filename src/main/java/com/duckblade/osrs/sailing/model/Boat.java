@@ -28,6 +28,7 @@ public class Boat
 
 	@Setter(AccessLevel.NONE)
 	Set<GameObject> salvagingHooks = new HashSet<>();
+    Set<GameObject> fishingNets = new HashSet<>();
 
 	// these are intentionally not cached in case the object is transformed without respawning
 	// e.g. helms have a different idle vs in-use id
@@ -53,6 +54,14 @@ public class Boat
 			.mapToObj(SalvagingHookTier::fromGameObjectId)
 			.collect(Collectors.toList());
 	}
+    
+    public List<FishingNetTier> getNetTiers()
+    {
+        return fishingNets.stream()
+                .mapToInt(GameObject::getId)
+                .mapToObj(FishingNetTier::fromGameObjectId)
+                .collect(Collectors.toList());
+    }
 
 	public CargoHoldTier getCargoHoldTier()
 	{
