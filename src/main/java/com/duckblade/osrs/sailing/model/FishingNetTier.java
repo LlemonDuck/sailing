@@ -4,10 +4,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.gameval.ObjectID;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 @RequiredArgsConstructor
 @Getter
 public enum FishingNetTier {

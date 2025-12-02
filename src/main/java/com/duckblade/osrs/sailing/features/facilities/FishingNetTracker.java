@@ -3,8 +3,6 @@ package com.duckblade.osrs.sailing.features.facilities;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import net.runelite.api.Client;
 import net.runelite.client.config.ConfigManager;
-import net.runelite.client.ui.overlay.OverlayLayer;
-import net.runelite.client.ui.overlay.OverlayPosition;
 
 import javax.inject.Inject;
 
