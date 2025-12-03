@@ -261,6 +261,18 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "reverseBeep",
+		name = "Reverse Beep",
+		description = "Become a truck",
+		section = SECTION_NAVIGATION,
+		position = 7
+	)
+	default boolean reverseBeep()
+	{
+		return false;
+	}
+
+	@ConfigItem(
 		keyName = "highlightTrimmableSails",
 		name = "Highlight Trimmable Sails",
 		description = "Highlight sails when they require trimming.",

@@ -1,6 +1,7 @@
 package com.duckblade.osrs.sailing.module;
 
 import com.duckblade.osrs.sailing.SailingConfig;
+import com.duckblade.osrs.sailing.features.reversebeep.ReverseBeep;
 import com.duckblade.osrs.sailing.features.barracudatrials.HidePortalTransitions;
 import com.duckblade.osrs.sailing.features.barracudatrials.JubblyJiveHelper;
 import com.duckblade.osrs.sailing.features.barracudatrials.LostCargoHighlighter;
@@ -99,7 +100,8 @@ public class SailingModule extends AbstractModule
 		SpeedBoostInfoBox speedBoostInfoBox,
 		NavigationOverlay navigationOverlay,
 		TrueTileIndicator trueTileIndicator,
-		WeatherTaskTracker weatherTaskTracker
+		WeatherTaskTracker weatherTaskTracker,
+        ReverseBeep reverseBeep
 	)
 	{
 		var builder = ImmutableSet.<PluginLifecycleComponent>builder()
@@ -139,7 +141,8 @@ public class SailingModule extends AbstractModule
 			.add(seaChartTaskIndex)
 			.add(speedBoostInfoBox)
 			.add(trueTileIndicator)
-			.add(weatherTaskTracker);
+			.add(weatherTaskTracker)
+            .add(reverseBeep);
 
 		// features still in development
 		if (developerMode)
