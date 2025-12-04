@@ -93,6 +93,7 @@ public class SailingModule extends AbstractModule
 		OceanMan oceanMan,
 		PrioritizeCargoHold prioritizeCargoHold,
 		RapidsOverlay rapidsOverlay,
+		ReverseBeep reverseBeep,
 		SalvagingHighlight salvagingHighlight,
 		SeaChartOverlay seaChartOverlay,
 		SeaChartPanelOverlay seaChartPanelOverlay,
@@ -100,8 +101,7 @@ public class SailingModule extends AbstractModule
 		SpeedBoostInfoBox speedBoostInfoBox,
 		NavigationOverlay navigationOverlay,
 		TrueTileIndicator trueTileIndicator,
-		WeatherTaskTracker weatherTaskTracker,
-        ReverseBeep reverseBeep
+		WeatherTaskTracker weatherTaskTracker
 	)
 	{
 		var builder = ImmutableSet.<PluginLifecycleComponent>builder()
@@ -135,14 +135,14 @@ public class SailingModule extends AbstractModule
 			.add(oceanMan)
 			.add(prioritizeCargoHold)
 			.add(rapidsOverlay)
+			.add(reverseBeep)
 			.add(salvagingHighlight)
 			.add(seaChartOverlay)
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
 			.add(speedBoostInfoBox)
 			.add(trueTileIndicator)
-			.add(weatherTaskTracker)
-            .add(reverseBeep);
+			.add(weatherTaskTracker);
 
 		// features still in development
 		if (developerMode)
