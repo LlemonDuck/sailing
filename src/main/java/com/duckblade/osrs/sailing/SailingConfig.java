@@ -414,7 +414,7 @@ public interface SailingConfig extends Config
     @ConfigItem(
             keyName = "hideCargoHoldOptionsDuringTrials",
             name = "Deprio Cargo Hold During BT",
-            description = "Hides cargo hold options while in BT and at helm, preventing unintended stop-nav when setting/trimming sails.",
+            description = "Deprioritizes cargo hold options while in a Barracuda Trial and at helm.",
             section = SECTION_MES,
             position = 4
     )

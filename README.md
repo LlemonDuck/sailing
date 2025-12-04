@@ -24,6 +24,8 @@ Sailing quality-of-life for charting, navigation, facilities, and more.
 ## Menu Entry Swaps
 - Sails At Helm Only: Deprioritizes sail interaction options when you’re not at the helm.
 - Prioritize Cargo Hold: Prioritizes clicking the Cargo Hold over nearby objects to make it easier to open.
+- Deprio(ritize) Stop-navigating During BT: Deprioritizes the 'Stop-navigating' and 'Escape' option while you are in a Barracuda Trial.
+- Deprio(ritize) Cargo Hold During BT: Deprioritizes cargo hold options while in a Barracuda Trial and at helm.
 
 ## Sea Charting
 - Highlight Sea Charting Locations: Highlights nearby chartable locations.
