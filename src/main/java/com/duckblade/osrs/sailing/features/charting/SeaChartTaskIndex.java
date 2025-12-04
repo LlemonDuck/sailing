@@ -10,13 +10,11 @@ import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.NPC;
 import net.runelite.api.Quest;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.gameval.ItemID;
-import net.runelite.api.gameval.NpcID;
-import net.runelite.api.gameval.ObjectID;
 import net.runelite.client.game.ItemManager;
 
 @Slf4j
@@ -26,6 +24,9 @@ public class SeaChartTaskIndex implements PluginLifecycleComponent
 
 	private static final int SEARCH_DIST_GAME_OBJECT = 5;
 	private static final int SEARCH_DIST_NPC = 5;
+
+	@Inject
+	private Client client;
 
 	@Inject
 	private ItemManager itemManager;
@@ -161,70 +162,21 @@ public class SeaChartTaskIndex implements PluginLifecycleComponent
 
 	public BufferedImage getTaskSprite(SeaChartTask task)
 	{
-		switch (task.getObjectId())
-		{
-			case ObjectID.SAILING_CHARTING_HINT_MARKER_SPYGLASS:
-				return itemManager.getImage(ItemID.SAILING_CHARTING_SPYGLASS);
-
-			case ObjectID.SAILING_CHARTING_HINT_MARKER_DUCK:
-				return itemManager.getImage(ItemID.SAILING_CHARTING_CURRENT_DUCK);
-
-			case ObjectID.SAILING_CHARTING_DRINK_CRATE:
-				return itemManager.getImage(ItemID.SAILING_CHARTING_CROWBAR);
-
-			case -1:
-				break;
-
-			default:
-				return itemManager.getImage(ItemID.SAILING_LOG_INITIAL);
-		}
-
-		switch (task.getNpcId())
-		{
-			case NpcID.SAILING_CHARTING_MERMAID_GUIDE_1:
-			case NpcID.SAILING_CHARTING_MERMAID_GUIDE_2:
-			case NpcID.SAILING_CHARTING_MERMAID_GUIDE_3:
-			case NpcID.SAILING_CHARTING_MERMAID_GUIDE_4:
-			case NpcID.SAILING_CHARTING_MERMAID_GUIDE_5:
-				return itemManager.getImage(ItemID.HUNDRED_PIRATE_DIVING_HELMET);
-
-			case NpcID.SAILING_CHARTING_WEATHER_TROLL:
-				return itemManager.getImage(ItemID.SAILING_CHARTING_WEATHER_STATION_EMPTY);
-
-			default:
-				return itemManager.getImage(ItemID.SAILING_LOG_INITIAL);
-		}
+		return itemManager.getImage(task.getType().getIconItem());
 	}
 
 	public Quest getTaskQuestRequirement(SeaChartTask task)
 	{
-		switch (task.getObjectId())
+		switch (task.getType())
 		{
-			case ObjectID.SAILING_CHARTING_HINT_MARKER_DUCK:
+			case CURRENT_DUCK:
 				return Quest.CURRENT_AFFAIRS;
-
-			case ObjectID.SAILING_CHARTING_DRINK_CRATE:
+			case DRINK_CRATE:
 				return Quest.PRYING_TIMES;
-
-			case -1:
-				break;
-
-			default:
-				return Quest.PANDEMONIUM;
-		}
-
-		switch (task.getNpcId())
-		{
-			case NpcID.SAILING_CHARTING_MERMAID_GUIDE_1:
-			case NpcID.SAILING_CHARTING_MERMAID_GUIDE_2:
-			case NpcID.SAILING_CHARTING_MERMAID_GUIDE_3:
-			case NpcID.SAILING_CHARTING_MERMAID_GUIDE_4:
-			case NpcID.SAILING_CHARTING_MERMAID_GUIDE_5:
+			case MERMAID_GUIDE:
 				return Quest.RECIPE_FOR_DISASTER__PIRATE_PETE;
-
 			default:
 				return Quest.PANDEMONIUM;
 		}
-
 	}
 }
