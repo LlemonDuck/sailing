@@ -14,6 +14,8 @@ import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.NPC;
 import net.runelite.api.Quest;
+import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.game.ItemManager;
 
@@ -178,5 +180,16 @@ public class SeaChartTaskIndex implements PluginLifecycleComponent
 			default:
 				return Quest.PANDEMONIUM;
 		}
+	}
+
+	public boolean hasTaskRequirement(SeaChartTask task)
+	{
+		var questRequirement = getTaskQuestRequirement(task);
+		if (questRequirement.getState(client) != QuestState.FINISHED)
+		{
+			return false;
+		}
+
+		return client.getRealSkillLevel(Skill.SAILING) >= task.getLevel();
 	}
 }
