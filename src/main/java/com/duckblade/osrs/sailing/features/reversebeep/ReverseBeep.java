@@ -1,55 +1,51 @@
 package com.duckblade.osrs.sailing.features.reversebeep;
 
 import com.duckblade.osrs.sailing.SailingConfig;
-import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import net.runelite.api.Client;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.gameval.VarbitID;
-import net.runelite.client.audio.AudioPlayer;
 import net.runelite.client.eventbus.Subscribe;
 
+@Slf4j
+@Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ReverseBeep implements PluginLifecycleComponent
 {
-	Client client;
-	BoatTracker boatTracker;
-	AudioPlayer audioPlayer;
-	boolean reversing;
-	boolean beeping;
-	Thread audioThread;
-	Clip audioClip;
 
-	@Inject
-	public ReverseBeep(Client client)
+	private boolean reversing;
+	private Thread audioThread;
+	private Clip audioClip;
+
+	public boolean isEnabled(SailingConfig config)
 	{
-		this.client = client;
-		this.boatTracker = new BoatTracker(client);
-		this.audioPlayer = new AudioPlayer();
-		this.reversing = false;
-		this.beeping = false;
-		AudioInputStream stream;
+		return config.reverseBeep();
+	}
+
+	@Override
+	public void startUp()
+	{
+		reversing = false;
+
 		try
 		{
-			stream = generateBeep();
-			this.audioClip = AudioSystem.getClip();
-			this.audioClip.open(stream);
+			AudioInputStream stream = generateBeep();
+			audioClip = AudioSystem.getClip();
+			audioClip.open(stream);
 		}
 		catch (Exception ex)
 		{
 			System.err.println(ex.getMessage());
 		}
-	}
-
-	public boolean isEnabled(SailingConfig config)
-	{
-		return config.reverseBeep();
 	}
 
 	// Generates a beep for the reverse
