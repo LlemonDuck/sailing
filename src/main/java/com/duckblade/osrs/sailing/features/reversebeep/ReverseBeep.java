@@ -2,18 +2,17 @@ package com.duckblade.osrs.sailing.features.reversebeep;
 
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.client.audio.AudioPlayer;
 import net.runelite.client.eventbus.Subscribe;
 
 @Slf4j
@@ -22,12 +21,21 @@ import net.runelite.client.eventbus.Subscribe;
 public class ReverseBeep implements PluginLifecycleComponent
 {
 
-	private boolean reversing;
-	private Thread audioThread;
-	private Clip audioClip;
+	private static final int VARB_VALUE_REVERSING = 3;
 
+	private final AudioPlayer audioPlayer;
+
+	private boolean reversing;
+
+	private ScheduledExecutorService es;
+	private ScheduledFuture<?> beepTask;
+
+	private float gain;
+
+	@Override
 	public boolean isEnabled(SailingConfig config)
 	{
+		gain = (float) config.reverseBeepVolume() - 50.0f;
 		return config.reverseBeep();
 	}
 
@@ -35,95 +43,29 @@ public class ReverseBeep implements PluginLifecycleComponent
 	public void startUp()
 	{
 		reversing = false;
-
-		try
-		{
-			AudioInputStream stream = generateBeep();
-			audioClip = AudioSystem.getClip();
-			audioClip.open(stream);
-		}
-		catch (Exception ex)
-		{
-			System.err.println(ex.getMessage());
-		}
+		es = Executors.newScheduledThreadPool(1);
 	}
 
-	// Generates a beep for the reverse
-	public AudioInputStream generateBeep()
+	@Override
+	public void shutDown()
 	{
-		float sampleRate = 44100;
-		double frequency = 1200;
-		double durationSeconds = 1;
-		int samples = (int) (durationSeconds * sampleRate);
-		int sampleSize = 16;
-
-		AudioFormat format = new AudioFormat(sampleRate, sampleSize, 1, true, false);
-		byte[] beepData = new byte[samples * (sampleSize / 8)];
-
-		for (int i = 0; i < samples; i++)
-		{
-			double angle = 2 * Math.PI * frequency * i / sampleRate;
-			short sample = (short) (Short.MAX_VALUE * Math.sin(angle));
-			beepData[i * 2] = (byte) (sample & 0xFF);
-			beepData[i * 2 + 1] = (byte) ((sample >> 8) & 0xFF);
-		}
-		InputStream byteArrayInputStream = new ByteArrayInputStream(beepData);
-		return new AudioInputStream(byteArrayInputStream, format, samples);
+		es.shutdown();
+		beepTask = null;
 	}
 
-	// Beeps for specified time
-	public void beepForDuration(long milliseconds)
+	@Subscribe
+	public void onGameTick(GameTick e)
 	{
-		audioClip.start();
-		try
+		if (reversing && beepTask == null)
 		{
-			Thread.sleep(milliseconds);
+			// become a truck
+			beepTask = es.scheduleAtFixedRate(this::beepOnce, 0, 1200, java.util.concurrent.TimeUnit.MILLISECONDS);
 		}
-		catch (InterruptedException ex)
+		else if (!reversing && beepTask != null)
 		{
-			System.err.println(ex.getMessage());
-		}
-	}
-
-	// Stops beeping for duration
-	public void pauseForDuration(long milliseconds)
-	{
-		stopBeeps();
-		try
-		{
-			Thread.sleep(milliseconds);
-		}
-		catch (InterruptedException ex)
-		{
-			System.err.println(ex.getMessage());
-		}
-	}
-
-	// Become a truck
-	public void doBeeps()
-	{
-		this.audioThread = new Thread(() ->
-		{
-			if (audioClip != null)
-			{
-				while (this.reversing)
-				{
-					// See I enjoy that it's .6 seconds and sounds perfect isn't that beautiful?
-					beepForDuration(600);
-					pauseForDuration(600);
-				}
-			}
-		});
-		this.audioThread.start();
-	}
-
-	// Cease being a truck
-	public void stopBeeps()
-	{
-		if (this.audioClip != null)
-		{
-			audioClip.stop();
-			audioClip.setMicrosecondPosition(0);
+			// become a boat again
+			beepTask.cancel(false);
+			beepTask = null;
 		}
 	}
 
@@ -133,16 +75,21 @@ public class ReverseBeep implements PluginLifecycleComponent
 	{
 		if (e.getVarbitId() == VarbitID.SAILING_SIDEPANEL_BOAT_MOVE_MODE)
 		{
-			if (e.getValue() == 3)
-			{
-				this.reversing = true;
-				doBeeps();
-			}
-			else
-			{
-				this.reversing = false;
-				stopBeeps();
-			}
+			reversing = e.getValue() == VARB_VALUE_REVERSING;
 		}
 	}
+
+	private void beepOnce()
+	{
+		try
+		{
+			audioPlayer.play(ReverseBeep.class, "beep.wav", gain);
+		}
+		catch (Exception e)
+		{
+			log.warn("Failed to play beep", e);
+			beepTask.cancel(false);
+		}
+	}
+
 }

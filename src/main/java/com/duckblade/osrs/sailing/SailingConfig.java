@@ -1,5 +1,6 @@
 package com.duckblade.osrs.sailing;
 
+import com.duckblade.osrs.sailing.features.reversebeep.ReverseBeep;
 import java.awt.Color;
 import net.runelite.client.config.Alpha;
 import net.runelite.client.config.Config;
@@ -7,6 +8,7 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 import net.runelite.client.config.Notification;
+import net.runelite.client.config.Range;
 import net.runelite.client.util.ColorUtil;
 
 @ConfigGroup(SailingConfig.CONFIG_GROUP)
@@ -866,5 +868,19 @@ public interface SailingConfig extends Config
 	default boolean reverseBeep()
 	{
 		return false;
+	}
+
+	int REVERSE_BEEP_MAX = 100;
+	@ConfigItem(
+		keyName = "reverseBeepVolume",
+		name = "Reverse Beep Volume",
+		description = "From 1-100.",
+		section = SECTION_SILLY,
+		position = 2
+	)
+	@Range(max = REVERSE_BEEP_MAX)
+	default int reverseBeepVolume()
+	{
+		return 25;
 	}
 }
