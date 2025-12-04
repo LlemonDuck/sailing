@@ -411,6 +411,18 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
+    @ConfigItem(
+            keyName = "hideCargoHoldOptionsDuringTrials",
+            name = "Deprio Cargo Hold During BT",
+            description = "Hides cargo hold options while in BT and at helm, preventing unintended stop-nav when setting/trimming sails.",
+            section = SECTION_MES,
+            position = 4
+    )
+    default boolean hideCargoHoldOptionsDuringTrials()
+    {
+        return true;
+    }
+
 	enum ShowChartsMode
 	{
 		NONE,
