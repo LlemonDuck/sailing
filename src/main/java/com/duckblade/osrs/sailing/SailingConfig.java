@@ -96,6 +96,14 @@ public interface SailingConfig extends Config
 	)
 	String SECTION_OCEAN_ENCOUNTERS = "oceanEncounters";
 
+	@ConfigSection(
+		name = "Silly Things",
+		description = "Fun options for the lighthearted sailor.",
+		position = 1100,
+		closedByDefault = true
+	)
+	String SECTION_SILLY = "silly";
+
 	@ConfigItem(
 		keyName = "highlightRapids",
 		name = "Highlight Rapids",
@@ -258,18 +266,6 @@ public interface SailingConfig extends Config
 	default boolean navigationOverlaySpeed()
 	{
 		return true;
-	}
-
-	@ConfigItem(
-		keyName = "reverseBeep",
-		name = "Reverse Beep",
-		description = "Become a truck",
-		section = SECTION_NAVIGATION,
-		position = 7
-	)
-	default boolean reverseBeep()
-	{
-		return false;
 	}
 
 	@ConfigItem(
@@ -858,5 +854,17 @@ public interface SailingConfig extends Config
 	default Notification notifyOceanManSpawn()
 	{
 		return Notification.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "reverseBeep",
+		name = "Reverse Beep",
+		description = "Become a truck",
+		section = SECTION_SILLY,
+		position = 1
+	)
+	default boolean reverseBeep()
+	{
+		return false;
 	}
 }
