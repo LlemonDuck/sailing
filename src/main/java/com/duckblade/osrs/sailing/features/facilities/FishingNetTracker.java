@@ -8,6 +8,7 @@ import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.SpriteID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -72,8 +73,8 @@ public class FishingNetTracker extends Overlay
     // Java
     @Override
     public Dimension render(Graphics2D graphics) {
-        int netDownSpriteId = 6860;
-        int netUpSpriteId = 6862;
+        int netDownSpriteId = SpriteID.IconChevron16x16._2;
+        int netUpSpriteId = SpriteID.IconChevron16x16._4;
         int firstNetDown, firstNetUp, secondNetDown, secondNetUp;
         // chevron down icon id: 897 or 6860?
         // chevron up icon id: 897 or 6862?
