@@ -25,12 +25,20 @@ public class SailingUtil
 		3 // 3? confirm sloop?
 	);
 	public static final int ACCOUNT_TYPE_UIM = 2;
+	public static final int SAILING_BOAT_FACILITY_LOCKEDIN_HELM = 3;
 
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public static boolean isSailing(Client client)
 	{
 		return client.getLocalPlayer() != null &&
 			!client.getLocalPlayer().getWorldView().isTopLevel();
+	}
+
+	public static boolean isInBarracudaTrialAndAtHelm(Client client)
+	{
+		return isSailing(client)
+			&& client.getVarbitValue(VarbitID.SAILING_BT_IN_TRIAL) > 0
+			&& client.getVarbitValue(VarbitID.SAILING_BOAT_FACILITY_LOCKEDIN) == SAILING_BOAT_FACILITY_LOCKEDIN_HELM;
 	}
 
 	public static boolean isUim(Client client)
