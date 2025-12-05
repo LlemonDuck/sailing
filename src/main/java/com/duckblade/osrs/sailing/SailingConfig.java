@@ -7,6 +7,7 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 import net.runelite.client.config.Notification;
+import net.runelite.client.config.Range;
 import net.runelite.client.util.ColorUtil;
 
 @ConfigGroup(SailingConfig.CONFIG_GROUP)
@@ -104,6 +105,14 @@ public interface SailingConfig extends Config
 	)
 	String SECTION_OCEAN_ENCOUNTERS = "oceanEncounters";
 
+	@ConfigSection(
+		name = "Silly Things",
+		description = "Fun options for the lighthearted sailor.",
+		position = 1100,
+		closedByDefault = true
+	)
+	String SECTION_SILLY = "silly";
+
 	@ConfigItem(
 		keyName = "highlightRapids",
 		name = "Highlight Rapids",
@@ -178,6 +187,94 @@ public interface SailingConfig extends Config
 	default Color lightningCloudStrikeColour()
 	{
 		return new Color(210, 109, 3);
+	}
+
+	enum TrueTileMode
+	{
+		OFF,
+		NAVIGATING,
+		ALWAYS,
+		;
+	}
+
+	@ConfigItem(
+		keyName = "navigationTrueTileIndicator",
+		name = "True \"Tile\"",
+		description = "Shows the location of your boat according to the server.<br>NOTE: Boats use sub-tile positioning.",
+		section = SECTION_NAVIGATION,
+		position = 7
+	)
+	default TrueTileMode navigationTrueTileIndicator()
+	{
+		return TrueTileMode.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "navigationTrueTileIndicatorColor",
+		name = "True \"Tile\" Colour",
+		description = "The colour to use for indicating your true \"tile\".",
+		section = SECTION_NAVIGATION,
+		position = 8
+	)
+	default Color navigationTrueTileIndicatorColor()
+	{
+		return Color.CYAN;
+	}
+
+	enum NavigationOverlayMode
+	{
+		OFF,
+		NAVIGATING,
+		ALWAYS,
+		;
+	}
+
+	@ConfigItem(
+		keyName = "navigationOverlayMode",
+		name = "Sail Overlay",
+		description = "Overlays basic navigational info on your sails.",
+		section = SECTION_NAVIGATION,
+		position = 9
+	)
+	default NavigationOverlayMode navigationOverlayMode()
+	{
+		return NavigationOverlayMode.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "navigationOverlayColour",
+		name = "Sail Overlay: Colour",
+		description = "Colour to render the sails overlay with.",
+		section = SECTION_NAVIGATION,
+		position = 10
+	)
+	default Color navigationOverlayColour()
+	{
+		return new Color(0xC4C4C4);
+	}
+
+	@ConfigItem(
+		keyName = "navigationOverlayHeading",
+		name = "Sail Overlay: Heading",
+		description = "Shows the heading of your boat.",
+		section = SECTION_NAVIGATION,
+		position = 11
+	)
+	default boolean navigationOverlayHeading()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "navigationOverlaySpeed",
+		name = "Sail Overlay: Speed",
+		description = "Shows the speed of your boat in quarter-tile units.",
+		section = SECTION_NAVIGATION,
+		position = 12
+	)
+	default boolean navigationOverlaySpeed()
+	{
+		return true;
 	}
 
 	@ConfigItem(
@@ -859,5 +956,31 @@ public interface SailingConfig extends Config
 	default Notification notifyOceanManSpawn()
 	{
 		return Notification.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "reverseBeep",
+		name = "Reverse Beep",
+		description = "Become a truck",
+		section = SECTION_SILLY,
+		position = 1
+	)
+	default boolean reverseBeep()
+	{
+		return false;
+	}
+
+	int REVERSE_BEEP_MAX = 100;
+	@ConfigItem(
+		keyName = "reverseBeepVolume",
+		name = "Reverse Beep Volume",
+		description = "From 1-100.",
+		section = SECTION_SILLY,
+		position = 2
+	)
+	@Range(max = REVERSE_BEEP_MAX)
+	default int reverseBeepVolume()
+	{
+		return 25;
 	}
 }

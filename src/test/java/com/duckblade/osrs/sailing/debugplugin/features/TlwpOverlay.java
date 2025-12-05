@@ -58,12 +58,12 @@ public class TlwpOverlay
 
 		LocalPoint tllp = boatTracker.getBoat()
 			.getWorldEntity()
-			.transformToMainWorld(boatTracker.getBoat().getHull().getLocalLocation());
+			.getLocalLocation();
 		Point canvasPoint = Perspective.localToCanvas(client, tllp, 0);
 		if (canvasPoint != null)
 		{
 			graphics.setColor(Color.PINK);
-			graphics.drawRect(canvasPoint.getX() - 5, canvasPoint.getY() - 5, 10, 10);
+			graphics.drawRect(canvasPoint.getX() - 5, canvasPoint.getY() - 5, 11, 11);
 			graphics.drawRect(canvasPoint.getX(), canvasPoint.getY(), 1, 1);
 		}
 

@@ -33,7 +33,7 @@ public interface SailingDebugConfig extends Config
 	@ConfigItem(
 		keyName = "tlwp",
 		name = "Top Level WP Default On",
-		description = ""
+		description = "also toggleable with ::tlwp"
 	)
 	default boolean tlwp()
 	{
@@ -46,6 +46,16 @@ public interface SailingDebugConfig extends Config
 		description = ""
 	)
 	default boolean courierTaskInfo()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "routeOverlayDefaultOn",
+		name = "Route Default On",
+		description = "also toggleable with ::route"
+	)
+	default boolean routeOverlayDefaultOn()
 	{
 		return true;
 	}

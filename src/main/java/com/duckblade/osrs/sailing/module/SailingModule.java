@@ -1,6 +1,7 @@
 package com.duckblade.osrs.sailing.module;
 
 import com.duckblade.osrs.sailing.SailingConfig;
+import com.duckblade.osrs.sailing.features.reversebeep.ReverseBeep;
 import com.duckblade.osrs.sailing.features.barracudatrials.HidePortalTransitions;
 import com.duckblade.osrs.sailing.features.barracudatrials.JubblyJiveHelper;
 import com.duckblade.osrs.sailing.features.barracudatrials.LostCargoHighlighter;
@@ -24,7 +25,9 @@ import com.duckblade.osrs.sailing.features.mes.DeprioSailsOffHelm;
 import com.duckblade.osrs.sailing.features.mes.HideStopNavigatingDuringTrials;
 import com.duckblade.osrs.sailing.features.mes.PrioritizeCargoHold;
 import com.duckblade.osrs.sailing.features.navigation.LightningCloudsOverlay;
+import com.duckblade.osrs.sailing.features.navigation.NavigationOverlay;
 import com.duckblade.osrs.sailing.features.navigation.RapidsOverlay;
+import com.duckblade.osrs.sailing.features.navigation.TrueTileIndicator;
 import com.duckblade.osrs.sailing.features.oceanencounters.Castaway;
 import com.duckblade.osrs.sailing.features.oceanencounters.ClueCasket;
 import com.duckblade.osrs.sailing.features.oceanencounters.ClueTurtle;
@@ -91,12 +94,15 @@ public class SailingModule extends AbstractModule
 		OceanMan oceanMan,
 		PrioritizeCargoHold prioritizeCargoHold,
 		RapidsOverlay rapidsOverlay,
+		ReverseBeep reverseBeep,
 		SalvagingHighlight salvagingHighlight,
 		SeaChartOverlay seaChartOverlay,
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
 		ShoalOverlay shoalOverlay,
 		SpeedBoostInfoBox speedBoostInfoBox,
+		NavigationOverlay navigationOverlay,
+		TrueTileIndicator trueTileIndicator,
 		WeatherTaskTracker weatherTaskTracker
 	)
 	{
@@ -128,15 +134,18 @@ public class SailingModule extends AbstractModule
 			.add(mermaidTaskSolver)
 			.add(mysteriousGlow)
 			.add(netCapacityOverlay)
+			.add(navigationOverlay)
 			.add(oceanMan)
 			.add(prioritizeCargoHold)
 			.add(rapidsOverlay)
+			.add(reverseBeep)
 			.add(salvagingHighlight)
 			.add(seaChartOverlay)
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
 			.add(shoalOverlay)
 			.add(speedBoostInfoBox)
+			.add(trueTileIndicator)
 			.add(weatherTaskTracker);
 
 		// features still in development

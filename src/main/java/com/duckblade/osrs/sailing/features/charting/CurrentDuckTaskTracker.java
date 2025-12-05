@@ -146,13 +146,17 @@ public class CurrentDuckTaskTracker
 			OverlayUtil.renderTileOverlay(client, graphics, destLp, sprite, Color.GREEN);
 		}
 
-		SailingGraphicsUtil.renderBoatArrowTowardPoint(
-			graphics,
-			client,
-			boatTracker,
-			dest,
-			Color.ORANGE
-		);
+		if (SailingUtil.isSailing(client))
+		{
+			SailingGraphicsUtil.renderBoatArrowTowardPoint(
+				graphics,
+				client,
+				boatTracker,
+				dest,
+				Color.ORANGE
+			);
+			return null;
+		}
 
 		return null;
 	}

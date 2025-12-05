@@ -1,6 +1,7 @@
 package com.duckblade.osrs.sailing.features.salvaging;
 
 import com.duckblade.osrs.sailing.SailingConfig;
+import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import com.google.common.collect.ImmutableMap;
 import java.awt.Color;
@@ -102,6 +103,11 @@ public class SalvagingHighlight
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
+		if (!SailingUtil.isSailing(client))
+		{
+			return null;
+		}
+
 		int sailingLevel = client.getBoostedSkillLevel(Skill.SAILING);
 
 		for (GameObject wreck : wrecks)
