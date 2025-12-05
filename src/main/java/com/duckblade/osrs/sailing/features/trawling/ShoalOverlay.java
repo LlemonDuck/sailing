@@ -8,8 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.Perspective;
+
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
+
 import net.runelite.api.events.WorldViewUnloaded;
 import net.runelite.api.gameval.ObjectID;
 import net.runelite.client.eventbus.Subscribe;
@@ -66,6 +68,7 @@ public class ShoalOverlay extends Overlay
         this.config = config;
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_SCENE);
+        setPriority(PRIORITY_HIGH);
     }
 
     @Override
@@ -89,8 +92,8 @@ public class ShoalOverlay extends Overlay
         GameObject obj = e.getGameObject();
         int objectId = obj.getId();
         if (SHOAL_CLICKBOX_IDS.contains(objectId) || SHOAL_OBJECT_IDS.contains(objectId)) {
-            log.debug("Shoal spawned with ID {} at {} (total shoals: {})", objectId, obj.getLocalLocation(), shoals.size() + 1);
             shoals.add(obj);
+            log.debug("Shoal spawned with ID {} at {} (total shoals: {})", objectId, obj.getLocalLocation(), shoals.size());
         }
     }
 
@@ -106,34 +109,52 @@ public class ShoalOverlay extends Overlay
     public void onWorldViewUnloaded(WorldViewUnloaded e) {
         // Only clear shoals when we're not actively sailing
         // During sailing, shoals move and respawn frequently, so we keep them tracked
-        if (e.getWorldView().isTopLevel() && !SailingUtil.isSailing(client)) {
+        if (!e.getWorldView().isTopLevel()) {
+            return;
+        }
+        
+        // Check if player and worldview are valid before calling isSailing
+        if (client.getLocalPlayer() == null || client.getLocalPlayer().getWorldView() == null) {
+            log.debug("Top-level world view unloaded (player/worldview null), clearing {} shoals", shoals.size());
+            shoals.clear();
+            return;
+        }
+        
+        if (!SailingUtil.isSailing(client)) {
             log.debug("Top-level world view unloaded while not sailing, clearing {} shoals", shoals.size());
             shoals.clear();
         }
     }
 
+
+
     @Override
     public Dimension render(Graphics2D graphics) {
-        if (!config.trawlingHighlightShoals()) {
+        if (!config.trawlingHighlightShoals() || shoals.isEmpty()) {
             return null;
         }
 
-        if (shoals.isEmpty()) {
-            return null;
-        }
-
+        // Track which object IDs we've already rendered to avoid stacking overlays
+        Set<Integer> renderedIds = new HashSet<>();
+        
         for (GameObject shoal : shoals) {
-            renderShoal(graphics, shoal);
+            int objectId = shoal.getId();
+            // Only render one shoal per object ID to avoid overlay stacking
+            if (!renderedIds.contains(objectId)) {
+                renderShoalHighlight(graphics, shoal);
+                renderedIds.add(objectId);
+            }
         }
 
         return null;
     }
 
-    private void renderShoal(Graphics2D graphics, GameObject shoal) {
+    private void renderShoalHighlight(Graphics2D graphics, GameObject shoal) {
         Polygon poly = Perspective.getCanvasTileAreaPoly(client, shoal.getLocalLocation(), SHOAL_HIGHLIGHT_SIZE);
         if (poly != null) {
             Color color = config.trawlingShoalHighlightColour();
             OverlayUtil.renderPolygon(graphics, poly, color);
         }
     }
+
 }

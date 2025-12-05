@@ -84,9 +84,17 @@ public class NetCapacityOverlay extends OverlayPanel
     }
 
     private int parseFishCount(String message) {
+        String lowerMessage = message.toLowerCase();
+        
+        // Check for "a fish" or "an fish" (singular)
+        if (lowerMessage.contains(" a ") && !lowerMessage.contains(" catch a ")) {
+            return 1;
+        }
+        
+        // Check for number words
         String[] words = {"one", "two", "three", "four", "five", "six"};
         for (int i = 0; i < words.length; i++) {
-            if (message.toLowerCase().contains(" " + words[i] + " ")) {
+            if (lowerMessage.contains(" " + words[i] + " ")) {
                 return i + 1;
             }
         }
@@ -100,7 +108,7 @@ public class NetCapacityOverlay extends OverlayPanel
         }
 
         Boat boat = boatTracker.getBoat();
-        if (boat == null || boat.getNetTiers().isEmpty()) {
+        if (boat == null) {
             return null;
         }
 
