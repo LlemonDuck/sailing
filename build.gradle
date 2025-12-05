@@ -72,6 +72,23 @@ tasks.register('shadowJar', Jar) {
 	archiveFileName.set("${rootProject.name}-${project.version}-all.jar")
 }
 
+tasks.register('runTestClient', JavaExec) {
+	group = 'application'
+	description = 'Runs the SailingPluginTest main class'
+	
+	dependsOn testClasses
+	
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'com.duckblade.osrs.sailing.SailingPluginTest'
+	
+	args = ['--developer-mode']
+	
+	jvmArgs = [
+		'-ea',
+		'-Drunelite.pluginhub.skip=true'
+	]
+}
+
 idea {
     module {
         downloadSources = true

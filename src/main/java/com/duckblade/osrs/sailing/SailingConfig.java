@@ -33,6 +33,14 @@ public interface SailingConfig extends Config
 	String SECTION_FACILITIES = "facilities";
 
 	@ConfigSection(
+		name = "Trawling",
+		description = "Settings for fishing net trawling.",
+		position = 250,
+		closedByDefault = true
+	)
+	String SECTION_TRAWLING = "trawling";
+
+	@ConfigSection(
 		name = "Crewmates",
 		description = "Settings for your crewmates.",
 		position = 300,
@@ -256,6 +264,63 @@ public interface SailingConfig extends Config
 	default Color highlightCrystalExtractorInactiveColour()
 	{
 		return Color.YELLOW;
+	}
+
+	enum NetOperator
+	{
+		PLAYER,
+		CREWMATE,
+		;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingStarboardNetOperator",
+		name = "Starboard Net Operator",
+		description = "Who is operating the starboard fishing net.",
+		section = SECTION_TRAWLING,
+		position = 1
+	)
+	default NetOperator trawlingStarboardNetOperator()
+	{
+		return NetOperator.PLAYER;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingPortNetOperator",
+		name = "Port Net Operator",
+		description = "Who is operating the port fishing net.",
+		section = SECTION_TRAWLING,
+		position = 2
+	)
+	default NetOperator trawlingPortNetOperator()
+	{
+		return NetOperator.CREWMATE;
+	}
+
+	@ConfigItem(
+		keyName = "fishingNetRaiseHighlightColour",
+		name = "Raise Net Colour",
+		description = "Colour to highlight the raise net button when the net is too deep.",
+		section = SECTION_TRAWLING,
+		position = 3
+	)
+	@Alpha
+	default Color fishingNetRaiseHighlightColour()
+	{
+		return Color.GREEN;
+	}
+
+	@ConfigItem(
+		keyName = "fishingNetLowerHighlightColour",
+		name = "Lower Net Colour",
+		description = "Colour to highlight the lower net button when the net is too shallow.",
+		section = SECTION_TRAWLING,
+		position = 4
+	)
+	@Alpha
+	default Color fishingNetLowerHighlightColour()
+	{
+		return Color.RED;
 	}
 
 	enum CrewmateMuteMode

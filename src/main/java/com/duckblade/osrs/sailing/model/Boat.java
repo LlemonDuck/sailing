@@ -130,7 +130,7 @@ public class Boat
 	public String getDebugString()
 	{
 		return String.format(
-			"Id: %d, Hull: %s, Sail: %s, Helm: %s, Hook: %s, Cargo: %s",
+			"Id: %d, Hull: %s, Sail: %s, Helm: %s, Hook: %s, Cargo: %s, Nets: %s",
 			worldViewId,
 			getHullTier(),
 			getSailTier(),
@@ -139,7 +139,11 @@ public class Boat
 				.stream()
 				.map(SalvagingHookTier::toString)
 				.collect(Collectors.joining(", ", "[", "]")),
-			getCargoHoldTier()
+			getCargoHoldTier(),
+			getNetTiers()
+				.stream()
+				.map(FishingNetTier::toString)
+				.collect(Collectors.joining(", ", "[", "]"))
 		);
 	}
 }
