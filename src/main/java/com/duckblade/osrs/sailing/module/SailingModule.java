@@ -12,6 +12,7 @@ import com.duckblade.osrs.sailing.features.barracudatrials.splits.BarracudaSplit
 import com.duckblade.osrs.sailing.features.barracudatrials.splits.BarracudaSplitsTracker;
 import com.duckblade.osrs.sailing.features.charting.CurrentDuckTaskTracker;
 import com.duckblade.osrs.sailing.features.charting.MermaidTaskSolver;
+import com.duckblade.osrs.sailing.features.charting.SeaChartMapPointManager;
 import com.duckblade.osrs.sailing.features.charting.SeaChartOverlay;
 import com.duckblade.osrs.sailing.features.charting.SeaChartPanelOverlay;
 import com.duckblade.osrs.sailing.features.charting.SeaChartTaskIndex;
@@ -95,6 +96,7 @@ public class SailingModule extends AbstractModule
 		RapidsOverlay rapidsOverlay,
 		ReverseBeep reverseBeep,
 		SalvagingHighlight salvagingHighlight,
+		SeaChartMapPointManager seaChartMapPointManager,
 		SeaChartOverlay seaChartOverlay,
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
@@ -138,6 +140,7 @@ public class SailingModule extends AbstractModule
 			.add(reverseBeep)
 			.add(salvagingHighlight)
 			.add(seaChartOverlay)
+			.add(seaChartMapPointManager)
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
 			.add(speedBoostInfoBox)

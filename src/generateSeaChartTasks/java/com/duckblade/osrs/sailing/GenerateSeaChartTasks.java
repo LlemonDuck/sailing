@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class GenerateSeaChartTasks
 {
@@ -41,6 +42,8 @@ public class GenerateSeaChartTasks
 		System.out.println("{");
 		System.out.println();
 
+		var taskTypePat = Pattern.compile("GENERIC|SPYGLASS|DRINK_CRATE|CURRENT_DUCK|MERMAID_GUIDE|WEATHER");
+
 		try (Scanner scanner = new Scanner(Objects.requireNonNull(GenerateSeaChartTasks.class.getResourceAsStream("/chartables.tsv"))))
 		{
 			scanner.nextLine(); // skip header
@@ -57,13 +60,28 @@ public class GenerateSeaChartTasks
 				int dstY = Integer.parseInt(parts[7]);
 				int level = Integer.parseInt(parts[8]);
 
+				var varbName = varbNames.get(varb);
+
 				System.out.print("\t");
 				System.out.print("TASK_");
 				System.out.print(taskId);
 				System.out.print("(");
 				System.out.print(taskId);
 				System.out.print(", ");
-				System.out.print("VarbitID." + varbNames.get(varb));
+				{
+					var matcher = taskTypePat.matcher(varbName);
+					if (!matcher.find())
+					{
+						System.out.println("null");
+					}
+					else
+					{
+						System.out.print("SeaChartTaskType.");
+						System.out.print(matcher.group(0));
+					}
+					System.out.print(", ");
+				}
+				System.out.print("VarbitID." + varbName);
 				System.out.print(", ");
 				if (object != -1)
 				{
@@ -117,6 +135,7 @@ public class GenerateSeaChartTasks
 		System.out.println("\t;");
 		System.out.println();
 		System.out.println("\tprivate final int taskId;");
+		System.out.println("\tprivate final SeaChartTaskType type;");
 		System.out.println("\tprivate final int completionVarb;");
 		System.out.println("\tprivate final int objectId;");
 		System.out.println("\tprivate final int npcId;");
