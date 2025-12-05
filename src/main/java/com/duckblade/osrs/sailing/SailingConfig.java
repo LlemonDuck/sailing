@@ -402,7 +402,8 @@ public interface SailingConfig extends Config
     @ConfigItem(
             keyName = "LockToHelmDuringTrials",
             name = "Lock Player to Helm During BT",
-            description = "Deprioritizes non-navigational options while in a Barracuda Trial and at helm.",
+            description = "Deprioritizes non-navigational options while in a Barracuda Trial and at helm. " +
+                    "Currently only works with helm and cargo hold.",
             section = SECTION_MES,
             position = 4
     )
