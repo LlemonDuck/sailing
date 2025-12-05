@@ -40,17 +40,17 @@ public class LockToHelmDuringTrials
         .collect(Collectors.toUnmodifiableSet());
 
     private static final Comparator<MenuEntry> MENU_ENTRY_COMPARATOR =
-            Comparator.comparing((MenuEntry me) -> CARGO_HOLD_IDS.contains(me.getIdentifier())
-                            && me.getType() != MenuAction.EXAMINE_OBJECT)
-                .reversed();
+        Comparator.comparing((MenuEntry me) -> CARGO_HOLD_IDS.contains(me.getIdentifier())
+        && me.getType() != MenuAction.EXAMINE_OBJECT)
+        .reversed();
 
 	private final Client client;
 
     private boolean isNotSailingOrInTrials() {
         // Not sailing, not in BT or not at helm
         return !SailingUtil.isSailing(client)
-                || client.getVarbitValue(VarbitID.SAILING_BT_IN_TRIAL) == 0
-                || client.getVarbitValue(VarbitID.SAILING_BOAT_FACILITY_LOCKEDIN) != FACILITY_HELM;
+            || client.getVarbitValue(VarbitID.SAILING_BT_IN_TRIAL) == 0
+            || client.getVarbitValue(VarbitID.SAILING_BOAT_FACILITY_LOCKEDIN) != FACILITY_HELM;
     }
 
 	@Override
@@ -64,8 +64,7 @@ public class LockToHelmDuringTrials
 	{
         if (isNotSailingOrInTrials()) return;
 
-        if (OPTION_STOP_NAVIGATING.equals(e.getOption()) ||
-                OPTION_ESCAPE.equals(e.getOption()))
+        if (OPTION_STOP_NAVIGATING.equals(e.getOption()) || OPTION_ESCAPE.equals(e.getOption()))
         {
             // Push the Stop-navigating option down instead of removing it
             e.getMenuEntry().setDeprioritized(true);
@@ -79,9 +78,9 @@ public class LockToHelmDuringTrials
 
         Menu menu = client.getMenu();
         menu.setMenuEntries(
-                Arrays.stream(menu.getMenuEntries())
-                        .sorted(MENU_ENTRY_COMPARATOR)
-                        .toArray(MenuEntry[]::new)
+            Arrays.stream(menu.getMenuEntries())
+                .sorted(MENU_ENTRY_COMPARATOR)
+                .toArray(MenuEntry[]::new)
         );
     }
 
