@@ -359,17 +359,7 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(
-		keyName = "trawlingRecordShoalRoutes",
-		name = "Record Shoal Routes",
-		description = "Record shoal movement paths for route mapping. Routes will be logged to the console.",
-		section = SECTION_TRAWLING,
-		position = 8
-	)
-	default boolean trawlingRecordShoalRoutes()
-	{
-		return false;
-	}
+
 
 	enum CrewmateMuteMode
 	{

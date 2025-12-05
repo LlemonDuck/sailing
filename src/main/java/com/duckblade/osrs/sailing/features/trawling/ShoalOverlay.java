@@ -8,10 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.Perspective;
-import net.runelite.api.coords.WorldPoint;
+
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
-import net.runelite.api.events.GameTick;
+
 import net.runelite.api.events.WorldViewUnloaded;
 import net.runelite.api.gameval.ObjectID;
 import net.runelite.client.eventbus.Subscribe;
@@ -23,11 +23,7 @@ import net.runelite.client.ui.overlay.OverlayUtil;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -65,9 +61,6 @@ public class ShoalOverlay extends Overlay
     private final Client client;
     private final SailingConfig config;
     private final Set<GameObject> shoals = new HashSet<>();
-    
-    // Route tracking - track by object ID since shoals of same type follow same route
-    private final Map<Integer, List<WorldPoint>> recordedRoutes = new HashMap<>();
 
     @Inject
     public ShoalOverlay(Client client, SailingConfig config) {
@@ -75,12 +68,12 @@ public class ShoalOverlay extends Overlay
         this.config = config;
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_SCENE);
+        setPriority(PRIORITY_HIGH);
     }
 
     @Override
     public boolean isEnabled(SailingConfig config) {
-        // Enable if either highlighting or recording is enabled
-        return config.trawlingHighlightShoals() || config.trawlingRecordShoalRoutes();
+        return config.trawlingHighlightShoals();
     }
 
     @Override
@@ -91,11 +84,7 @@ public class ShoalOverlay extends Overlay
     @Override
     public void shutDown() {
         log.debug("ShoalOverlay shutting down");
-        if (config.trawlingRecordShoalRoutes() && !recordedRoutes.isEmpty()) {
-            exportRecordedRoutes();
-        }
         shoals.clear();
-        recordedRoutes.clear();
     }
 
     @Subscribe
@@ -104,11 +93,7 @@ public class ShoalOverlay extends Overlay
         int objectId = obj.getId();
         if (SHOAL_CLICKBOX_IDS.contains(objectId) || SHOAL_OBJECT_IDS.contains(objectId)) {
             shoals.add(obj);
-            if (config.trawlingRecordShoalRoutes()) {
-                log.info("Shoal spawned with ID {} at {} (total shoals: {})", objectId, obj.getWorldLocation(), shoals.size());
-            } else {
-                log.debug("Shoal spawned with ID {} at {} (total shoals: {})", objectId, obj.getLocalLocation(), shoals.size());
-            }
+            log.debug("Shoal spawned with ID {} at {} (total shoals: {})", objectId, obj.getLocalLocation(), shoals.size());
         }
     }
 
@@ -116,11 +101,7 @@ public class ShoalOverlay extends Overlay
     public void onGameObjectDespawned(GameObjectDespawned e) {
         GameObject obj = e.getGameObject();
         if (shoals.remove(obj)) {
-            if (config.trawlingRecordShoalRoutes()) {
-                log.info("Shoal despawned with ID {} at {} (remaining shoals: {})", obj.getId(), obj.getWorldLocation(), shoals.size());
-            } else {
-                log.debug("Shoal despawned with ID {}", obj.getId());
-            }
+            log.debug("Shoal despawned with ID {}", obj.getId());
         }
     }
 
@@ -145,63 +126,30 @@ public class ShoalOverlay extends Overlay
         }
     }
 
-    @Subscribe
-    public void onGameTick(GameTick e) {
-        if (!config.trawlingRecordShoalRoutes()) {
-            return;
-        }
 
-        // Check if sailing with null safety
-        if (client.getLocalPlayer() == null || client.getLocalPlayer().getWorldView() == null) {
-            log.info("GameTick: Player or WorldView is null, skipping");
-            return;
-        }
-        
-        boolean isSailing = SailingUtil.isSailing(client);
-        if (!isSailing) {
-            log.info("GameTick: Not sailing, skipping");
-            return;
-        }
-
-        log.info("GameTick: Recording routes for {} shoals", shoals.size());
-
-        // Track positions of all active shoals
-        for (GameObject shoal : shoals) {
-            int objectId = shoal.getId();
-            WorldPoint currentPos = shoal.getWorldLocation();
-            
-            // Initialize route list if needed
-            List<WorldPoint> route = recordedRoutes.computeIfAbsent(objectId, k -> new ArrayList<>());
-            
-            // Avoid duplicate consecutive positions
-            if (route.isEmpty() || !route.get(route.size() - 1).equals(currentPos)) {
-                route.add(currentPos);
-                log.info("Recorded position for shoal {}: {} (total waypoints: {})", 
-                        objectId, currentPos, route.size());
-            } else {
-                log.info("Shoal {} still at same position: {}", objectId, currentPos);
-            }
-        }
-    }
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        if (!config.trawlingHighlightShoals()) {
+        if (!config.trawlingHighlightShoals() || shoals.isEmpty()) {
             return null;
         }
 
-        if (shoals.isEmpty()) {
-            return null;
-        }
-
+        // Track which object IDs we've already rendered to avoid stacking overlays
+        Set<Integer> renderedIds = new HashSet<>();
+        
         for (GameObject shoal : shoals) {
-            renderShoal(graphics, shoal);
+            int objectId = shoal.getId();
+            // Only render one shoal per object ID to avoid overlay stacking
+            if (!renderedIds.contains(objectId)) {
+                renderShoalHighlight(graphics, shoal);
+                renderedIds.add(objectId);
+            }
         }
 
         return null;
     }
 
-    private void renderShoal(Graphics2D graphics, GameObject shoal) {
+    private void renderShoalHighlight(Graphics2D graphics, GameObject shoal) {
         Polygon poly = Perspective.getCanvasTileAreaPoly(client, shoal.getLocalLocation(), SHOAL_HIGHLIGHT_SIZE);
         if (poly != null) {
             Color color = config.trawlingShoalHighlightColour();
@@ -209,28 +157,4 @@ public class ShoalOverlay extends Overlay
         }
     }
 
-    private void exportRecordedRoutes() {
-        log.info("=== RECORDED SHOAL ROUTES ===");
-        for (Map.Entry<Integer, List<WorldPoint>> entry : recordedRoutes.entrySet()) {
-            int objectId = entry.getKey();
-            List<WorldPoint> route = entry.getValue();
-            
-            if (route.isEmpty()) {
-                continue;
-            }
-            
-            log.info("Shoal ID {}: {} waypoints", objectId, route.size());
-            log.info("SHOAL_ROUTES.put({}, Arrays.asList(", objectId);
-            
-            for (int i = 0; i < route.size(); i++) {
-                WorldPoint wp = route.get(i);
-                String comma = (i < route.size() - 1) ? "," : "";
-                log.info("    new WorldPoint({}, {}, {}){}", wp.getX(), wp.getY(), wp.getPlane(), comma);
-            }
-            
-            log.info("));");
-            log.info("");
-        }
-        log.info("=== END RECORDED ROUTES ===");
-    }
 }
