@@ -10,6 +10,7 @@ import net.runelite.api.Client;
 import net.runelite.api.Menu;
 import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
+import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.PostMenuSort;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.eventbus.Subscribe;
@@ -24,11 +25,14 @@ import java.util.stream.Collectors;
 @Slf4j
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
-public class HideCargoHoldDuringBT
+public class LockToHelmDuringTrials
 	implements PluginLifecycleComponent
 {
 
 	private static final int FACILITY_HELM = 3;
+    private static final String OPTION_STOP_NAVIGATING = "Stop-navigating";
+    private static final String OPTION_ESCAPE = "Escape";
+
     private static final Set<Integer> CARGO_HOLD_IDS = Arrays.stream(CargoHoldTier.values())
         .map(CargoHoldTier::getGameObjectIds)
         .flatMapToInt(Arrays::stream)
@@ -42,35 +46,43 @@ public class HideCargoHoldDuringBT
 
 	private final Client client;
 
+    private boolean isNotSailingOrInTrials() {
+        // Not sailing, not in BT or not at helm
+        return !SailingUtil.isSailing(client)
+                || client.getVarbitValue(VarbitID.SAILING_BT_IN_TRIAL) == 0
+                || client.getVarbitValue(VarbitID.SAILING_BOAT_FACILITY_LOCKEDIN) != FACILITY_HELM;
+    }
+
 	@Override
 	public boolean isEnabled(SailingConfig config)
 	{
-		return config.hideCargoHoldOptionsDuringTrials();
+		return config.lockToHelmDuringTrials();
 	}
 
-	@Subscribe(priority = -99)
-	public void onPostMenuSort(PostMenuSort e)
+	@Subscribe
+    public void onMenuEntryAdded(MenuEntryAdded e)
 	{
-		if (!SailingUtil.isSailing(client))
-		{
-			return;
-		}
+        if (isNotSailingOrInTrials()) return;
 
-        // todo getSailingFacility
-		// todo crewmate support?
-		if (client.getVarbitValue(VarbitID.SAILING_BT_IN_TRIAL) == 0
-                || client.getVarbitValue(VarbitID.SAILING_BOAT_FACILITY_LOCKEDIN) != FACILITY_HELM)
-		{
-            // Not in BT or not at helm
-            return;
-		}
-
-		Menu menu = client.getMenu();
-        menu.setMenuEntries(
-            Arrays.stream(menu.getMenuEntries())
-                .sorted(MENU_ENTRY_COMPARATOR)
-                .toArray(MenuEntry[]::new)
-		);
+        if (OPTION_STOP_NAVIGATING.equals(e.getOption()) ||
+                OPTION_ESCAPE.equals(e.getOption()))
+        {
+            // Push the Stop-navigating option down instead of removing it
+            e.getMenuEntry().setDeprioritized(true);
+        }
 	}
+
+    @Subscribe(priority = -99)
+    public void onPostMenuSort(PostMenuSort e)
+    {
+        if (isNotSailingOrInTrials()) return;
+
+        Menu menu = client.getMenu();
+        menu.setMenuEntries(
+                Arrays.stream(menu.getMenuEntries())
+                        .sorted(MENU_ENTRY_COMPARATOR)
+                        .toArray(MenuEntry[]::new)
+        );
+    }
 
 }

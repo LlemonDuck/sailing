@@ -399,26 +399,14 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(
-		keyName = "hideStopNavigatingDuringTrials",
-		name = "Deprio Stop-navigating During BT",
-		description = "Deprioritizes the 'Stop-navigating' and 'Escape' option while you are in a Barracuda Trial.",
-		section = SECTION_MES,
-		position = 3
-	)
-	default boolean hideStopNavigatingDuringTrials()
-	{
-		return true;
-	}
-
     @ConfigItem(
-            keyName = "hideCargoHoldOptionsDuringTrials",
-            name = "Deprio Cargo Hold During BT",
-            description = "Deprioritizes cargo hold options while in a Barracuda Trial and at helm.",
+            keyName = "LockToHelmDuringTrials",
+            name = "Lock Player to Helm During BT",
+            description = "Deprioritizes non-navigational options while in a Barracuda Trial and at helm.",
             section = SECTION_MES,
             position = 4
     )
-    default boolean hideCargoHoldOptionsDuringTrials()
+    default boolean lockToHelmDuringTrials()
     {
         return true;
     }
