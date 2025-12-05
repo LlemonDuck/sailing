@@ -1,6 +1,11 @@
 package com.duckblade.osrs.sailing.features.util;
-
-import com.duckblade.osrs.sailing.model.*;
+import com.duckblade.osrs.sailing.model.Boat;
+import com.duckblade.osrs.sailing.model.CargoHoldTier;
+import com.duckblade.osrs.sailing.model.HelmTier;
+import com.duckblade.osrs.sailing.model.HullTier;
+import com.duckblade.osrs.sailing.model.SailTier;
+import com.duckblade.osrs.sailing.model.SalvagingHookTier;
+import com.duckblade.osrs.sailing.model.FishingNetTier;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import java.util.HashMap;
 import java.util.Map;
