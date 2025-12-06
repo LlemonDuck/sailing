@@ -1,6 +1,7 @@
 package com.duckblade.osrs.sailing.module;
 
 import com.duckblade.osrs.sailing.SailingConfig;
+import com.duckblade.osrs.sailing.features.reversebeep.ReverseBeep;
 import com.duckblade.osrs.sailing.features.barracudatrials.HidePortalTransitions;
 import com.duckblade.osrs.sailing.features.barracudatrials.JubblyJiveHelper;
 import com.duckblade.osrs.sailing.features.barracudatrials.LostCargoHighlighter;
@@ -11,6 +12,7 @@ import com.duckblade.osrs.sailing.features.barracudatrials.splits.BarracudaSplit
 import com.duckblade.osrs.sailing.features.barracudatrials.splits.BarracudaSplitsTracker;
 import com.duckblade.osrs.sailing.features.charting.CurrentDuckTaskTracker;
 import com.duckblade.osrs.sailing.features.charting.MermaidTaskSolver;
+import com.duckblade.osrs.sailing.features.charting.SeaChartMapPointManager;
 import com.duckblade.osrs.sailing.features.charting.SeaChartOverlay;
 import com.duckblade.osrs.sailing.features.charting.SeaChartPanelOverlay;
 import com.duckblade.osrs.sailing.features.charting.SeaChartTaskIndex;
@@ -27,7 +29,9 @@ import com.duckblade.osrs.sailing.features.mes.DeprioSailsOffHelm;
 import com.duckblade.osrs.sailing.features.mes.HideStopNavigatingDuringTrials;
 import com.duckblade.osrs.sailing.features.mes.PrioritizeCargoHold;
 import com.duckblade.osrs.sailing.features.navigation.LightningCloudsOverlay;
+import com.duckblade.osrs.sailing.features.navigation.NavigationOverlay;
 import com.duckblade.osrs.sailing.features.navigation.RapidsOverlay;
+import com.duckblade.osrs.sailing.features.navigation.TrueTileIndicator;
 import com.duckblade.osrs.sailing.features.oceanencounters.Castaway;
 import com.duckblade.osrs.sailing.features.oceanencounters.ClueCasket;
 import com.duckblade.osrs.sailing.features.oceanencounters.ClueTurtle;
@@ -91,13 +95,17 @@ public class SailingModule extends AbstractModule
 		OceanMan oceanMan,
 		PrioritizeCargoHold prioritizeCargoHold,
 		RapidsOverlay rapidsOverlay,
+		ReverseBeep reverseBeep,
 		SalvagingHighlight salvagingHighlight,
+		SeaChartMapPointManager seaChartMapPointManager,
 		SeaChartOverlay seaChartOverlay,
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
 		SpeedBoostInfoBox speedBoostInfoBox,
+		NavigationOverlay navigationOverlay,
+		TrueTileIndicator trueTileIndicator,
 		WeatherTaskTracker weatherTaskTracker,
-		LowHPNotification lowHPNotification
+    LowHPNotification lowHPNotification
 	)
 	{
 		var builder = ImmutableSet.<PluginLifecycleComponent>builder()
@@ -127,16 +135,20 @@ public class SailingModule extends AbstractModule
 			.add(crystalExtractorHighlight)
 			.add(mermaidTaskSolver)
 			.add(mysteriousGlow)
+			.add(navigationOverlay)
 			.add(oceanMan)
 			.add(prioritizeCargoHold)
 			.add(rapidsOverlay)
+			.add(reverseBeep)
 			.add(salvagingHighlight)
 			.add(seaChartOverlay)
+			.add(seaChartMapPointManager)
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
 			.add(speedBoostInfoBox)
+			.add(trueTileIndicator)
 			.add(weatherTaskTracker)
-			.add(lowHPNotification);
+      .add(lowHPNotification);
 
 		// features still in development
 		if (developerMode)

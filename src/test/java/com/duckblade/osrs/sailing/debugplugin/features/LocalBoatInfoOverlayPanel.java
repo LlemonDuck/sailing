@@ -1,5 +1,7 @@
-package com.duckblade.osrs.sailing.debugplugin;
+package com.duckblade.osrs.sailing.debugplugin.features;
 
+import com.duckblade.osrs.sailing.debugplugin.SailingDebugConfig;
+import com.duckblade.osrs.sailing.debugplugin.module.DebugLifecycleComponent;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.model.Boat;
 import com.duckblade.osrs.sailing.model.SalvagingHookTier;
@@ -15,21 +17,26 @@ import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
 
 @Singleton
-public class SailingDebugLocalBoatInfoOverlayPanel
+public class LocalBoatInfoOverlayPanel
 	extends OverlayPanel
+	implements DebugLifecycleComponent
 {
 
 	private final BoatTracker boatTracker;
-	private final SailingDebugConfig config;
 
 	@Inject
-	public SailingDebugLocalBoatInfoOverlayPanel(BoatTracker boatTracker, SailingDebugConfig config)
+	public LocalBoatInfoOverlayPanel(BoatTracker boatTracker)
 	{
 		this.boatTracker = boatTracker;
-		this.config = config;
 
 		setPreferredPosition(OverlayPosition.TOP_LEFT);
 		setLayer(OverlayLayer.ALWAYS_ON_TOP);
+	}
+
+	@Override
+	public boolean isEnabled(SailingDebugConfig config)
+	{
+		return config.localBoatInfo();
 	}
 
 	@Override

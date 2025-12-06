@@ -1,6 +1,6 @@
-package com.duckblade.osrs.sailing.module;
+package com.duckblade.osrs.sailing.debugplugin.module;
 
-import com.duckblade.osrs.sailing.SailingConfig;
+import com.duckblade.osrs.sailing.debugplugin.SailingDebugConfig;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -26,17 +26,17 @@ import net.runelite.client.util.GameEventManager;
 @Slf4j
 @Singleton
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class ComponentManager
+public class DebugComponentManager
 {
 
 	private final EventBus eventBus;
 	private final OverlayManager overlayManager;
 	private final InfoBoxManager infoBoxManager;
 	private final GameEventManager gameEventManager;
-	private final SailingConfig config;
-	private final Set<PluginLifecycleComponent> components;
+	private final SailingDebugConfig config;
+	private final Set<DebugLifecycleComponent> components;
 
-	private final Map<PluginLifecycleComponent, Boolean> states = new HashMap<>();
+	private final Map<DebugLifecycleComponent, Boolean> states = new HashMap<>();
 
 	public void onPluginStart()
 	{
@@ -56,7 +56,7 @@ public class ComponentManager
 	@Subscribe
 	public void onConfigChanged(ConfigChanged e)
 	{
-		if (!SailingConfig.CONFIG_GROUP.equals(e.getGroup()))
+		if (!SailingDebugConfig.CONFIG_GROUP.equals(e.getGroup()))
 		{
 			return;
 		}
@@ -86,7 +86,7 @@ public class ComponentManager
 		});
 	}
 
-	private void tryStartUp(PluginLifecycleComponent component)
+	private void tryStartUp(DebugLifecycleComponent component)
 	{
 		if (states.get(component))
 		{
@@ -121,7 +121,7 @@ public class ComponentManager
 		}
 	}
 
-	private void tryShutDown(PluginLifecycleComponent component)
+	private void tryShutDown(DebugLifecycleComponent component)
 	{
 		eventBus.unregister(component);
 		if (component instanceof Overlay)

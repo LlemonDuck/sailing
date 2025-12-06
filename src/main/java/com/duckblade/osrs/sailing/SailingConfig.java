@@ -7,6 +7,7 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 import net.runelite.client.config.Notification;
+import net.runelite.client.config.Range;
 import net.runelite.client.util.ColorUtil;
 
 @ConfigGroup(SailingConfig.CONFIG_GROUP)
@@ -97,9 +98,17 @@ public interface SailingConfig extends Config
 	String SECTION_OCEAN_ENCOUNTERS = "oceanEncounters";
 
 	@ConfigSection(
+		name = "Silly Things",
+		description = "Fun options for the lighthearted sailor.",
+		position = 1100,
+		closedByDefault = true
+	)
+	String SECTION_SILLY = "silly";
+  
+	@ConfigSection(
 		name = "Ship Combat",
 		description = "Settings for ship combat and health monitoring.",
-		position = 1100,
+		position = 1200,
 		closedByDefault = true
 	)
 	String SECTION_SHIP_COMBAT = "shipCombat";
@@ -178,6 +187,94 @@ public interface SailingConfig extends Config
 	default Color lightningCloudStrikeColour()
 	{
 		return new Color(210, 109, 3);
+	}
+
+	enum TrueTileMode
+	{
+		OFF,
+		NAVIGATING,
+		ALWAYS,
+		;
+	}
+
+	@ConfigItem(
+		keyName = "navigationTrueTileIndicator",
+		name = "True \"Tile\"",
+		description = "Shows the location of your boat according to the server.<br>NOTE: Boats use sub-tile positioning.",
+		section = SECTION_NAVIGATION,
+		position = 7
+	)
+	default TrueTileMode navigationTrueTileIndicator()
+	{
+		return TrueTileMode.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "navigationTrueTileIndicatorColor",
+		name = "True \"Tile\" Colour",
+		description = "The colour to use for indicating your true \"tile\".",
+		section = SECTION_NAVIGATION,
+		position = 8
+	)
+	default Color navigationTrueTileIndicatorColor()
+	{
+		return Color.CYAN;
+	}
+
+	enum NavigationOverlayMode
+	{
+		OFF,
+		NAVIGATING,
+		ALWAYS,
+		;
+	}
+
+	@ConfigItem(
+		keyName = "navigationOverlayMode",
+		name = "Sail Overlay",
+		description = "Overlays basic navigational info on your sails.",
+		section = SECTION_NAVIGATION,
+		position = 9
+	)
+	default NavigationOverlayMode navigationOverlayMode()
+	{
+		return NavigationOverlayMode.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "navigationOverlayColour",
+		name = "Sail Overlay: Colour",
+		description = "Colour to render the sails overlay with.",
+		section = SECTION_NAVIGATION,
+		position = 10
+	)
+	default Color navigationOverlayColour()
+	{
+		return new Color(0xC4C4C4);
+	}
+
+	@ConfigItem(
+		keyName = "navigationOverlayHeading",
+		name = "Sail Overlay: Heading",
+		description = "Shows the heading of your boat.",
+		section = SECTION_NAVIGATION,
+		position = 11
+	)
+	default boolean navigationOverlayHeading()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "navigationOverlaySpeed",
+		name = "Sail Overlay: Speed",
+		description = "Shows the speed of your boat in quarter-tile units.",
+		section = SECTION_NAVIGATION,
+		position = 12
+	)
+	default boolean navigationOverlaySpeed()
+	{
+		return true;
 	}
 
 	@ConfigItem(
@@ -330,6 +427,27 @@ public interface SailingConfig extends Config
 		CHARTED,
 		ALL,
 		;
+
+		public boolean isHidden(boolean completed, boolean meetsRequirements)
+		{
+			switch (this)
+			{
+				case ALL:
+					return false;
+
+				case CHARTED:
+					return !completed;
+
+				case UNCHARTED:
+					return completed;
+
+				case REQUIREMENTS_MET:
+					return completed || !meetsRequirements;
+
+				default:
+					return true;
+			}
+		}
 	}
 
 	@ConfigItem(
@@ -344,12 +462,26 @@ public interface SailingConfig extends Config
 		return ShowChartsMode.UNCHARTED;
 	}
 
+	String SHOW_CHARTS_ON_MAP = "showChartsOnMap";
+
+	@ConfigItem(
+		keyName = SHOW_CHARTS_ON_MAP,
+		name = "Charting Map Icons",
+		description = "Add icons for sea charting locations to the world map.",
+		section = SECTION_SEA_CHARTING,
+		position = 2
+	)
+	default ShowChartsMode showChartsOnMap()
+	{
+		return ShowChartsMode.UNCHARTED;
+	}
+
 	@ConfigItem(
 		keyName = "chartingUnchartedColor",
 		name = "Uncharted Colour",
 		description = "Colour to highlight nearby uncharted locations.",
 		section = SECTION_SEA_CHARTING,
-		position = 2
+		position = 3
 	)
 	@Alpha
 	default Color chartingUnchartedColor()
@@ -362,7 +494,7 @@ public interface SailingConfig extends Config
 		name = "Charted Colour",
 		description = "Colour to highlight nearby charted locations.",
 		section = SECTION_SEA_CHARTING,
-		position = 3
+		position = 4
 	)
 	@Alpha
 	default Color chartingChartedColor()
@@ -375,7 +507,7 @@ public interface SailingConfig extends Config
 		name = "Unavailable Colour",
 		description = "Colour to highlight nearby uncharted locations you do not meet requirements for.",
 		section = SECTION_SEA_CHARTING,
-		position = 4
+		position = 5
 	)
 	@Alpha
 	default Color chartingRequirementsUnmetColor()
@@ -388,7 +520,7 @@ public interface SailingConfig extends Config
 		name = "Weather Station Solver",
 		description = "Whether to provide a helper for weather charting.",
 		section = SECTION_SEA_CHARTING,
-		position = 5
+		position = 6
 	)
 	default boolean chartingWeatherSolver()
 	{
@@ -400,7 +532,7 @@ public interface SailingConfig extends Config
 		name = "Current Duck Solver",
 		description = "Whether to provide a helper for current duck trails.",
 		section = SECTION_SEA_CHARTING,
-		position = 6
+		position = 7
 	)
 	default boolean chartingDuckSolver()
 	{
@@ -412,7 +544,7 @@ public interface SailingConfig extends Config
 		name = "Mermaid Task Solver",
 		description = "Whether to provide a helper for mermaid charting tasks.",
 		section = SECTION_SEA_CHARTING,
-		position = 7
+		position = 8
 	)
 	default boolean chartingMermaidSolver()
 	{
@@ -769,6 +901,32 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "reverseBeep",
+		name = "Reverse Beep",
+		description = "Become a truck",
+		section = SECTION_SILLY,
+		position = 1
+	)
+	default boolean reverseBeep()
+	{
+		return false;
+	}
+
+	int REVERSE_BEEP_MAX = 100;
+	@ConfigItem(
+		keyName = "reverseBeepVolume",
+		name = "Reverse Beep Volume",
+		description = "From 1-100.",
+		section = SECTION_SILLY,
+		position = 2
+	)
+	@Range(max = REVERSE_BEEP_MAX)
+	default int reverseBeepVolume()
+	{
+		return 25;
+	}
+  
+  @ConfigItem(
 		keyName = "notifyLowBoatHP",
 		name = "Notify on Low Boat HP",
 		description = "Notify when your boat's hitpoints drop below the threshold.",

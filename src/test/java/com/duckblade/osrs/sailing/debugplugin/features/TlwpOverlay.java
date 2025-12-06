@@ -1,5 +1,7 @@
-package com.duckblade.osrs.sailing.debugplugin;
+package com.duckblade.osrs.sailing.debugplugin.features;
 
+import com.duckblade.osrs.sailing.debugplugin.SailingDebugConfig;
+import com.duckblade.osrs.sailing.debugplugin.module.DebugLifecycleComponent;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import java.awt.Color;
@@ -14,16 +16,15 @@ import net.runelite.api.Perspective;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.CommandExecuted;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
 @Singleton
-public class SailingDebugTlwpOverlay
+public class TlwpOverlay
 	extends Overlay
+	implements DebugLifecycleComponent
 {
 
 	private final Client client;
@@ -32,14 +33,19 @@ public class SailingDebugTlwpOverlay
 	private boolean active;
 
 	@Inject
-	public SailingDebugTlwpOverlay(Client client, BoatTracker boatTracker, SailingDebugConfig config)
+	public TlwpOverlay(Client client, BoatTracker boatTracker)
 	{
 		this.client = client;
 		this.boatTracker = boatTracker;
-		active = config.tlwpOverlayDefaultOn();
 
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ALWAYS_ON_TOP);
+	}
+
+	@Override
+	public boolean isEnabled(SailingDebugConfig config)
+	{
+		return config.tlwp();
 	}
 
 	@Override
@@ -52,12 +58,12 @@ public class SailingDebugTlwpOverlay
 
 		LocalPoint tllp = boatTracker.getBoat()
 			.getWorldEntity()
-			.transformToMainWorld(boatTracker.getBoat().getHull().getLocalLocation());
+			.getLocalLocation();
 		Point canvasPoint = Perspective.localToCanvas(client, tllp, 0);
 		if (canvasPoint != null)
 		{
 			graphics.setColor(Color.PINK);
-			graphics.drawRect(canvasPoint.getX() - 5, canvasPoint.getY() - 5, 10, 10);
+			graphics.drawRect(canvasPoint.getX() - 5, canvasPoint.getY() - 5, 11, 11);
 			graphics.drawRect(canvasPoint.getX(), canvasPoint.getY(), 1, 1);
 		}
 
@@ -69,14 +75,5 @@ public class SailingDebugTlwpOverlay
 		}
 
 		return null;
-	}
-
-	@Subscribe
-	public void onCommandExecuted(CommandExecuted e)
-	{
-		if (e.getCommand().equals("tlwp"))
-		{
-			active = !active;
-		}
 	}
 }

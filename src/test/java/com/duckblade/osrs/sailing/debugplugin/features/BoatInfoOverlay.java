@@ -1,5 +1,7 @@
-package com.duckblade.osrs.sailing.debugplugin;
+package com.duckblade.osrs.sailing.debugplugin.features;
 
+import com.duckblade.osrs.sailing.debugplugin.SailingDebugConfig;
+import com.duckblade.osrs.sailing.debugplugin.module.DebugLifecycleComponent;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.model.Boat;
 import java.awt.Color;
@@ -12,41 +14,39 @@ import net.runelite.api.Perspective;
 import net.runelite.api.Point;
 import net.runelite.api.WorldEntity;
 import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.events.CommandExecuted;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
 @Singleton
-public class SailingDebugBoatInfoOverlay extends Overlay
+public class BoatInfoOverlay
+	extends Overlay
+	implements DebugLifecycleComponent
 {
 
 	private final Client client;
 	private final BoatTracker boatTracker;
 
-	private boolean active;
-
 	@Inject
-	public SailingDebugBoatInfoOverlay(Client client, BoatTracker boatTracker, SailingDebugConfig config)
+	public BoatInfoOverlay(Client client, BoatTracker boatTracker)
 	{
 		this.client = client;
 		this.boatTracker = boatTracker;
-		active = config.boatInfoDefaultOn();
 
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ALWAYS_ON_TOP);
 	}
 
 	@Override
+	public boolean isEnabled(SailingDebugConfig config)
+	{
+		return config.boatInfo();
+	}
+
+	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		if (!active)
-		{
-			return null;
-		}
-
 		for (WorldEntity we : client.getTopLevelWorldView().worldEntities())
 		{
 			LocalPoint location = we.getLocalLocation();
@@ -76,15 +76,6 @@ public class SailingDebugBoatInfoOverlay extends Overlay
 		}
 
 		return null;
-	}
-
-	@Subscribe
-	public void onCommandExecuted(CommandExecuted e)
-	{
-		if (e.getCommand().equals("boats"))
-		{
-			active = !active;
-		}
 	}
 
 }

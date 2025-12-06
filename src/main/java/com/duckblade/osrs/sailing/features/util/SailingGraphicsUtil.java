@@ -1,7 +1,6 @@
 package com.duckblade.osrs.sailing.features.util;
 
 import com.duckblade.osrs.sailing.model.Boat;
-import com.duckblade.osrs.sailing.model.SizeClass;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
@@ -9,6 +8,7 @@ import net.runelite.api.Client;
 import net.runelite.api.Perspective;
 import static net.runelite.api.Perspective.LOCAL_HALF_TILE_SIZE;
 import static net.runelite.api.Perspective.LOCAL_TILE_SIZE;
+import net.runelite.api.WorldEntityConfig;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
@@ -66,8 +66,8 @@ public class SailingGraphicsUtil
 		LocalPoint targetLp = LocalPoint.fromScene(destination.getX() - baseX, destination.getY() - baseY, tlwv); // maybe outside the scene
 		LocalPoint boatLp = boat.getWorldEntity().getLocalLocation();
 
-		SizeClass sizeClass = boat.getSizeClass();
-		int radius = Math.max(sizeClass.getSizeX(), sizeClass.getSizeY()) + 5;
+		WorldEntityConfig wec = boat.getWorldEntity().getConfig();
+		int radius = Math.max(wec.getBoundsWidth(), wec.getBoundsHeight()) / LOCAL_TILE_SIZE + 5;
 		float[] arrowX = SailingGraphicsUtil.translate(ARROW_X, radius * LOCAL_HALF_TILE_SIZE); // push the arrow outside the boat
 		float[] arrowY = ARROW_Y;
 

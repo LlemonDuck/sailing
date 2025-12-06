@@ -4,16 +4,18 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
-@ConfigGroup("sailingdebug")
+@ConfigGroup(SailingDebugConfig.CONFIG_GROUP)
 public interface SailingDebugConfig extends Config
 {
 
+	String CONFIG_GROUP = "sailingdebug";
+
 	@ConfigItem(
-		keyName = "boatInfoDefaultOn",
-		name = "Boat Info Default On",
-		description = "also toggleable with ::boats"
+		keyName = "boatInfo",
+		name = "Boat Info",
+		description = ""
 	)
-	default boolean boatInfoDefaultOn()
+	default boolean boatInfo()
 	{
 		return false;
 	}
@@ -21,7 +23,7 @@ public interface SailingDebugConfig extends Config
 	@ConfigItem(
 		keyName = "localBoatInfo",
 		name = "Local Boat Info Panel",
-		description = "also toggleable with ::tlwp"
+		description = ""
 	)
 	default boolean localBoatInfo()
 	{
@@ -29,13 +31,13 @@ public interface SailingDebugConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "tlwpOverlayDefaultOn",
+		keyName = "tlwp",
 		name = "Top Level WP Default On",
-		description = ""
+		description = "also toggleable with ::tlwp"
 	)
-	default boolean tlwpOverlayDefaultOn()
+	default boolean tlwp()
 	{
-		return true;
+		return false;
 	}
 
 	@ConfigItem(
@@ -46,6 +48,36 @@ public interface SailingDebugConfig extends Config
 	default boolean courierTaskInfo()
 	{
 		return true;
+	}
+
+	@ConfigItem(
+		keyName = "routeOverlayDefaultOn",
+		name = "Route Default On",
+		description = "also toggleable with ::route"
+	)
+	default boolean routeOverlayDefaultOn()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "facilities",
+		name = "Facilities Overlay",
+		description = ""
+	)
+	default boolean facilities()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "crewmates",
+		name = "Crewmates",
+		description = ""
+	)
+	default boolean crewmates()
+	{
+		return false;
 	}
 
 }

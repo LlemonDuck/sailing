@@ -1,8 +1,11 @@
-package com.duckblade.osrs.sailing.debugplugin;
+package com.duckblade.osrs.sailing.debugplugin.features;
 
+import com.duckblade.osrs.sailing.debugplugin.SailingDebugConfig;
+import com.duckblade.osrs.sailing.debugplugin.module.DebugLifecycleComponent;
 import com.duckblade.osrs.sailing.features.courier.CourierTaskTracker;
 import com.duckblade.osrs.sailing.model.CourierTask;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -15,27 +18,34 @@ import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
 
 @Slf4j
-public class SailingDebugCourierTaskOverlayPanel extends OverlayPanel
+@Singleton
+public class CourierTaskOverlayPanel
+	extends OverlayPanel
+	implements DebugLifecycleComponent
 {
 
 	private final CourierTaskTracker taskTracker;
-	private final SailingDebugConfig config;
 
 	@Inject
-	public SailingDebugCourierTaskOverlayPanel(SailingDebugConfig config, CourierTaskTracker taskTracker)
+	public CourierTaskOverlayPanel(CourierTaskTracker taskTracker)
 	{
 		this.taskTracker = taskTracker;
-		this.config = config;
 
 		setPreferredPosition(OverlayPosition.ABOVE_CHATBOX_RIGHT);
 		setLayer(OverlayLayer.ALWAYS_ON_TOP);
 	}
 
 	@Override
+	public boolean isEnabled(SailingDebugConfig config)
+	{
+		return config.courierTaskInfo();
+	}
+
+	@Override
 	public Dimension render(Graphics2D graphics)
 	{
 		Set<CourierTask> tasks = taskTracker.getTasks();
-		if (!config.courierTaskInfo() || tasks.isEmpty())
+		if (tasks.isEmpty())
 		{
 			return null;
 		}

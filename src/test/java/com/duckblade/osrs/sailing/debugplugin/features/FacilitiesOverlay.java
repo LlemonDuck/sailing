@@ -1,5 +1,7 @@
-package com.duckblade.osrs.sailing.debugplugin;
+package com.duckblade.osrs.sailing.debugplugin.features;
 
+import com.duckblade.osrs.sailing.debugplugin.SailingDebugConfig;
+import com.duckblade.osrs.sailing.debugplugin.module.DebugLifecycleComponent;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.model.Boat;
@@ -21,7 +23,9 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
 @Singleton
-public class SailingDebugFacilitiesOverlay extends Overlay
+public class FacilitiesOverlay
+	extends Overlay
+	implements DebugLifecycleComponent
 {
 
 	private final Client client;
@@ -29,23 +33,26 @@ public class SailingDebugFacilitiesOverlay extends Overlay
 
 	private final Set<String> facilityTypes = new HashSet<>();
 
-	private boolean active;
-
 	@Inject
-	public SailingDebugFacilitiesOverlay(Client client, BoatTracker boatTracker, SailingDebugConfig config)
+	public FacilitiesOverlay(Client client, BoatTracker boatTracker)
 	{
 		this.client = client;
 		this.boatTracker = boatTracker;
-		active = config.boatInfoDefaultOn();
 
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ALWAYS_ON_TOP);
 	}
 
 	@Override
+	public boolean isEnabled(SailingDebugConfig config)
+	{
+		return config.facilities();
+	}
+
+	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		if (!active || !SailingUtil.isSailing(client))
+		if (!SailingUtil.isSailing(client))
 		{
 			return null;
 		}
@@ -75,14 +82,13 @@ public class SailingDebugFacilitiesOverlay extends Overlay
 	@Subscribe
 	public void onCommandExecuted(CommandExecuted e)
 	{
-		if (!e.getCommand().equals("facilities"))
+		if (!e.getCommand().equals("facility"))
 		{
 			return;
 		}
 
 		if (e.getArguments().length == 0)
 		{
-			active = !active;
 			return;
 		}
 

@@ -1,16 +1,12 @@
 package com.duckblade.osrs.sailing.debugplugin;
 
+import com.duckblade.osrs.sailing.debugplugin.module.DebugComponentManager;
+import com.duckblade.osrs.sailing.debugplugin.module.DebugModule;
+import com.google.inject.Binder;
 import com.google.inject.Inject;
-import com.google.inject.Provides;
-import java.util.Arrays;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.client.config.ConfigManager;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.ui.overlay.Overlay;
-import net.runelite.client.ui.overlay.OverlayManager;
 
 @Slf4j
 @PluginDescriptor(
@@ -21,68 +17,23 @@ public class SailingDebugPlugin extends Plugin
 {
 
 	@Inject
-	private OverlayManager overlayManager;
+	private DebugComponentManager componentManager;
 
-	@Inject
-	private EventBus eventBus;
-
-	@Inject
-	private SailingDebugConfig config;
-
-	@Inject
-	private SailingDebugBoatInfoOverlay boatInfoOverlayPanel;
-
-	@Inject
-	private SailingDebugLocalBoatInfoOverlayPanel localBoatInfoOverlayPanel;
-
-	@Inject
-	private SailingDebugTlwpOverlay tlwpOverlay;
-
-	@Inject
-	private SailingDebugFacilitiesOverlay facilitiesOverlay;
-
-	@Inject
-	private SailingDebugCourierTaskOverlayPanel courierTaskOverlayPanel;
-
-	private List<?> components;
+	@Override
+	public void configure(Binder binder)
+	{
+		binder.install(new DebugModule());
+	}
 
 	@Override
 	protected void startUp() throws Exception
 	{
-		components = Arrays.asList(
-			boatInfoOverlayPanel,
-			courierTaskOverlayPanel,
-			localBoatInfoOverlayPanel,
-			tlwpOverlay,
-			facilitiesOverlay
-		);
-
-		components.forEach(c ->
-		{
-			eventBus.register(c);
-			if (c instanceof Overlay)
-			{
-				overlayManager.add((Overlay) c);
-			}
-		});
+		componentManager.onPluginStart();
 	}
 
 	@Override
 	protected void shutDown() throws Exception
 	{
-		components.forEach(c ->
-		{
-			if (c instanceof Overlay)
-			{
-				overlayManager.remove((Overlay) c);
-			}
-			eventBus.unregister(c);
-		});
-	}
-
-	@Provides
-	public SailingDebugConfig provideConfig(ConfigManager configManager)
-	{
-		return configManager.getConfig(SailingDebugConfig.class);
+		componentManager.onPluginStop();
 	}
 }
