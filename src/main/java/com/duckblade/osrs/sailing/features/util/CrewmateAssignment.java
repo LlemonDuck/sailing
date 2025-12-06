@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum CrewAssignment
+public enum CrewmateAssignment
 {
 
 	SAILS(4),
@@ -18,9 +18,9 @@ public enum CrewAssignment
 
 	private final int varbValue;
 
-	public static CrewAssignment fromCrewAssignmentVarb(int varbitValue)
+	public static CrewmateAssignment fromCrewAssignmentVarb(int varbitValue)
 	{
-		for (CrewAssignment slot : values())
+		for (CrewmateAssignment slot : values())
 		{
 			if (slot.getVarbValue() == varbitValue)
 			{
@@ -29,6 +29,20 @@ public enum CrewAssignment
 		}
 
 		return null;
+	}
+
+	public boolean isHook()
+	{
+		switch (this)
+		{
+			case HOOK_SLOOP_1:
+			case HOOK_SLOOP_2:
+			case HOOK_SKIFF:
+				return true;
+
+			default:
+				return false;
+		}
 	}
 
 }
