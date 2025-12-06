@@ -105,7 +105,7 @@ public class SailingModule extends AbstractModule
 		NavigationOverlay navigationOverlay,
 		TrueTileIndicator trueTileIndicator,
 		WeatherTaskTracker weatherTaskTracker,
-    LowHPNotification lowHPNotification
+		LowHPNotification lowHPNotification
 	)
 	{
 		var builder = ImmutableSet.<PluginLifecycleComponent>builder()
@@ -148,7 +148,7 @@ public class SailingModule extends AbstractModule
 			.add(speedBoostInfoBox)
 			.add(trueTileIndicator)
 			.add(weatherTaskTracker)
-      .add(lowHPNotification);
+			.add(lowHPNotification);
 
 		// features still in development
 		if (developerMode)
