@@ -34,6 +34,14 @@ public interface SailingConfig extends Config
 	String SECTION_FACILITIES = "facilities";
 
 	@ConfigSection(
+		name = "Trawling",
+		description = "Settings for fishing net trawling.",
+		position = 250,
+		closedByDefault = true
+	)
+	String SECTION_TRAWLING = "trawling";
+
+	@ConfigSection(
 		name = "Crewmates",
 		description = "Settings for your crewmates.",
 		position = 300,
@@ -354,6 +362,101 @@ public interface SailingConfig extends Config
 	{
 		return Color.YELLOW;
 	}
+
+	@ConfigItem(
+		keyName = "trawlingHighlightNetButtons",
+		name = "Highlight Net Buttons",
+		description = "Highlight fishing net buttons when they need adjustment.",
+		section = SECTION_TRAWLING,
+		position = 1
+	)
+	default boolean trawlingHighlightNetButtons()
+	{
+		return true;
+	}
+
+	enum NetOperator
+	{
+		PLAYER,
+		CREWMATE,
+		;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingStarboardNetOperator",
+		name = "Starboard Net Operator",
+		description = "Who is operating the starboard fishing net.",
+		section = SECTION_TRAWLING,
+		position = 2
+	)
+	default NetOperator trawlingStarboardNetOperator()
+	{
+		return NetOperator.PLAYER;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingPortNetOperator",
+		name = "Port Net Operator",
+		description = "Who is operating the port fishing net.",
+		section = SECTION_TRAWLING,
+		position = 3
+	)
+	default NetOperator trawlingPortNetOperator()
+	{
+		return NetOperator.CREWMATE;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingHighlightColour",
+		name = "Highlight Colour",
+		description = "Colour to highlight fishing net buttons that need adjustment.",
+		section = SECTION_TRAWLING,
+		position = 4
+	)
+	@Alpha
+	default Color trawlingHighlightColour()
+	{
+		return Color.ORANGE;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingHighlightShoals",
+		name = "Highlight Shoals",
+		description = "Highlight fish shoals with a 4x4 tile area.",
+		section = SECTION_TRAWLING,
+		position = 5
+	)
+	default boolean trawlingHighlightShoals()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingShoalHighlightColour",
+		name = "Shoal Highlight Colour",
+		description = "Colour to highlight fish shoals.",
+		section = SECTION_TRAWLING,
+		position = 6
+	)
+	@Alpha
+	default Color trawlingShoalHighlightColour()
+	{
+		return Color.CYAN;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingShowNetCapacity",
+		name = "Show Net Capacity",
+		description = "Display the current fish count in your nets.",
+		section = SECTION_TRAWLING,
+		position = 7
+	)
+	default boolean trawlingShowNetCapacity()
+	{
+		return true;
+	}
+
+
 
 	enum CrewmateMuteMode
 	{
