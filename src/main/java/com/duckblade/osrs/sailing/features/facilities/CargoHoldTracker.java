@@ -1,6 +1,7 @@
 package com.duckblade.osrs.sailing.features.facilities;
 
 import com.duckblade.osrs.sailing.SailingConfig;
+import com.duckblade.osrs.sailing.features.courier.CourierTaskTracker;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.model.Boat;
@@ -60,8 +61,10 @@ public class CargoHoldTracker
 	private static final int UNKNOWN_ITEM = -1;
 
 	// todo cargo pickup and dropoff
+	// these aren't necessary as of dec 4 2025 but jagex has said that is temporary (we'll see)
 	private static final String MES_CARGO_PACK_PERSONAL = "You deposit some cargo into the cargo hold."; // always 1
 	private static final String MES_CARGO_PACK_CREW = "Your crew pack the cargo they were holding into the cargo hold."; // todo determine amount?
+
 	private static final String MSG_CREWMATE_SALVAGES = "Managed to hook some salvage! I'll put it in the cargo hold.";
 	private static final String MSG_CREWMATE_SALVAGE_FULL = "The cargo hold is full. I can't salvage anything.";
 	private static final String WIDGET_TEXT_CARGO_HOLD_EMPTY = "This cargo hold has no items to show here.";
@@ -86,6 +89,7 @@ public class CargoHoldTracker
 	private final Client client;
 	private final ConfigManager configManager;
 	private final BoatTracker boatTracker;
+	private final CourierTaskTracker courierTaskTracker;
 
 	// boat slot -> item id+count
 	private final Map<Integer, Multiset<Integer>> cargoHoldItems = new HashMap<>();
@@ -97,11 +101,12 @@ public class CargoHoldTracker
 	private boolean sawInventoryContainerUpdate;
 
 	@Inject
-	public CargoHoldTracker(Client client, ConfigManager configManager, BoatTracker boatTracker)
+	public CargoHoldTracker(Client client, ConfigManager configManager, BoatTracker boatTracker, CourierTaskTracker courierTaskTracker)
 	{
 		this.client = client;
 		this.configManager = configManager;
 		this.boatTracker = boatTracker;
+		this.courierTaskTracker = courierTaskTracker;
 
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_SCENE);
@@ -208,10 +213,17 @@ public class CargoHoldTracker
 		trackedInv.clear();
 		for (Item item : containerInv.getItems())
 		{
-			if (item != null)
+			if (item == null)
 			{
-				trackedInv.add(item.getId(), item.getQuantity());
+				continue;
 			}
+
+			if (courierTaskTracker.getTaskForItemID(item.getId()) != null)
+			{
+				continue;
+			}
+
+			trackedInv.add(item.getId(), item.getQuantity());
 		}
 
 		log.debug("read cargo hold inventory from event {}", trackedInv);
