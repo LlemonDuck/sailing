@@ -2,7 +2,7 @@ package com.duckblade.osrs.sailing.features.mes;
 
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
-import com.duckblade.osrs.sailing.model.CargoHoldTier;
+import com.duckblade.osrs.sailing.model.FacilityAggregate;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +17,7 @@ import net.runelite.client.eventbus.Subscribe;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,20 +31,21 @@ public class LockToHelmDuringTrials
     private static final String OPTION_STOP_NAVIGATING = "Stop-navigating";
     private static final String OPTION_ESCAPE = "Escape";
 
-    private static final Set<Integer> CARGO_HOLD_IDS = Arrays.stream(CargoHoldTier.values())
-        .map(CargoHoldTier::getGameObjectIds)
+    private static final Set<Integer> NON_WIND_FACILITY_IDS = Arrays.stream(FacilityAggregate.values())
+        .filter(facility -> facility != FacilityAggregate.WIND)
+        .map(FacilityAggregate::getGameObjectIds)
         .flatMapToInt(Arrays::stream)
         .boxed()
         .collect(Collectors.toUnmodifiableSet());
 
-    private static final Comparator<MenuEntry> MENU_ENTRY_COMPARATOR =
-        Comparator.comparing((MenuEntry me) -> CARGO_HOLD_IDS.contains(me.getIdentifier())
+    private static final Comparator<MenuEntry> NON_WIND_FACILITY_COMPARATOR =
+        Comparator.comparing((MenuEntry me) -> NON_WIND_FACILITY_IDS.contains(me.getIdentifier())
         && me.getType() != MenuAction.EXAMINE_OBJECT)
         .reversed();
 
 	private final Client client;
 
-    private boolean isNotSailingOrInTrials() {
+    private boolean isNotSailingOrNotInTrials() {
         // Not sailing, not in BT or not at helm
         return !SailingUtil.isSailing(client)
             || client.getVarbitValue(VarbitID.SAILING_BT_IN_TRIAL) == 0
@@ -62,7 +61,7 @@ public class LockToHelmDuringTrials
 	@Subscribe
     public void onMenuEntryAdded(MenuEntryAdded e)
 	{
-        if (isNotSailingOrInTrials()) return;
+        if (isNotSailingOrNotInTrials()) return;
 
         if (OPTION_STOP_NAVIGATING.equals(e.getOption()) || OPTION_ESCAPE.equals(e.getOption()))
         {
@@ -74,12 +73,12 @@ public class LockToHelmDuringTrials
     @Subscribe(priority = -99)
     public void onPostMenuSort(PostMenuSort e)
     {
-        if (isNotSailingOrInTrials()) return;
+        if (isNotSailingOrNotInTrials()) return;
 
         Menu menu = client.getMenu();
         menu.setMenuEntries(
             Arrays.stream(menu.getMenuEntries())
-                .sorted(MENU_ENTRY_COMPARATOR)
+                .sorted(NON_WIND_FACILITY_COMPARATOR)
                 .toArray(MenuEntry[]::new)
         );
     }
