@@ -26,7 +26,7 @@ import com.duckblade.osrs.sailing.features.facilities.CrystalExtractorHighlight;
 import com.duckblade.osrs.sailing.features.facilities.LuffOverlay;
 import com.duckblade.osrs.sailing.features.facilities.SpeedBoostInfoBox;
 import com.duckblade.osrs.sailing.features.mes.DeprioSailsOffHelm;
-import com.duckblade.osrs.sailing.features.mes.HideStopNavigatingDuringTrials;
+import com.duckblade.osrs.sailing.features.mes.LockToHelmDuringTrials;
 import com.duckblade.osrs.sailing.features.mes.PrioritizeCargoHold;
 import com.duckblade.osrs.sailing.features.navigation.LightningCloudsOverlay;
 import com.duckblade.osrs.sailing.features.navigation.NavigationOverlay;
@@ -79,8 +79,8 @@ public class SailingModule extends AbstractModule
 		CrewmateOverheadMuter crewmateOverheadMuter,
 		CurrentDuckTaskTracker currentDuckTaskTracker,
 		DeprioSailsOffHelm deprioSailsOffHelm,
-		HideStopNavigatingDuringTrials hideStopNavigatingDuringTrials,
-		GiantClam giantClam,
+        LockToHelmDuringTrials lockToHelmDuringTrials,
+        GiantClam giantClam,
 		HidePortalTransitions hidePortalTransitions,
 		JubblyJiveHelper jubblyJiveHelper,
 		TemporTantrumHelper temporTantrumHelper,
@@ -121,8 +121,8 @@ public class SailingModule extends AbstractModule
 			.add(crewmateOverheadMuter)
 			.add(currentDuckTaskTracker)
 			.add(deprioSailsOffHelm)
-			.add(hideStopNavigatingDuringTrials)
-			.add(giantClam)
+            .add(lockToHelmDuringTrials)
+            .add(giantClam)
 			.add(hidePortalTransitions)
 			.add(jubblyJiveHelper)
 			.add(temporTantrumHelper)
