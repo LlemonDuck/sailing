@@ -40,6 +40,7 @@ import com.duckblade.osrs.sailing.features.oceanencounters.LostShipment;
 import com.duckblade.osrs.sailing.features.oceanencounters.MysteriousGlow;
 import com.duckblade.osrs.sailing.features.oceanencounters.OceanMan;
 import com.duckblade.osrs.sailing.features.salvaging.SalvagingHighlight;
+import com.duckblade.osrs.sailing.features.shipcombat.LowHPNotification;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -103,7 +104,8 @@ public class SailingModule extends AbstractModule
 		SpeedBoostInfoBox speedBoostInfoBox,
 		NavigationOverlay navigationOverlay,
 		TrueTileIndicator trueTileIndicator,
-		WeatherTaskTracker weatherTaskTracker
+		WeatherTaskTracker weatherTaskTracker,
+		LowHPNotification lowHPNotification
 	)
 	{
 		var builder = ImmutableSet.<PluginLifecycleComponent>builder()
@@ -145,7 +147,8 @@ public class SailingModule extends AbstractModule
 			.add(seaChartTaskIndex)
 			.add(speedBoostInfoBox)
 			.add(trueTileIndicator)
-			.add(weatherTaskTracker);
+			.add(weatherTaskTracker)
+			.add(lowHPNotification);
 
 		// features still in development
 		if (developerMode)
