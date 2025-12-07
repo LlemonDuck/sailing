@@ -31,6 +31,12 @@ import java.util.Map;
 public class NetDepthTimer extends Overlay
         implements PluginLifecycleComponent {
 
+    // WorldEntity config ID for moving shoals
+    private static final int SHOAL_WORLD_ENTITY_CONFIG_ID = 4;
+    
+    // Number of ticks at same position to consider shoal "stopped"
+    private static final int STOPPED_THRESHOLD_TICKS = 2;
+    
     // Shoal object IDs
     private static final int SHOAL_MARLIN = 59740;
     private static final int SHOAL_BLUEFIN = 59737;
@@ -109,12 +115,12 @@ public class NetDepthTimer extends Overlay
     public void onWorldEntitySpawned(WorldEntitySpawned e) {
         WorldEntity entity = e.getWorldEntity();
         
-        // Only track shoal WorldEntity (config ID 4)
-        if (entity.getConfig() != null && entity.getConfig().getId() == 4) {
+        // Only track shoal WorldEntity
+        if (entity.getConfig() != null && entity.getConfig().getId() == SHOAL_WORLD_ENTITY_CONFIG_ID) {
             movingShoal = entity;
             lastShoalPosition = null;
             ticksAtSamePosition = 0;
-            log.debug("Shoal WorldEntity spawned (config ID 4), tracking movement");
+            log.debug("Shoal WorldEntity spawned, tracking movement");
         }
     }
 
@@ -158,11 +164,11 @@ public class NetDepthTimer extends Overlay
                 if (currentPos != null) {
                     if (currentPos.equals(lastShoalPosition)) {
                         ticksAtSamePosition++;
-                        if (ticksAtSamePosition == 2 && !hasSeenShoalStop) {
+                        if (ticksAtSamePosition == STOPPED_THRESHOLD_TICKS && !hasSeenShoalStop) {
                             // First time seeing shoal stop
                             hasSeenShoalStop = true;
                             log.debug("Shoal stopped at {} (first stop observed, waiting for movement)", currentPos);
-                        } else if (ticksAtSamePosition == 2 && hasSeenShoalStop) {
+                        } else if (ticksAtSamePosition == STOPPED_THRESHOLD_TICKS && hasSeenShoalStop) {
                             // Shoal stopped again after moving - restart timer
                             activeTracker.restart();
                             log.debug("Shoal stopped at {}, timer restarted", currentPos);

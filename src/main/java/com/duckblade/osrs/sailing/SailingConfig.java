@@ -366,7 +366,7 @@ public interface SailingConfig extends Config
 	@ConfigItem(
 		keyName = "trawlingHighlightNetButtons",
 		name = "Highlight Net Buttons",
-		description = "Highlight fishing net buttons when they need adjustment.",
+		description = "Highlight fishing net buttons when they need adjustment. Only highlights nets you can control.",
 		section = SECTION_TRAWLING,
 		position = 1
 	)
@@ -375,43 +375,12 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
-	enum NetOperator
-	{
-		PLAYER,
-		CREWMATE,
-		;
-	}
-
-	@ConfigItem(
-		keyName = "trawlingStarboardNetOperator",
-		name = "Starboard Net Operator",
-		description = "Who is operating the starboard fishing net.",
-		section = SECTION_TRAWLING,
-		position = 2
-	)
-	default NetOperator trawlingStarboardNetOperator()
-	{
-		return NetOperator.PLAYER;
-	}
-
-	@ConfigItem(
-		keyName = "trawlingPortNetOperator",
-		name = "Port Net Operator",
-		description = "Who is operating the port fishing net.",
-		section = SECTION_TRAWLING,
-		position = 3
-	)
-	default NetOperator trawlingPortNetOperator()
-	{
-		return NetOperator.CREWMATE;
-	}
-
 	@ConfigItem(
 		keyName = "trawlingHighlightColour",
 		name = "Highlight Colour",
 		description = "Colour to highlight fishing net buttons that need adjustment.",
 		section = SECTION_TRAWLING,
-		position = 4
+		position = 2
 	)
 	@Alpha
 	default Color trawlingHighlightColour()
@@ -424,7 +393,7 @@ public interface SailingConfig extends Config
 		name = "Highlight Shoals",
 		description = "Highlight fish shoals with a 4x4 tile area.",
 		section = SECTION_TRAWLING,
-		position = 5
+		position = 3
 	)
 	default boolean trawlingHighlightShoals()
 	{
