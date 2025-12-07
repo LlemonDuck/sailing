@@ -19,13 +19,11 @@ public class NetCapacityOverlay extends OverlayPanel
         implements PluginLifecycleComponent {
 
     private final Client client;
-    private final SailingConfig config;
     private final NetCapacityTracker netCapacityTracker;
 
     @Inject
-    public NetCapacityOverlay(Client client, SailingConfig config, NetCapacityTracker netCapacityTracker) {
+    public NetCapacityOverlay(Client client, NetCapacityTracker netCapacityTracker) {
         this.client = client;
-        this.config = config;
         this.netCapacityTracker = netCapacityTracker;
         setPosition(OverlayPosition.ABOVE_CHATBOX_RIGHT);
     }

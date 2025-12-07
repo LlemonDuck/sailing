@@ -17,12 +17,10 @@ import java.awt.*;
 public class NetDepthTimerOverlay extends OverlayPanel
         implements PluginLifecycleComponent {
 
-    private final SailingConfig config;
     private final NetDepthTimer netDepthTimer;
 
     @Inject
-    public NetDepthTimerOverlay(SailingConfig config, NetDepthTimer netDepthTimer) {
-        this.config = config;
+    public NetDepthTimerOverlay(NetDepthTimer netDepthTimer) {
         this.netDepthTimer = netDepthTimer;
         setPosition(OverlayPosition.TOP_LEFT);
     }

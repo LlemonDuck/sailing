@@ -20,6 +20,7 @@ import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
@@ -58,12 +59,13 @@ public class ShoalOverlay extends Overlay
             59744   // Vibrant shoal
     );
 
+    @Nonnull
     private final Client client;
     private final SailingConfig config;
     private final Set<GameObject> shoals = new HashSet<>();
 
     @Inject
-    public ShoalOverlay(Client client, SailingConfig config) {
+    public ShoalOverlay(@Nonnull Client client, SailingConfig config) {
         this.client = client;
         this.config = config;
         setPosition(OverlayPosition.DYNAMIC);
