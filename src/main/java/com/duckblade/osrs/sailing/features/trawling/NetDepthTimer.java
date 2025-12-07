@@ -241,8 +241,9 @@ public class NetDepthTimer extends Overlay
     private void highlightButtonsForDepth(Graphics2D graphics, Widget parent, NetDepth requiredDepth) {
         Color highlightColor = config.trawlingHighlightColour();
 
-        // Check starboard net
-        if (config.trawlingStarboardNetOperator() == SailingConfig.NetOperator.PLAYER) {
+        // Check starboard net - only highlight if opacity is 0 (player can interact)
+        Widget starboardDepthWidget = parent.getChild(STARBOARD_DEPTH_WIDGET_INDEX);
+        if (starboardDepthWidget != null && starboardDepthWidget.getOpacity() == 0) {
             NetDepth currentDepth = getNetDepth(parent, STARBOARD_DEPTH_WIDGET_INDEX);
             if (currentDepth != null && currentDepth != requiredDepth) {
                 highlightNetButton(graphics, parent, currentDepth, requiredDepth, 
@@ -250,8 +251,9 @@ public class NetDepthTimer extends Overlay
             }
         }
 
-        // Check port net
-        if (config.trawlingPortNetOperator() == SailingConfig.NetOperator.PLAYER) {
+        // Check port net - only highlight if opacity is 0 (player can interact)
+        Widget portDepthWidget = parent.getChild(PORT_DEPTH_WIDGET_INDEX);
+        if (portDepthWidget != null && portDepthWidget.getOpacity() == 0) {
             NetDepth currentDepth = getNetDepth(parent, PORT_DEPTH_WIDGET_INDEX);
             if (currentDepth != null && currentDepth != requiredDepth) {
                 highlightNetButton(graphics, parent, currentDepth, requiredDepth,
