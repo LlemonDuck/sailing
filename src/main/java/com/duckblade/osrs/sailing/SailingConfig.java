@@ -418,9 +418,21 @@ public interface SailingConfig extends Config
 		name = "Show Net Capacity",
 		description = "Display the current fish count in your nets.",
 		section = SECTION_TRAWLING,
-		position = 7
+		position = 5
 	)
 	default boolean trawlingShowNetCapacity()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingShowNetDepthTimer",
+		name = "Show Net Depth Timer",
+		description = "Display an overlay showing ticks until net depth change.",
+		section = SECTION_TRAWLING,
+		position = 6
+	)
+	default boolean trawlingShowNetDepthTimer()
 	{
 		return true;
 	}

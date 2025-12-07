@@ -43,6 +43,9 @@ public class NetDepthTimer extends Overlay
     private static final int SHOAL_HALIBUT = 59739;
     private static final int SHOAL_YELLOWFIN = 59736;
 
+    // Grace period in ticks before depth change is required
+    private static final int GRACE_PERIOD_TICKS = 6;
+    
     // Shoal timing data (in ticks)
     private static final Map<Integer, ShoalTiming> SHOAL_TIMINGS = new HashMap<>();
     
@@ -109,6 +112,17 @@ public class NetDepthTimer extends Overlay
         ticksAtSamePosition = 0;
         hasSeenShoalStop = false;
         activeTracker = null;
+    }
+
+    /**
+     * Get current timer information for display in overlay
+     * @return TimerInfo object with current state, or null if no active tracker
+     */
+    public TimerInfo getTimerInfo() {
+        if (activeTracker == null) {
+            return null;
+        }
+        return activeTracker.getTimerInfo();
     }
 
     @Subscribe
@@ -212,36 +226,10 @@ public class NetDepthTimer extends Overlay
             NetDepth requiredDepth = activeTracker.getCurrentRequiredDepth();
             if (requiredDepth != null) {
                 highlightButtonsForDepth(graphics, widgetSailingRows, requiredDepth);
-            } else {
-                // Timer not active yet - show calibration message
-                renderCalibrationMessage(graphics, widgetSailingRows);
             }
         }
 
         return null;
-    }
-
-    private void renderCalibrationMessage(Graphics2D graphics, Widget parent) {
-        // Render "Calibrating Nets..." text on the sailing interface
-        Rectangle bounds = parent.getBounds();
-        if (bounds.width > 0 && bounds.height > 0) {
-            String message = "Calibrating Nets...";
-            FontMetrics fm = graphics.getFontMetrics();
-            int textWidth = fm.stringWidth(message);
-            int textHeight = fm.getHeight();
-            
-            // Center the text in the widget area
-            int x = bounds.x + (bounds.width - textWidth) / 2;
-            int y = bounds.y + (bounds.height + textHeight) / 2 - fm.getDescent();
-            
-            // Draw shadow for better visibility
-            graphics.setColor(Color.BLACK);
-            graphics.drawString(message, x + 1, y + 1);
-            
-            // Draw main text
-            graphics.setColor(Color.YELLOW);
-            graphics.drawString(message, x, y);
-        }
     }
 
     private void highlightButtonsForDepth(Graphics2D graphics, Widget parent, NetDepth requiredDepth) {
@@ -345,6 +333,52 @@ public class NetDepthTimer extends Overlay
         DEEP
     }
 
+    /**
+     * Data class for exposing timer information to overlay
+     */
+    public static class TimerInfo {
+        private final boolean active;
+        private final String currentDepth;
+        private final String nextDepth;
+        private final int currentTick;
+        private final int totalDuration;
+        private final int ticksUntilDepthChange;
+
+        public TimerInfo(boolean active, String currentDepth, String nextDepth, 
+                        int currentTick, int totalDuration, int ticksUntilDepthChange) {
+            this.active = active;
+            this.currentDepth = currentDepth;
+            this.nextDepth = nextDepth;
+            this.currentTick = currentTick;
+            this.totalDuration = totalDuration;
+            this.ticksUntilDepthChange = ticksUntilDepthChange;
+        }
+
+        public boolean isActive() {
+            return active;
+        }
+
+        public String getCurrentDepth() {
+            return currentDepth;
+        }
+
+        public String getNextDepth() {
+            return nextDepth;
+        }
+
+        public int getCurrentTick() {
+            return currentTick;
+        }
+
+        public int getTotalDuration() {
+            return totalDuration;
+        }
+
+        public int getTicksUntilDepthChange() {
+            return ticksUntilDepthChange;
+        }
+    }
+
     // Data class for shoal timing information
     private static class ShoalTiming {
         final int totalDuration; // Total ticks at each waypoint
@@ -407,11 +441,50 @@ public class NetDepthTimer extends Overlay
 
             int depthChangeTime = timing.getDepthChangeTime();
             
-            if (ticksAtWaypoint < depthChangeTime) {
+            // Account for grace period: change happens at midpoint + grace period
+            int actualChangeTime = depthChangeTime + GRACE_PERIOD_TICKS;
+            
+            if (ticksAtWaypoint < actualChangeTime) {
                 return timing.startDepth;
             } else {
                 return timing.endDepth;
             }
+        }
+
+        TimerInfo getTimerInfo() {
+            ShoalTiming timing = SHOAL_TIMINGS.get(objectId);
+            if (timing == null) {
+                return new TimerInfo(false, "UNKNOWN", "UNKNOWN", 0, 0, 0);
+            }
+
+            if (!timerActive) {
+                return new TimerInfo(false, "CALIBRATING", "CALIBRATING", 0, timing.totalDuration, 0);
+            }
+
+            int depthChangeTime = timing.getDepthChangeTime();
+            int actualChangeTime = depthChangeTime + GRACE_PERIOD_TICKS;
+            
+            NetDepth currentDepth = getCurrentRequiredDepth();
+            NetDepth nextDepth = (ticksAtWaypoint < actualChangeTime) ? timing.endDepth : timing.startDepth;
+            
+            // Calculate ticks until change (accounting for grace period)
+            int ticksUntilChange;
+            if (ticksAtWaypoint < actualChangeTime) {
+                // Before depth change
+                ticksUntilChange = actualChangeTime - ticksAtWaypoint;
+            } else {
+                // After depth change, until shoal moves
+                ticksUntilChange = timing.totalDuration - ticksAtWaypoint;
+            }
+
+            return new TimerInfo(
+                    true,
+                    currentDepth != null ? currentDepth.toString() : "UNKNOWN",
+                    nextDepth.toString(),
+                    ticksAtWaypoint,
+                    timing.totalDuration,
+                    ticksUntilChange
+            );
         }
     }
 }

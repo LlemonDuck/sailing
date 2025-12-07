@@ -40,6 +40,7 @@ import com.duckblade.osrs.sailing.features.trawling.NetCapacityOverlay;
 import com.duckblade.osrs.sailing.features.trawling.NetCapacityTracker;
 import com.duckblade.osrs.sailing.features.trawling.ShoalOverlay;
 import com.duckblade.osrs.sailing.features.trawling.NetDepthTimer;
+import com.duckblade.osrs.sailing.features.trawling.NetDepthTimerOverlay;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -93,6 +94,8 @@ public class SailingModule extends AbstractModule
 		MysteriousGlow mysteriousGlow,
 		NetCapacityOverlay netCapacityOverlay,
 		NetCapacityTracker netCapacityTracker,
+		NetDepthTimer netDepthTimer,
+		NetDepthTimerOverlay netDepthTimerOverlay,
 		OceanMan oceanMan,
 		PrioritizeCargoHold prioritizeCargoHold,
 		RapidsOverlay rapidsOverlay,
@@ -105,8 +108,7 @@ public class SailingModule extends AbstractModule
 		SpeedBoostInfoBox speedBoostInfoBox,
 		NavigationOverlay navigationOverlay,
 		TrueTileIndicator trueTileIndicator,
-		WeatherTaskTracker weatherTaskTracker,
-        NetDepthTimer netDepthTimer
+		WeatherTaskTracker weatherTaskTracker
 	)
 	{
 		var builder = ImmutableSet.<PluginLifecycleComponent>builder()
@@ -138,6 +140,7 @@ public class SailingModule extends AbstractModule
 			 .add(mysteriousGlow)
 			.add(netCapacityOverlay)
 			.add(netCapacityTracker)
+			.add(netDepthTimerOverlay)
 			.add(navigationOverlay)
 			 .add(oceanMan)
 			 .add(prioritizeCargoHold)
