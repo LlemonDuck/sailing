@@ -50,12 +50,43 @@ public class HardcodedShoalPathOverlay extends Overlay implements PluginLifecycl
 
 	@Override
 	public Dimension render(Graphics2D graphics) {
+		WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
+		if (playerLocation == null) {
+			return null;
+		}
+
 		Color pathColor = config.trawlingHardcodedShoalPathColour();
 		
-		// Render hardcoded paths
-		renderPath(graphics, ShoalPaths.HALIBUT_SOUTHERN_EXPANSE, pathColor, "Halibut");
+		// Only render paths if player is in the same region as the path
+		if (isInPathRegion(playerLocation, ShoalPaths.HALIBUT_PORT_ROBERTS)) {
+			renderPath(graphics, ShoalPaths.HALIBUT_PORT_ROBERTS, pathColor, "Halibut - Port Roberts");
+		}
+		if (isInPathRegion(playerLocation, ShoalPaths.HALIBUT_SOUTHERN_EXPANSE)) {
+			renderPath(graphics, ShoalPaths.HALIBUT_SOUTHERN_EXPANSE, pathColor, "Halibut - Southern Expanse");
+		}
 		
 		return null;
+	}
+
+	/**
+	 * Check if the player is in the same region as any point in the path.
+	 * A region is 64x64 tiles, so we check if the player's region ID matches any region used by the path.
+	 */
+	private boolean isInPathRegion(WorldPoint playerLocation, WorldPoint[] path) {
+		if (path == null || path.length == 0) {
+			return false;
+		}
+
+		int playerRegionID = playerLocation.getRegionID();
+		
+		// Check if any point in the path is in the same region as the player
+		for (WorldPoint point : path) {
+			if (point.getRegionID() == playerRegionID) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	private void renderPath(Graphics2D graphics, WorldPoint[] path, Color pathColor, String label) {
