@@ -104,6 +104,8 @@ public class CargoHoldTracker
 
 	// boat slot -> item id+count
 	private final Map<Integer, Multiset<Integer>> cargoHoldItems = new HashMap<>();
+	private final Map<Integer, Boolean> stackabilityCache = new HashMap<>();
+
 	private Multiset<Integer> memoizedInventory;
 
 	private boolean overlayEnabled;
@@ -202,14 +204,14 @@ public class CargoHoldTracker
 		{
 			// todo different ones? doesn't matter now since it's count only but will matter later
 			log.trace("crewmate salvage");
-			cargoHold().add(ItemID.SAILING_SMALL_SHIPWRECK_SALVAGE);
+			add(ItemID.SAILING_SMALL_SHIPWRECK_SALVAGE, 1);
 			writeToConfig();
 			return;
 		}
 
 		if (MSG_CREWMATE_SALVAGE_FULL.equals(e.getOverheadText()))
 		{
-			cargoHold().add(UNKNOWN_ITEM, maxCapacity() - usedCapacity());
+			set(UNKNOWN_ITEM, maxCapacity() - usedCapacity());
 			writeToConfig();
 			return;
 		}
@@ -228,7 +230,7 @@ public class CargoHoldTracker
 			pendingJenkinsAction)
 		{
 			log.trace("jenkins salvage");
-			cargoHold().add(ItemID.SAILING_SMALL_SHIPWRECK_SALVAGE);
+			add(ItemID.SAILING_SMALL_SHIPWRECK_SALVAGE, 1);
 			writeToConfig();
 		}
 	}
@@ -264,7 +266,7 @@ public class CargoHoldTracker
 				continue;
 			}
 
-			trackedInv.add(item.getId(), item.getQuantity());
+			add(item.getId(), item.getQuantity());
 		}
 
 		log.debug("read cargo hold inventory from event {}", trackedInv);
@@ -409,6 +411,38 @@ public class CargoHoldTracker
 		}
 
 		return ret;
+	}
+
+	private void add(int item, int count)
+	{
+		if (isStackable(item))
+		{
+			cargoHold().setCount(item, 1);
+		}
+		else
+		{
+			cargoHold().add(item, count);
+		}
+	}
+
+	private void set(int item, int count)
+	{
+		if (isStackable(item))
+		{
+			cargoHold().setCount(item, 1);
+		}
+		else
+		{
+			cargoHold().setCount(item, count);
+		}
+	}
+
+	private boolean isStackable(int itemId)
+	{
+		assert client.isClientThread();
+		return stackabilityCache.computeIfAbsent(itemId, id ->
+			client.getItemDefinition(id).isStackable()
+		);
 	}
 
 	private String configKey(int boatSlot)
