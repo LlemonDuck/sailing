@@ -26,9 +26,9 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 	// WorldEntity config ID for moving shoals
 	private static final int SHOAL_WORLD_ENTITY_CONFIG_ID = 4;
 	
-	// Halibut/Glistening shoal GameObject IDs - same route, different spawns
-	private static final int HALIBUT_SHOAL_ID = 59737;
-	private static final int GLISTENING_SHOAL_ID = 59741;
+	// Bluefin/Vibrant shoal GameObject IDs - same route, different spawns
+	private static final int BLUEFIN_SHOAL_ID = 59738;
+	private static final int VIBRANT_SHOAL_ID = 59742;
 	
 	private static final int MIN_PATH_POINTS = 10; // Minimum points before we consider it a valid path
 	private static final int POSITION_TOLERANCE = 2; // World coordinate units (tiles)
@@ -58,8 +58,8 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 
 	@Override
 	public void startUp() {
-		log.info("Route tracing ENABLED - tracking Halibut/Glistening shoal (IDs: {}, {})", 
-			HALIBUT_SHOAL_ID, GLISTENING_SHOAL_ID);
+		log.info("Route tracing ENABLED - tracking Bluefin/Vibrant shoal (IDs: {}, {})", 
+			BLUEFIN_SHOAL_ID, VIBRANT_SHOAL_ID);
 		wasTracking = true;
 	}
 
@@ -121,8 +121,8 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 		GameObject obj = e.getGameObject();
 		int objectId = obj.getId();
 		
-		// Only track Halibut or Glistening shoals
-		if (objectId != HALIBUT_SHOAL_ID && objectId != GLISTENING_SHOAL_ID) {
+		// Only track Bluefin or Vibrant shoals
+		if (objectId != BLUEFIN_SHOAL_ID && objectId != VIBRANT_SHOAL_ID) {
 			return;
 		}
 
@@ -130,12 +130,12 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 		if (currentPath == null) {
 			currentPath = new ShoalPath(objectId);
 			log.info("Started tracking shoal ID {} ({})", objectId, 
-				objectId == HALIBUT_SHOAL_ID ? "Halibut" : "Glistening");
+				objectId == BLUEFIN_SHOAL_ID ? "Bluefin" : "Vibrant");
 		} else if (currentShoalId != null && currentShoalId != objectId) {
-			// Shoal changed type (e.g., Halibut -> Glistening)
+			// Shoal changed type (e.g., Bluefin -> Vibrant)
 			log.info("Shoal changed from {} to {} - continuing same path", 
-				currentShoalId == HALIBUT_SHOAL_ID ? "Halibut" : "Glistening",
-				objectId == HALIBUT_SHOAL_ID ? "Halibut" : "Glistening");
+				currentShoalId == BLUEFIN_SHOAL_ID ? "Bluefin" : "Vibrant",
+				objectId == BLUEFIN_SHOAL_ID ? "Bluefin" : "Vibrant");
 		}
 		
 		// Store the current shoal type

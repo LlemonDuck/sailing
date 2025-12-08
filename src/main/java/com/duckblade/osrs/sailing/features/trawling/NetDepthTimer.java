@@ -39,8 +39,10 @@ public class NetDepthTimer extends Overlay
     
     // Shoal object IDs
     private static final int SHOAL_MARLIN = 59740;
-    private static final int SHOAL_BLUEFIN = 59737;
-    private static final int SHOAL_HALIBUT = 59739;
+    private static final int SHOAL_BLUEFIN = 59738;
+    private static final int SHOAL_VIBRANT = 59742;
+    private static final int SHOAL_HALIBUT = 59737;
+    private static final int SHOAL_GLISTENING = 59741;
     private static final int SHOAL_YELLOWFIN = 59736;
 
     // Grace period in ticks before depth change is required
@@ -51,8 +53,10 @@ public class NetDepthTimer extends Overlay
     
     static {
         SHOAL_TIMINGS.put(SHOAL_MARLIN, new ShoalTiming(54, NetDepth.MODERATE, NetDepth.DEEP));
-        SHOAL_TIMINGS.put(SHOAL_BLUEFIN, new ShoalTiming(70, NetDepth.SHALLOW, NetDepth.MODERATE));
+        SHOAL_TIMINGS.put(SHOAL_BLUEFIN, new ShoalTiming(66, NetDepth.SHALLOW, NetDepth.MODERATE));
+        SHOAL_TIMINGS.put(SHOAL_VIBRANT, new ShoalTiming(66, NetDepth.SHALLOW, NetDepth.MODERATE));
         SHOAL_TIMINGS.put(SHOAL_HALIBUT, new ShoalTiming(80, NetDepth.SHALLOW, NetDepth.MODERATE));
+        SHOAL_TIMINGS.put(SHOAL_GLISTENING, new ShoalTiming(80, NetDepth.SHALLOW, NetDepth.MODERATE));
         SHOAL_TIMINGS.put(SHOAL_YELLOWFIN, new ShoalTiming(100, NetDepth.SHALLOW, NetDepth.MODERATE));
     }
 
