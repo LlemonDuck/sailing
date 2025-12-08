@@ -4,6 +4,7 @@ import com.duckblade.osrs.sailing.debugplugin.SailingDebugConfig;
 import com.duckblade.osrs.sailing.debugplugin.module.DebugLifecycleComponent;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.model.Boat;
+import com.duckblade.osrs.sailing.model.FishingNetTier;
 import com.duckblade.osrs.sailing.model.SalvagingHookTier;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -91,6 +92,17 @@ public class LocalBoatInfoOverlayPanel
 			.add(LineComponent.builder()
 				.left("Cargo")
 				.right(String.valueOf(boat.getCargoHoldTier()))
+				.build());
+
+		getPanelComponent().getChildren()
+			.add(LineComponent.builder()
+				.left("Nets")
+				.right(boat
+					.getNetTiers()
+					.stream()
+					.map(FishingNetTier::toString)
+					.collect(Collectors.joining(", ", "[", "]"))
+				)
 				.build());
 
 		return super.render(graphics);

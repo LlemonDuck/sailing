@@ -7,24 +7,24 @@ import net.runelite.api.gameval.ObjectID;
 @RequiredArgsConstructor
 @Getter
 public enum FishingNetTier {
-    Rope(
+    ROPE(
             new int[]{
                     ObjectID.SAILING_ROPE_TRAWLING_NET,
                     ObjectID.SAILING_ROPE_TRAWLING_NET_3X8_PORT,
                     ObjectID.SAILING_ROPE_TRAWLING_NET_3X8_STARBOARD
             }
     ),
-    Linen(new int[]{
+    LINEN(new int[]{
             ObjectID.SAILING_LINEN_TRAWLING_NET,
             ObjectID.SAILING_LINEN_TRAWLING_NET_3X8_PORT,
             ObjectID.SAILING_LINEN_TRAWLING_NET_3X8_STARBOARD
     }),
-    Hemp(new int[]{
+    HEMP(new int[]{
             ObjectID.SAILING_HEMP_TRAWLING_NET,
             ObjectID.SAILING_HEMP_TRAWLING_NET_3X8_PORT,
             ObjectID.SAILING_HEMP_TRAWLING_NET_3X8_STARBOARD,
     }),
-    Cotton(new int[]{
+    COTTON(new int[]{
             ObjectID.SAILING_COTTON_TRAWLING_NET,
             ObjectID.SAILING_COTTON_TRAWLING_NET_3X8_PORT,
             ObjectID.SAILING_COTTON_TRAWLING_NET_3X8_STARBOARD,

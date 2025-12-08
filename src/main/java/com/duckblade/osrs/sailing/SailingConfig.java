@@ -430,11 +430,74 @@ public interface SailingConfig extends Config
 		name = "Show Net Depth Timer",
 		description = "Display an overlay showing ticks until net depth change.",
 		section = SECTION_TRAWLING,
-		position = 6
+		position = 8
 	)
 	default boolean trawlingShowNetDepthTimer()
 	{
 		return true;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingShowHardcodedShoalPaths",
+		name = "Show Hardcoded Shoal Routes",
+		description = "Display the known hardcoded routes for shoals.",
+		section = SECTION_TRAWLING,
+		position = 9
+	)
+	default boolean trawlingShowHardcodedShoalPaths()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingHardcodedShoalPathColour",
+		name = "Hardcoded Route Colour",
+		description = "Colour for displaying hardcoded shoal routes.",
+		section = SECTION_TRAWLING,
+		position = 10
+	)
+	@Alpha
+	default Color trawlingHardcodedShoalPathColour()
+	{
+		return new Color(0, 255, 255, 150); // Semi-transparent cyan
+	}
+
+	@ConfigItem(
+		keyName = "trawlingEnableRouteTracing",
+		name = "Enable Route Tracing",
+		description = "Track and trace shoal movement paths. Disable to auto-export traced paths to logs.",
+		section = SECTION_TRAWLING,
+		position = 11
+	)
+	default boolean trawlingEnableRouteTracing()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingShoalPathColour",
+		name = "Traced Path Colour",
+		description = "Colour for shoal paths that are still being traced.",
+		section = SECTION_TRAWLING,
+		position = 12
+	)
+	@Alpha
+	default Color trawlingShoalPathColour()
+	{
+		return new Color(255, 255, 0, 150); // Semi-transparent yellow
+	}
+
+	@ConfigItem(
+		keyName = "trawlingShoalPathCompletedColour",
+		name = "Completed Trace Colour",
+		description = "Colour for traced shoal paths that have completed a full loop.",
+		section = SECTION_TRAWLING,
+		position = 13
+	)
+	@Alpha
+	default Color trawlingShoalPathCompletedColour()
+	{
+		return new Color(0, 255, 0, 200); // Semi-transparent green
 	}
 
 
