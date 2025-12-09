@@ -64,7 +64,7 @@ public class ComponentManager
 		revalidateComponentStates();
 	}
 
-	private void revalidateComponentStates()
+	public void revalidateComponentStates()
 	{
 		components.forEach(c ->
 		{

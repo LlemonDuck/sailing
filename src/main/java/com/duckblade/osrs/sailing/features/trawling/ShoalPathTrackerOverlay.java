@@ -25,12 +25,14 @@ public class ShoalPathTrackerOverlay extends Overlay implements PluginLifecycleC
 	private final Client client;
 	private final SailingConfig config;
 	private final ShoalPathTracker shoalPathTracker;
+	private final ShoalPathTracerCommand tracerCommand;
 
 	@Inject
-	public ShoalPathTrackerOverlay(@Nonnull Client client, SailingConfig config, ShoalPathTracker shoalPathTracker) {
+	public ShoalPathTrackerOverlay(@Nonnull Client client, SailingConfig config, ShoalPathTracker shoalPathTracker, ShoalPathTracerCommand tracerCommand) {
 		this.client = client;
 		this.config = config;
 		this.shoalPathTracker = shoalPathTracker;
+		this.tracerCommand = tracerCommand;
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_SCENE);
 		setPriority(PRIORITY_LOW); // Draw paths below the shoal highlights
@@ -38,7 +40,8 @@ public class ShoalPathTrackerOverlay extends Overlay implements PluginLifecycleC
 
 	@Override
 	public boolean isEnabled(SailingConfig config) {
-		return config.trawlingEnableRouteTracing();
+		// Enabled via chat command: ::traceroutes, ::traceroutes on, ::traceroutes off
+		return tracerCommand.isTracingEnabled();
 	}
 
 	@Override

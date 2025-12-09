@@ -39,21 +39,22 @@ public class NetDepthTimer extends Overlay
     private static final int STOPPED_THRESHOLD_TICKS = 2;
     
     // Shoal object IDs
-    private static final int SHOAL_MARLIN = 59740;
-    private static final int SHOAL_BLUEFIN = 59738;
-    private static final int SHOAL_VIBRANT = 59742;
-    private static final int SHOAL_HALIBUT = 59737;
-    private static final int SHOAL_GLISTENING = 59741;
     private static final int SHOAL_YELLOWFIN = 59736;
-
-    // Grace period in ticks before depth change is required
-    private static final int GRACE_PERIOD_TICKS = 6;
+    private static final int SHOAL_HALIBUT = 59737;
+    private static final int SHOAL_BLUEFIN = 59738;
+    private static final int SHOAL_MARLIN = 59739;
+    private static final int SHOAL_SHIMMERING = 59740;
+    private static final int SHOAL_GLISTENING = 59741;
+    private static final int SHOAL_VIBRANT = 59742;
+    
+    
+    
     
     // Shoal timing data (in ticks)
     private static final Map<Integer, ShoalTiming> SHOAL_TIMINGS = new HashMap<>();
     
     static {
-        SHOAL_TIMINGS.put(SHOAL_MARLIN, new ShoalTiming(54, NetDepth.MODERATE, NetDepth.DEEP));
+        SHOAL_TIMINGS.put(SHOAL_MARLIN, new ShoalTiming(50, NetDepth.MODERATE, NetDepth.DEEP));
         SHOAL_TIMINGS.put(SHOAL_BLUEFIN, new ShoalTiming(66, NetDepth.SHALLOW, NetDepth.MODERATE));
         SHOAL_TIMINGS.put(SHOAL_VIBRANT, new ShoalTiming(66, NetDepth.SHALLOW, NetDepth.MODERATE));
         SHOAL_TIMINGS.put(SHOAL_HALIBUT, new ShoalTiming(80, NetDepth.SHALLOW, NetDepth.MODERATE));
@@ -84,7 +85,7 @@ public class NetDepthTimer extends Overlay
     private WorldEntity movingShoal = null;
     private WorldPoint lastShoalPosition = null;
     private int ticksAtSamePosition = 0;
-    private boolean hasSeenShoalStop = false; // Track if we've seen the shoal stop at least once
+    private int ticksMoving = 0; // Track how many ticks the shoal has been moving
     
     // Track the active shoal timer
     private ShoalTracker activeTracker = null;
@@ -101,7 +102,7 @@ public class NetDepthTimer extends Overlay
 
     @Override
     public boolean isEnabled(SailingConfig config) {
-        return config.trawlingHighlightNetButtons();
+        return config.trawlingShowNetDepthTimer();
     }
 
     @Override
@@ -115,7 +116,7 @@ public class NetDepthTimer extends Overlay
         movingShoal = null;
         lastShoalPosition = null;
         ticksAtSamePosition = 0;
-        hasSeenShoalStop = false;
+        ticksMoving = 0;
         activeTracker = null;
     }
 
@@ -159,9 +160,8 @@ public class NetDepthTimer extends Overlay
             // Store the shoal type when we first see it
             if (activeTracker == null || activeTracker.objectId != objectId) {
                 activeTracker = new ShoalTracker(objectId);
-                log.debug("Tracking shoal type: ID={}, movingShoal={}, hasSeenStop={}, activeTracker created", 
-                         objectId, movingShoal != null, hasSeenShoalStop);
-                log.debug("Overlay should now show calibration status");
+                log.debug("Tracking shoal type: ID={}, movingShoal={}, activeTracker created", 
+                         objectId, movingShoal != null);
             }
         }
     }
@@ -178,7 +178,7 @@ public class NetDepthTimer extends Overlay
             movingShoal = null;
             lastShoalPosition = null;
             ticksAtSamePosition = 0;
-            hasSeenShoalStop = false;
+            ticksMoving = 0;
         }
     }
 
@@ -206,20 +206,23 @@ public class NetDepthTimer extends Overlay
             if (localPos != null) {
                 WorldPoint currentPos = WorldPoint.fromLocal(client, localPos);
                 if (currentPos.equals(lastShoalPosition)) {
+                    // Shoal is at same position
                     ticksAtSamePosition++;
-                    if (ticksAtSamePosition == STOPPED_THRESHOLD_TICKS && !hasSeenShoalStop) {
-                        // First time seeing shoal stop
-                        hasSeenShoalStop = true;
-                        log.debug("Shoal stopped at {} (first stop observed, waiting for movement)", currentPos);
-                    } else if (ticksAtSamePosition == STOPPED_THRESHOLD_TICKS) {
-                        // Shoal stopped again after moving - restart timer
+                    
+                    // Check if shoal just stopped after moving for at least 5 ticks
+                    if (ticksAtSamePosition == STOPPED_THRESHOLD_TICKS && ticksMoving >= 5) {
+                        // Shoal stopped after moving - start/restart timer
                         activeTracker.restart();
-                        log.debug("Shoal stopped at {}, timer restarted", currentPos);
+                        log.debug("Shoal stopped at {} after moving for {} ticks, timer started", currentPos, ticksMoving);
+                        ticksMoving = 0; // Reset movement counter
                     }
                 } else {
+                    // Shoal is moving
                     if (lastShoalPosition != null) {
-                        log.debug("Shoal moved from {} to {}", lastShoalPosition, currentPos);
-                        // Shoal started moving - this will trigger "waiting for stop" in overlay
+                        ticksMoving++;
+                        if (ticksMoving == 1) {
+                            log.debug("Shoal started moving from {}", lastShoalPosition);
+                        }
                     }
                     lastShoalPosition = currentPos;
                     ticksAtSamePosition = 0;
@@ -235,7 +238,7 @@ public class NetDepthTimer extends Overlay
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        if (!config.trawlingHighlightNetButtons()) {
+        if (!config.trawlingShowNetDepthTimer()) {
             return null;
         }
 
@@ -261,7 +264,7 @@ public class NetDepthTimer extends Overlay
     }
 
     private void highlightButtonsForDepth(Graphics2D graphics, Widget parent, NetDepth requiredDepth) {
-        Color highlightColor = config.trawlingHighlightColour();
+        Color highlightColor = Color.ORANGE;
 
         // Check starboard net - only highlight if opacity is 0 (player can interact)
         Widget starboardDepthWidget = parent.getChild(STARBOARD_DEPTH_WIDGET_INDEX);
@@ -465,16 +468,16 @@ public class NetDepthTimer extends Overlay
                 log.debug("Shoal {} at tick {}: required depth = {}", objectId, ticksAtWaypoint, requiredDepth);
             }
             
-            // Check if we've reached the depth change point - deactivate timer after first depth change
+            // Check if we've reached the depth change point (1/2 of total duration)
             ShoalTiming timing = SHOAL_TIMINGS.get(objectId);
             if (timing != null) {
                 int depthChangeTime = timing.getDepthChangeTime();
-                int actualChangeTime = depthChangeTime + GRACE_PERIOD_TICKS;
                 
-                if (ticksAtWaypoint >= actualChangeTime) {
+                if (ticksAtWaypoint >= depthChangeTime) {
                     // Depth change has occurred, deactivate timer until shoal moves and stops again
                     timerActive = false;
-                    log.debug("Shoal {} depth change occurred at tick {}, timer deactivated", objectId, ticksAtWaypoint);
+                    log.debug("Shoal {} depth change occurred at tick {} (1/2 of {}), timer deactivated", 
+                             objectId, ticksAtWaypoint, timing.totalDuration);
                 }
             }
         }
@@ -491,12 +494,11 @@ public class NetDepthTimer extends Overlay
 
             int depthChangeTime = timing.getDepthChangeTime();
             
-            // Account for grace period: change happens at midpoint + grace period
-            int actualChangeTime = depthChangeTime + GRACE_PERIOD_TICKS;
-            
-            if (ticksAtWaypoint < actualChangeTime) {
+            // Before the depth change point, use start depth
+            if (ticksAtWaypoint < depthChangeTime) {
                 return timing.startDepth;
             } else {
+                // After depth change, timer will be deactivated so this won't be called
                 return timing.endDepth;
             }
         }
@@ -516,10 +518,9 @@ public class NetDepthTimer extends Overlay
             }
 
             int depthChangeTime = timing.getDepthChangeTime();
-            int actualChangeTime = depthChangeTime + GRACE_PERIOD_TICKS;
             
-            // Only show timer until first depth change
-            int ticksUntilChange = actualChangeTime - ticksAtWaypoint;
+            // Show timer counting down to depth change (1/2 of total duration)
+            int ticksUntilChange = depthChangeTime - ticksAtWaypoint;
 
             return new TimerInfo(true, false, ticksUntilChange);
         }

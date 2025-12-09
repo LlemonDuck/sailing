@@ -363,41 +363,16 @@ public interface SailingConfig extends Config
 		return Color.YELLOW;
 	}
 
-	@ConfigItem(
-		keyName = "trawlingHighlightNetButtons",
-		name = "Highlight Net Buttons",
-		description = "Highlight fishing net buttons when they need adjustment. Only highlights nets you can control.",
-		section = SECTION_TRAWLING,
-		position = 1
-	)
-	default boolean trawlingHighlightNetButtons()
-	{
-		return true;
-	}
-
-	@ConfigItem(
-		keyName = "trawlingHighlightColour",
-		name = "Highlight Colour",
-		description = "Colour to highlight fishing net buttons that need adjustment.",
-		section = SECTION_TRAWLING,
-		position = 2
-	)
-	@Alpha
-	default Color trawlingHighlightColour()
-	{
-		return Color.ORANGE;
-	}
-
-	@ConfigItem(
+    @ConfigItem(
 		keyName = "trawlingHighlightShoals",
 		name = "Highlight Shoals",
 		description = "Highlight fish shoals with a 4x4 tile area.",
 		section = SECTION_TRAWLING,
-		position = 3
+		position = 1
 	)
 	default boolean trawlingHighlightShoals()
 	{
-		return true;
+		return false;
 	}
 
 	@ConfigItem(
@@ -405,7 +380,7 @@ public interface SailingConfig extends Config
 		name = "Shoal Highlight Colour",
 		description = "Colour to highlight fish shoals.",
 		section = SECTION_TRAWLING,
-		position = 6
+		position = 2
 	)
 	@Alpha
 	default Color trawlingShoalHighlightColour()
@@ -418,7 +393,7 @@ public interface SailingConfig extends Config
 		name = "Show Net Capacity",
 		description = "Display the current fish count in your nets.",
 		section = SECTION_TRAWLING,
-		position = 5
+		position = 3
 	)
 	default boolean trawlingShowNetCapacity()
 	{
@@ -430,7 +405,7 @@ public interface SailingConfig extends Config
 		name = "Show Net Depth Timer",
 		description = "Display an overlay showing ticks until net depth change.",
 		section = SECTION_TRAWLING,
-		position = 8
+		position = 4
 	)
 	default boolean trawlingShowNetDepthTimer()
 	{
@@ -438,69 +413,41 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "trawlingShowHardcodedShoalPaths",
-		name = "Show Hardcoded Shoal Routes",
-		description = "Display the known hardcoded routes for shoals.",
+		keyName = "trawlingShowShoalPaths",
+		name = "Show Shoal Routes",
+		description = "Display the known routes for shoals.",
 		section = SECTION_TRAWLING,
-		position = 9
+		position = 5
 	)
-	default boolean trawlingShowHardcodedShoalPaths()
-	{
-		return false;
-	}
-
-	@ConfigItem(
-		keyName = "trawlingHardcodedShoalPathColour",
-		name = "Hardcoded Route Colour",
-		description = "Colour for displaying hardcoded shoal routes.",
-		section = SECTION_TRAWLING,
-		position = 10
-	)
-	@Alpha
-	default Color trawlingHardcodedShoalPathColour()
-	{
-		return Color.WHITE;
-	}
-
-	@ConfigItem(
-		keyName = "trawlingEnableRouteTracing",
-		name = "Enable Route Tracing",
-		description = "Track and trace shoal movement paths. Disable to auto-export traced paths to logs.",
-		section = SECTION_TRAWLING,
-		position = 11
-	)
-	default boolean trawlingEnableRouteTracing()
+	default boolean trawlingShowShoalPaths()
 	{
 		return false;
 	}
 
 	@ConfigItem(
 		keyName = "trawlingShoalPathColour",
-		name = "Traced Path Colour",
-		description = "Colour for shoal paths that are still being traced.",
+		name = "Hardcoded Route Colour",
+		description = "Colour for displaying hardcoded shoal routes.",
 		section = SECTION_TRAWLING,
-		position = 12
+		position = 10
 	)
 	@Alpha
 	default Color trawlingShoalPathColour()
 	{
-		return new Color(255, 255, 0, 150); // Semi-transparent yellow
+		return Color.WHITE;
 	}
 
 	@ConfigItem(
-		keyName = "trawlingShoalPathCompletedColour",
-		name = "Completed Trace Colour",
-		description = "Colour for traced shoal paths that have completed a full loop.",
+		keyName = "trawlingButtonsDummy",
+		name = "Highlight Buttons (Under Development)",
+		description = "This feature is still under development and will be released soon.",
 		section = SECTION_TRAWLING,
-		position = 13
+		position = -999
 	)
-	@Alpha
-	default Color trawlingShoalPathCompletedColour()
+	default boolean trawlingButtonsDummy()
 	{
-		return new Color(0, 255, 0, 200); // Semi-transparent green
+		return true;
 	}
-
-
 
 	enum CrewmateMuteMode
 	{

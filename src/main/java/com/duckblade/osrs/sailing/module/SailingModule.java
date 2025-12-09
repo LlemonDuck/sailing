@@ -43,6 +43,7 @@ import com.duckblade.osrs.sailing.features.trawling.NetDepthTimerOverlay;
 import com.duckblade.osrs.sailing.features.trawling.ShoalOverlay;
 import com.duckblade.osrs.sailing.features.trawling.ShoalPathTrackerOverlay;
 import com.duckblade.osrs.sailing.features.trawling.ShoalPathTracker;
+import com.duckblade.osrs.sailing.features.trawling.ShoalPathTracerCommand;
 import com.duckblade.osrs.sailing.features.trawling.ShoalPathOverlay;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.google.common.collect.ImmutableSet;
@@ -110,6 +111,7 @@ public class SailingModule extends AbstractModule
 		ShoalOverlay shoalOverlay,
 		ShoalPathTrackerOverlay shoalPathOverlay,
 		ShoalPathTracker shoalPathTracker,
+		ShoalPathTracerCommand shoalPathTracerCommand,
 		ShoalPathOverlay hardcodedShoalPathOverlay,
 		SpeedBoostInfoBox speedBoostInfoBox,
 		NavigationOverlay navigationOverlay,
@@ -170,7 +172,8 @@ public class SailingModule extends AbstractModule
 		if (developerMode)
 		{
 			builder
-				.add(cargoHoldTracker);
+				.add(cargoHoldTracker)
+				.add(shoalPathTracerCommand);
 		}
 
 		return builder.build();

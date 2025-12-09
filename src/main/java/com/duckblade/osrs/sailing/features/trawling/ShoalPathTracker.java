@@ -14,7 +14,6 @@ import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.WorldEntitySpawned;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.events.ConfigChanged;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -45,6 +44,7 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 
 	private final Client client;
 	private final SailingConfig config;
+	private final ShoalPathTracerCommand tracerCommand;
 	
 	// Track the shoal path (Halibut or Glistening - same route)
 	@Getter
@@ -58,14 +58,16 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 	private int tickCounter = 0;
 
 	@Inject
-	public ShoalPathTracker(Client client, SailingConfig config) {
+	public ShoalPathTracker(Client client, SailingConfig config, ShoalPathTracerCommand tracerCommand) {
 		this.client = client;
 		this.config = config;
+		this.tracerCommand = tracerCommand;
 	}
 
 	@Override
 	public boolean isEnabled(SailingConfig config) {
-		return config.trawlingEnableRouteTracing();
+		// Enabled via chat command: !traceroutes [on|off]
+		return tracerCommand.isTracingEnabled();
 	}
 
 	@Override
@@ -86,22 +88,7 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 		tickCounter = 0;
 	}
 
-	@Subscribe
-	public void onConfigChanged(ConfigChanged event) {
-		if (!event.getGroup().equals("sailing")) {
-			return;
-		}
-		
-		if (event.getKey().equals("trawlingEnableRouteTracing")) {
-			boolean isEnabled = config.trawlingEnableRouteTracing();
-			
-			// Detect when tracing is turned off
-			if (wasTracking && !isEnabled) {
-				log.info("Route tracing config disabled - exporting path");
-				exportPath();
-			}
-		}
-	}
+
 	
 	private void exportPath() {
 		if (currentPath == null) {

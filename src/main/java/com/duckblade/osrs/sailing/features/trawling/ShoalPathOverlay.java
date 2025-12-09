@@ -53,17 +53,17 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 
 	@Override
 	public boolean isEnabled(SailingConfig config) {
-		return config.trawlingShowHardcodedShoalPaths();
+		return config.trawlingShowShoalPaths();
 	}
 
 	@Override
 	public void startUp() {
-		log.debug("HardcodedShoalPathOverlay started");
+		log.debug("ShoalPathOverlay started");
 	}
 
 	@Override
 	public void shutDown() {
-		log.debug("HardcodedShoalPathOverlay shut down");
+		log.debug("ShoalPathOverlay shut down");
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 		// Get top-level world coordinates (actual world position, not boat instance position)
 		WorldPoint playerLocation = SailingUtil.getTopLevelWorldPoint(client);
 
-        Color pathColor = config.trawlingHardcodedShoalPathColour();
+        Color pathColor = config.trawlingShoalPathColour();
 
 		if (PORT_ROBERTS.contains(playerLocation)) {
 			renderPath(graphics, ShoalPaths.HALIBUT_PORT_ROBERTS, pathColor);
