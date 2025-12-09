@@ -41,9 +41,9 @@ import com.duckblade.osrs.sailing.features.trawling.NetCapacityTracker;
 import com.duckblade.osrs.sailing.features.trawling.NetDepthTimer;
 import com.duckblade.osrs.sailing.features.trawling.NetDepthTimerOverlay;
 import com.duckblade.osrs.sailing.features.trawling.ShoalOverlay;
-import com.duckblade.osrs.sailing.features.trawling.ShoalPathOverlay;
+import com.duckblade.osrs.sailing.features.trawling.ShoalPathTrackerOverlay;
 import com.duckblade.osrs.sailing.features.trawling.ShoalPathTracker;
-import com.duckblade.osrs.sailing.features.trawling.HardcodedShoalPathOverlay;
+import com.duckblade.osrs.sailing.features.trawling.ShoalPathOverlay;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -108,9 +108,9 @@ public class SailingModule extends AbstractModule
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
 		ShoalOverlay shoalOverlay,
-		ShoalPathOverlay shoalPathOverlay,
+		ShoalPathTrackerOverlay shoalPathOverlay,
 		ShoalPathTracker shoalPathTracker,
-		HardcodedShoalPathOverlay hardcodedShoalPathOverlay,
+		ShoalPathOverlay hardcodedShoalPathOverlay,
 		SpeedBoostInfoBox speedBoostInfoBox,
 		NavigationOverlay navigationOverlay,
 		TrueTileIndicator trueTileIndicator,

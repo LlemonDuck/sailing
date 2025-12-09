@@ -4,6 +4,7 @@ import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.model.Boat;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
@@ -78,7 +79,6 @@ public class NetDepthTimer extends Overlay
     private final Client client;
     private final SailingConfig config;
     private final BoatTracker boatTracker;
-    private final ShoalPathTracker shoalPathTracker;
 
     // Track WorldEntity (moving shoal) for position monitoring
     private WorldEntity movingShoal = null;
@@ -90,11 +90,10 @@ public class NetDepthTimer extends Overlay
     private ShoalTracker activeTracker = null;
 
     @Inject
-    public NetDepthTimer(Client client, SailingConfig config, BoatTracker boatTracker, ShoalPathTracker shoalPathTracker) {
+    public NetDepthTimer(Client client, SailingConfig config, BoatTracker boatTracker) {
         this.client = client;
         this.config = config;
         this.boatTracker = boatTracker;
-        this.shoalPathTracker = shoalPathTracker;
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
         setPriority(1000.0f);
@@ -206,26 +205,24 @@ public class NetDepthTimer extends Overlay
             net.runelite.api.coords.LocalPoint localPos = movingShoal.getCameraFocus();
             if (localPos != null) {
                 WorldPoint currentPos = WorldPoint.fromLocal(client, localPos);
-                if (currentPos != null) {
-                    if (currentPos.equals(lastShoalPosition)) {
-                        ticksAtSamePosition++;
-                        if (ticksAtSamePosition == STOPPED_THRESHOLD_TICKS && !hasSeenShoalStop) {
-                            // First time seeing shoal stop
-                            hasSeenShoalStop = true;
-                            log.debug("Shoal stopped at {} (first stop observed, waiting for movement)", currentPos);
-                        } else if (ticksAtSamePosition == STOPPED_THRESHOLD_TICKS && hasSeenShoalStop) {
-                            // Shoal stopped again after moving - restart timer
-                            activeTracker.restart();
-                            log.debug("Shoal stopped at {}, timer restarted", currentPos);
-                        }
-                    } else {
-                        if (lastShoalPosition != null) {
-                            log.debug("Shoal moved from {} to {}", lastShoalPosition, currentPos);
-                            // Shoal started moving - this will trigger "waiting for stop" in overlay
-                        }
-                        lastShoalPosition = currentPos;
-                        ticksAtSamePosition = 0;
+                if (currentPos.equals(lastShoalPosition)) {
+                    ticksAtSamePosition++;
+                    if (ticksAtSamePosition == STOPPED_THRESHOLD_TICKS && !hasSeenShoalStop) {
+                        // First time seeing shoal stop
+                        hasSeenShoalStop = true;
+                        log.debug("Shoal stopped at {} (first stop observed, waiting for movement)", currentPos);
+                    } else if (ticksAtSamePosition == STOPPED_THRESHOLD_TICKS) {
+                        // Shoal stopped again after moving - restart timer
+                        activeTracker.restart();
+                        log.debug("Shoal stopped at {}, timer restarted", currentPos);
                     }
+                } else {
+                    if (lastShoalPosition != null) {
+                        log.debug("Shoal moved from {} to {}", lastShoalPosition, currentPos);
+                        // Shoal started moving - this will trigger "waiting for stop" in overlay
+                    }
+                    lastShoalPosition = currentPos;
+                    ticksAtSamePosition = 0;
                 }
             }
         }
@@ -378,7 +375,7 @@ public class NetDepthTimer extends Overlay
         // Parent widgets have invalid bounds, get their children
         if (bounds.x == -1 && bounds.y == -1) {
             Widget[] children = parentWidget.getChildren();
-            if (children != null && children.length > 0) {
+            if (children != null) {
                 for (Widget child : children) {
                     if (child != null) {
                         Rectangle childBounds = child.getBounds();
@@ -405,6 +402,7 @@ public class NetDepthTimer extends Overlay
     /**
      * Data class for exposing timer information to overlay
      */
+    @Getter
     public static class TimerInfo {
         private final boolean active;
         private final boolean waiting;
@@ -416,17 +414,6 @@ public class NetDepthTimer extends Overlay
             this.ticksUntilDepthChange = ticksUntilDepthChange;
         }
 
-        public boolean isActive() {
-            return active;
-        }
-
-        public boolean isWaiting() {
-            return waiting;
-        }
-
-        public int getTicksUntilDepthChange() {
-            return ticksUntilDepthChange;
-        }
     }
 
     // Data class for shoal timing information

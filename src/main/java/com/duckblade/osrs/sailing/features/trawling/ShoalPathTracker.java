@@ -3,6 +3,7 @@ package com.duckblade.osrs.sailing.features.trawling;
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
@@ -19,6 +20,15 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.*;
 
+
+/*
+    * Tracks the path of moving shoals (Bluefin and Vibrant) for route tracing.
+    * Update with different shoal IDs to trace other shoals. Enable the tracer in config and
+    * disable it once a route is fully traced to export the path to logs.
+    * Note that the GameObject spawns are used to get accurate positions, while the WorldEntity
+    * is used to track movement over time. Note that the stop points are not always accurate and may
+    * require some manual adjustment.
+ */
 @Slf4j
 @Singleton
 public class ShoalPathTracker implements PluginLifecycleComponent {
@@ -26,24 +36,26 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 	// WorldEntity config ID for moving shoals
 	private static final int SHOAL_WORLD_ENTITY_CONFIG_ID = 4;
 	
-	// Bluefin/Vibrant shoal GameObject IDs - same route, different spawns
-	private static final int BLUEFIN_SHOAL_ID = 59738;
+	// Bluefin/Vibrant shoal GameObject IDs - same route, different spawns change these to trace other shoals
+	private static final int BLUEFIN_SHOAL_ID = 59739;
 	private static final int VIBRANT_SHOAL_ID = 59742;
 	
-	private static final int MIN_PATH_POINTS = 10; // Minimum points before we consider it a valid path
-	private static final int POSITION_TOLERANCE = 2; // World coordinate units (tiles)
+	private static final int MIN_PATH_POINTS = 8; // Minimum points before we consider it a valid path
+	private static final int POSITION_TOLERANCE = 4; // World coordinate units (tiles)
 
 	private final Client client;
 	private final SailingConfig config;
 	
 	// Track the shoal path (Halibut or Glistening - same route)
-	private ShoalPath currentPath = null;
+	@Getter
+    private ShoalPath currentPath = null;
 	
 	// Track the WorldEntity (moving shoal)
 	private WorldEntity movingShoal = null;
 	private Integer currentShoalId = null;
 	
 	private boolean wasTracking = false;
+	private int tickCounter = 0;
 
 	@Inject
 	public ShoalPathTracker(Client client, SailingConfig config) {
@@ -71,6 +83,7 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 		movingShoal = null;
 		currentShoalId = null;
 		wasTracking = false;
+		tickCounter = 0;
 	}
 
 	@Subscribe
@@ -144,32 +157,26 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 		// Convert to WorldPoint for absolute positioning
 		LocalPoint localPos = obj.getLocalLocation();
 		WorldPoint worldPos = WorldPoint.fromLocal(client, localPos);
-		
-		if (worldPos != null) {
-			currentPath.addPosition(worldPos);
-			log.debug("Shoal ID {} at {} (path size: {})", objectId, worldPos, currentPath.getWaypoints().size());
-		}
-	}
+
+        currentPath.addPosition(worldPos);
+        log.debug("Shoal ID {} at {} (path size: {})", objectId, worldPos, currentPath.getWaypoints().size());
+    }
 
 	@Subscribe
 	public void onGameTick(GameTick e) {
-		// Track the moving shoal's position
-		if (movingShoal != null && currentShoalId != null && currentPath != null) {
+		// Track the moving shoal's position every 3 ticks
+		tickCounter++;
+		if (tickCounter >= 2 && movingShoal != null && currentShoalId != null && currentPath != null) {
 			LocalPoint localPos = movingShoal.getCameraFocus();
 			if (localPos != null) {
 				WorldPoint worldPos = WorldPoint.fromLocal(client, localPos);
-				if (worldPos != null) {
-					currentPath.updatePosition(worldPos);
-				}
-			}
+                currentPath.updatePosition(worldPos);
+            }
+			tickCounter = 0;
 		}
 	}
 
-	public ShoalPath getCurrentPath() {
-		return currentPath;
-	}
-
-	@Getter
+    @Getter
 	public static class ShoalPath {
 		private final int shoalId;
 		private final List<Waypoint> waypoints = new ArrayList<>();
@@ -191,8 +198,8 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 
 			// Only add if it's a new position (not too close to last recorded)
 			if (lastRecordedPosition == null || !isNearPosition(position, lastRecordedPosition)) {
-				// Mark previous waypoint as a stop point if we stayed there for 5+ ticks
-				if (!waypoints.isEmpty() && ticksAtCurrentPosition >= 5) {
+				// Mark previous waypoint as a stop point if we stayed there for 10+ ticks
+				if (!waypoints.isEmpty() && ticksAtCurrentPosition >= 10) {
 					waypoints.get(waypoints.size() - 1).setStopPoint(true);
 				}
 				
@@ -250,15 +257,13 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 	@Getter
 	public static class Waypoint {
 		private final WorldPoint position;
-		private boolean stopPoint;
+		@Setter
+        private boolean stopPoint;
 
 		public Waypoint(WorldPoint position, boolean stopPoint) {
 			this.position = position;
 			this.stopPoint = stopPoint;
 		}
 
-		public void setStopPoint(boolean stopPoint) {
-			this.stopPoint = stopPoint;
-		}
-	}
+    }
 }

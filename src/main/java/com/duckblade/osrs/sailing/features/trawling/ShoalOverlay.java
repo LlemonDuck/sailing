@@ -155,7 +155,10 @@ public class ShoalOverlay extends Overlay
         Polygon poly = Perspective.getCanvasTileAreaPoly(client, shoal.getLocalLocation(), SHOAL_HIGHLIGHT_SIZE);
         if (poly != null) {
             Color color = config.trawlingShoalHighlightColour();
+            Stroke originalStroke = graphics.getStroke();
+            graphics.setStroke(new BasicStroke(0.5f));
             OverlayUtil.renderPolygon(graphics, poly, color);
+            graphics.setStroke(originalStroke);
         }
     }
 
