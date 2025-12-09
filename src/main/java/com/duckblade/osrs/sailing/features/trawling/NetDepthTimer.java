@@ -38,28 +38,18 @@ public class NetDepthTimer extends Overlay
     // Number of ticks at same position to consider shoal "stopped"
     private static final int STOPPED_THRESHOLD_TICKS = 2;
     
-    // Shoal object IDs
-    private static final int SHOAL_YELLOWFIN = 59736;
-    private static final int SHOAL_HALIBUT = 59737;
-    private static final int SHOAL_BLUEFIN = 59738;
-    private static final int SHOAL_MARLIN = 59739;
-    private static final int SHOAL_SHIMMERING = 59740;
-    private static final int SHOAL_GLISTENING = 59741;
-    private static final int SHOAL_VIBRANT = 59742;
-    
-    
-    
-    
     // Shoal timing data (in ticks)
     private static final Map<Integer, ShoalTiming> SHOAL_TIMINGS = new HashMap<>();
     
     static {
-        SHOAL_TIMINGS.put(SHOAL_MARLIN, new ShoalTiming(50, NetDepth.MODERATE, NetDepth.DEEP));
-        SHOAL_TIMINGS.put(SHOAL_BLUEFIN, new ShoalTiming(66, NetDepth.SHALLOW, NetDepth.MODERATE));
-        SHOAL_TIMINGS.put(SHOAL_VIBRANT, new ShoalTiming(66, NetDepth.SHALLOW, NetDepth.MODERATE));
-        SHOAL_TIMINGS.put(SHOAL_HALIBUT, new ShoalTiming(80, NetDepth.SHALLOW, NetDepth.MODERATE));
-        SHOAL_TIMINGS.put(SHOAL_GLISTENING, new ShoalTiming(80, NetDepth.SHALLOW, NetDepth.MODERATE));
-        SHOAL_TIMINGS.put(SHOAL_YELLOWFIN, new ShoalTiming(100, NetDepth.SHALLOW, NetDepth.MODERATE));
+        SHOAL_TIMINGS.put(ShoalData.ShoalObjectID.MARLIN, 
+            new ShoalTiming(ShoalData.ShoalStopDuration.MARLIN, NetDepth.MODERATE, NetDepth.DEEP));
+        SHOAL_TIMINGS.put(ShoalData.ShoalObjectID.BLUEFIN, 
+            new ShoalTiming(ShoalData.ShoalStopDuration.BLUEFIN, NetDepth.SHALLOW, NetDepth.MODERATE));
+        SHOAL_TIMINGS.put(ShoalData.ShoalObjectID.HALIBUT, 
+            new ShoalTiming(ShoalData.ShoalStopDuration.HALIBUT, NetDepth.SHALLOW, NetDepth.MODERATE));
+        SHOAL_TIMINGS.put(ShoalData.ShoalObjectID.YELLOWFIN, 
+            new ShoalTiming(ShoalData.ShoalStopDuration.YELLOWFIN, NetDepth.SHALLOW, NetDepth.MODERATE));
     }
 
     // Widget indices for fishing net controls

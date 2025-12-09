@@ -36,28 +36,15 @@ public class ShoalOverlay extends Overlay
 
     // Clickbox IDs
     private static final Set<Integer> SHOAL_CLICKBOX_IDS = ImmutableSet.of(
-            ObjectID.SAILING_SHOAL_CLICKBOX_BLUEFIN,
-            ObjectID.SAILING_SHOAL_CLICKBOX_GIANT_KRILL,
-            ObjectID.SAILING_SHOAL_CLICKBOX_GLISTENING,
-            ObjectID.SAILING_SHOAL_CLICKBOX_HADDOCK,
-            ObjectID.SAILING_SHOAL_CLICKBOX_HALIBUT,
-            ObjectID.SAILING_SHOAL_CLICKBOX_MARLIN,
-            ObjectID.SAILING_SHOAL_CLICKBOX_SHIMMERING,
-            ObjectID.SAILING_SHOAL_CLICKBOX_VIBRANT,
-            ObjectID.SAILING_SHOAL_CLICKBOX_YELLOWFIN);
-    
-    // Actual shoal object IDs (visible objects, not clickboxes)
-    private static final Set<Integer> SHOAL_OBJECT_IDS = ImmutableSet.of(
-            59736,  // Yellowfin shoal
-            59737,  // Bluefin shoal
-            59738,  // Haddock shoal
-            59739,  // Halibut shoal
-            59740,  // Marlin shoal
-            59741,  // Giant krill shoal
-            59742,  // Glistening shoal
-            59743,  // Shimmering shoal
-            59744   // Vibrant shoal
-    );
+            ShoalData.ShoalObjectID.BLUEFIN,
+            ShoalData.ShoalObjectID.GIANT_KRILL,
+            ShoalData.ShoalObjectID.GLISTENING,
+            ShoalData.ShoalObjectID.HADDOCK,
+            ShoalData.ShoalObjectID.HALIBUT,
+            ShoalData.ShoalObjectID.MARLIN,
+            ShoalData.ShoalObjectID.SHIMMERING,
+            ShoalData.ShoalObjectID.VIBRANT,
+            ShoalData.ShoalObjectID.YELLOWFIN);
 
     @Nonnull
     private final Client client;
@@ -93,7 +80,7 @@ public class ShoalOverlay extends Overlay
     public void onGameObjectSpawned(GameObjectSpawned e) {
         GameObject obj = e.getGameObject();
         int objectId = obj.getId();
-        if (SHOAL_CLICKBOX_IDS.contains(objectId) || SHOAL_OBJECT_IDS.contains(objectId)) {
+        if (SHOAL_CLICKBOX_IDS.contains(objectId)) {
             shoals.add(obj);
             log.debug("Shoal spawned with ID {} at {} (total shoals: {})", objectId, obj.getLocalLocation(), shoals.size());
         }

@@ -36,8 +36,8 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 	private static final int SHOAL_WORLD_ENTITY_CONFIG_ID = 4;
 	
 	// Bluefin/Vibrant shoal GameObject IDs - same route, different spawns change these to trace other shoals
-	private static final int BLUEFIN_SHOAL_ID = 59739;
-	private static final int VIBRANT_SHOAL_ID = 59742;
+	private static final int BLUEFIN_SHOAL_ID = ShoalData.ShoalObjectID.BLUEFIN;
+	private static final int VIBRANT_SHOAL_ID = ShoalData.ShoalObjectID.VIBRANT;
 	
 	private static final int MIN_PATH_POINTS = 8; // Minimum points before we consider it a valid path
 	private static final int POSITION_TOLERANCE = 4; // World coordinate units (tiles)
