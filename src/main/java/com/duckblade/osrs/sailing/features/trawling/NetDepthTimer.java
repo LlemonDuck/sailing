@@ -15,6 +15,7 @@ import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.WorldEntitySpawned;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.SpriteID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.Overlay;
@@ -63,9 +64,9 @@ public class NetDepthTimer extends Overlay
     private static final int PORT_DEPTH_WIDGET_INDEX = 131;
     
     // Sprite IDs for each depth level
-    private static final int SPRITE_SHALLOW = 7081;
-    private static final int SPRITE_MODERATE = 7082;
-    private static final int SPRITE_DEEP = 7083;
+    private static final int SPRITE_SHALLOW = SpriteID.IconSailingFacilities24x24._13;
+    private static final int SPRITE_MODERATE = SpriteID.IconSailingFacilities24x24._14;
+    private static final int SPRITE_DEEP = SpriteID.IconSailingFacilities24x24._15;
 
     private final Client client;
     private final SailingConfig config;
