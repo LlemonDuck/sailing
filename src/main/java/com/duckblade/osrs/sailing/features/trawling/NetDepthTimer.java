@@ -325,7 +325,6 @@ public class NetDepthTimer extends Overlay
         
         // Get the visible viewport bounds (accounting for scroll position)
         Rectangle viewportBounds = scrollViewport.getBounds();
-        int scrollY = scrollViewport.getScrollY();
         
         // Adjust the viewport to account for scroll position
         Rectangle visibleArea = new Rectangle(
