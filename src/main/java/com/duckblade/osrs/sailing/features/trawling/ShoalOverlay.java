@@ -37,14 +37,9 @@ public class ShoalOverlay extends Overlay
 
     private static final int SHOAL_HIGHLIGHT_SIZE = 10;
 
-    // Widget indices for net depth indicators
-    private static final int STARBOARD_DEPTH_WIDGET_INDEX = 96;
-    private static final int PORT_DEPTH_WIDGET_INDEX = 131;
+
     
-    // Sprite IDs for each depth level
-    private static final int SPRITE_SHALLOW = 7081;
-    private static final int SPRITE_MODERATE = 7082;
-    private static final int SPRITE_DEEP = 7083;
+
 
     // Clickbox IDs
     private static final Set<Integer> SHOAL_CLICKBOX_IDS = ImmutableSet.of(
@@ -62,15 +57,17 @@ public class ShoalOverlay extends Overlay
     private final Client client;
     private final SailingConfig config;
     private final ShoalDepthTracker shoalDepthTracker;
+    private final NetDepthTracker netDepthTracker;
     private final BoatTracker boatTracker;
     private final Set<GameObject> shoals = new HashSet<>();
 
     @Inject
     public ShoalOverlay(@Nonnull Client client, SailingConfig config, 
-                       ShoalDepthTracker shoalDepthTracker, BoatTracker boatTracker) {
+                       ShoalDepthTracker shoalDepthTracker, NetDepthTracker netDepthTracker, BoatTracker boatTracker) {
         this.client = client;
         this.config = config;
         this.shoalDepthTracker = shoalDepthTracker;
+        this.netDepthTracker = netDepthTracker;
         this.boatTracker = boatTracker;
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_SCENE);
@@ -186,7 +183,7 @@ public class ShoalOverlay extends Overlay
     }
 
     /**
-     * Helper method to get player's current net depth from BoatTracker
+     * Helper method to get player's current net depth using NetDepthTracker
      * Returns null if player has no nets equipped or nets are not available
      */
     private NetDepth getPlayerNetDepth() {
@@ -195,43 +192,16 @@ public class ShoalOverlay extends Overlay
             return null;
         }
 
-        // Get the facilities widget to read net depth from UI
-        Widget widgetSailingRows = client.getWidget(InterfaceID.SailingSidepanel.FACILITIES_ROWS);
-        if (widgetSailingRows == null) {
-            return null;
-        }
-
         // Try to get depth from starboard net first, then port net
-        NetDepth starboardDepth = getNetDepthFromWidget(widgetSailingRows, STARBOARD_DEPTH_WIDGET_INDEX);
+        NetDepth starboardDepth = netDepthTracker.getStarboardNetDepth();
         if (starboardDepth != null) {
             return starboardDepth;
         }
 
-        NetDepth portDepth = getNetDepthFromWidget(widgetSailingRows, PORT_DEPTH_WIDGET_INDEX);
-        return portDepth;
+        return netDepthTracker.getPortNetDepth();
     }
 
-    /**
-     * Get the current net depth from widget sprite
-     */
-    private NetDepth getNetDepthFromWidget(Widget parent, int widgetIndex) {
-        Widget depthWidget = parent.getChild(widgetIndex);
-        if (depthWidget == null) {
-            return null;
-        }
 
-        int spriteId = depthWidget.getSpriteId();
-        
-        if (spriteId == SPRITE_SHALLOW) {
-            return NetDepth.SHALLOW;
-        } else if (spriteId == SPRITE_MODERATE) {
-            return NetDepth.MODERATE;
-        } else if (spriteId == SPRITE_DEEP) {
-            return NetDepth.DEEP;
-        }
-
-        return null;
-    }
 
     /**
      * Check if the shoal is a special type (VIBRANT, GLISTENING, SHIMMERING)

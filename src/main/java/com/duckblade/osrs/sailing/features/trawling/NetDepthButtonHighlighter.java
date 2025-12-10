@@ -7,6 +7,7 @@ import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -34,22 +35,30 @@ public class NetDepthButtonHighlighter extends Overlay
     private static final int STARBOARD_DEPTH_WIDGET_INDEX = 96;
     private static final int PORT_DEPTH_WIDGET_INDEX = 131;
     
-    // Sprite IDs for each depth level
+    // Sprite IDs for each depth level (kept for reference, but using varbits now)
     private static final int SPRITE_SHALLOW = 7081;
     private static final int SPRITE_MODERATE = 7082;
     private static final int SPRITE_DEEP = 7083;
+    
+    // Varbit IDs for trawling net depths (kept for reference, but using NetDepthTracker now)
+    // Net 0 = Port, Net 1 = Starboard
+    private static final int TRAWLING_NET_PORT_VARBIT = VarbitID.SAILING_SIDEPANEL_BOAT_TRAWLING_NET_0_DEPTH;
+    private static final int TRAWLING_NET_STARBOARD_VARBIT = VarbitID.SAILING_SIDEPANEL_BOAT_TRAWLING_NET_1_DEPTH;
 
     private final ShoalDepthTracker shoalDepthTracker;
+    private final NetDepthTracker netDepthTracker;
     private final BoatTracker boatTracker;
     private final Client client;
     private final SailingConfig config;
 
     @Inject
-    public NetDepthButtonHighlighter(ShoalDepthTracker shoalDepthTracker, 
+    public NetDepthButtonHighlighter(ShoalDepthTracker shoalDepthTracker,
+                                   NetDepthTracker netDepthTracker,
                                    BoatTracker boatTracker, 
                                    Client client, 
                                    SailingConfig config) {
         this.shoalDepthTracker = shoalDepthTracker;
+        this.netDepthTracker = netDepthTracker;
         this.boatTracker = boatTracker;
         this.client = client;
         this.config = config;
@@ -220,25 +229,18 @@ public class NetDepthButtonHighlighter extends Overlay
     }
 
     /**
-     * Get the current net depth from widget sprite
+     * Get the current net depth using NetDepthTracker
      */
     private NetDepth getNetDepth(Widget parent, int widgetIndex) {
-        Widget depthWidget = parent.getChild(widgetIndex);
-        if (depthWidget == null) {
+        // Determine which net we're checking based on widget index
+        if (widgetIndex == PORT_DEPTH_WIDGET_INDEX) {
+            return netDepthTracker.getPortNetDepth();
+        } else if (widgetIndex == STARBOARD_DEPTH_WIDGET_INDEX) {
+            return netDepthTracker.getStarboardNetDepth();
+        } else {
+            log.warn("Unknown widget index for net depth: {}", widgetIndex);
             return null;
         }
-
-        int spriteId = depthWidget.getSpriteId();
-        
-        if (spriteId == SPRITE_SHALLOW) {
-            return NetDepth.SHALLOW;
-        } else if (spriteId == SPRITE_MODERATE) {
-            return NetDepth.MODERATE;
-        } else if (spriteId == SPRITE_DEEP) {
-            return NetDepth.DEEP;
-        }
-
-        return null;
     }
 
     /**

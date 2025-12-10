@@ -87,6 +87,10 @@ public class NetDepthTimer extends Overlay
     // Track the active shoal timer
     private ShoalTracker activeTracker = null;
     
+    // Track last logged states to reduce verbosity
+    private int lastLoggedTicksAtSamePosition = -1;
+    private int lastLoggedTimerTick = -1;
+    
 
 
     @Inject
@@ -118,6 +122,9 @@ public class NetDepthTimer extends Overlay
         ticksAtSamePosition = 0;
         hasSeenShoalStop = false;
         activeTracker = null;
+        // Reset logging trackers when shutting down
+        lastLoggedTimerTick = -1;
+        lastLoggedTicksAtSamePosition = -1;
     }
 
     /**
@@ -159,6 +166,9 @@ public class NetDepthTimer extends Overlay
                     
                     if (stopDuration > 0) {
                         activeTracker = new ShoalTracker(stopDuration, worldPos);
+                        // Reset logging trackers when creating new tracker
+                        lastLoggedTimerTick = -1;
+                        lastLoggedTicksAtSamePosition = -1;
                         log.info("Created ShoalTracker at location {}: stop duration = {} ticks", 
                                  worldPos, stopDuration);
                     } else {
@@ -189,6 +199,9 @@ public class NetDepthTimer extends Overlay
             // Shoal left world view - reset everything
             log.debug("Shoal despawned (left world view): ID={}", objectId);
             activeTracker = null;
+            // Reset logging trackers when shoal despawns
+            lastLoggedTimerTick = -1;
+            lastLoggedTicksAtSamePosition = -1;
             movingShoal = null;
             lastShoalPosition = null;
             ticksAtSamePosition = 0;
@@ -221,7 +234,13 @@ public class NetDepthTimer extends Overlay
                 if (currentPos != null) {
                     if (currentPos.equals(lastShoalPosition)) {
                         ticksAtSamePosition++;
-                        log.debug("Shoal at same position: {} ticks", ticksAtSamePosition);
+                        // Only log on significant milestones or state changes to reduce verbosity
+                        if (ticksAtSamePosition == 1 || 
+                            ticksAtSamePosition == STOPPED_THRESHOLD_TICKS || 
+                            (ticksAtSamePosition % 30 == 0 && ticksAtSamePosition != lastLoggedTicksAtSamePosition)) {
+                            log.debug("Shoal at same position: {} ticks", ticksAtSamePosition);
+                            lastLoggedTicksAtSamePosition = ticksAtSamePosition;
+                        }
                         
                         if (ticksAtSamePosition == STOPPED_THRESHOLD_TICKS && !hasSeenShoalStop) {
                             // First time seeing shoal stop
@@ -230,6 +249,8 @@ public class NetDepthTimer extends Overlay
                         } else if (ticksAtSamePosition == STOPPED_THRESHOLD_TICKS && hasSeenShoalStop) {
                             // Shoal stopped again after moving - restart timer
                             activeTracker.restart();
+                            // Reset logging trackers when timer restarts
+                            lastLoggedTimerTick = -1;
                             log.info("Shoal stopped at {}, timer restarted", currentPos);
                         }
                     } else {
@@ -238,6 +259,7 @@ public class NetDepthTimer extends Overlay
                         }
                         lastShoalPosition = currentPos;
                         ticksAtSamePosition = 0;
+                        lastLoggedTicksAtSamePosition = -1; // Reset logging tracker
                     }
                 }
             }
@@ -332,10 +354,12 @@ public class NetDepthTimer extends Overlay
             if (ticksAtWaypoint == 1) {
                 log.debug("Shoal at {} timer TICK 1 - timer is now running", location);
             }
-            if (ticksAtWaypoint % 10 == 0) {
+            // Only log timer progress at larger intervals and avoid duplicate logs
+            if (ticksAtWaypoint % 30 == 0 && ticksAtWaypoint != lastLoggedTimerTick) {
                 NetDepth requiredDepth = getCurrentRequiredDepth();
                 log.debug("Shoal at {} at tick {}: required depth = {}", 
                          location, ticksAtWaypoint, requiredDepth);
+                lastLoggedTimerTick = ticksAtWaypoint;
             }
             
             // Check if we've reached the depth change point - deactivate timer after first depth change

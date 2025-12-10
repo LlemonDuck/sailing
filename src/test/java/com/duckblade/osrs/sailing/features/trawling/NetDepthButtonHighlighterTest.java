@@ -28,6 +28,9 @@ public class NetDepthButtonHighlighterTest {
     private ShoalDepthTracker shoalDepthTracker;
     
     @Mock
+    private NetDepthTracker netDepthTracker;
+    
+    @Mock
     private BoatTracker boatTracker;
     
     @Mock
@@ -65,7 +68,7 @@ public class NetDepthButtonHighlighterTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        highlighter = new NetDepthButtonHighlighter(shoalDepthTracker, boatTracker, client, config);
+        highlighter = new NetDepthButtonHighlighter(shoalDepthTracker, netDepthTracker, boatTracker, client, config);
         
         // Setup basic mocks
         when(config.trawlingShowNetDepthTimer()).thenReturn(true);
@@ -126,9 +129,8 @@ public class NetDepthButtonHighlighterTest {
             when(shoalDepthTracker.getNextMovementDirection()).thenReturn(MovementDirection.UNKNOWN);
             
             // Setup net depths (both starboard and port for simplicity)
-            int spriteId = getSpriteIdForDepth(testCase.netDepth);
-            when(starboardDepthWidget.getSpriteId()).thenReturn(spriteId);
-            when(portDepthWidget.getSpriteId()).thenReturn(spriteId);
+            when(netDepthTracker.getPortNetDepth()).thenReturn(testCase.netDepth);
+            when(netDepthTracker.getStarboardNetDepth()).thenReturn(testCase.netDepth);
             
             // Test the core logic by checking what required depth is determined
             // This tests the property without relying on complex widget mocking
@@ -175,9 +177,8 @@ public class NetDepthButtonHighlighterTest {
             when(shoalDepthTracker.getNextMovementDirection()).thenReturn(MovementDirection.UNKNOWN);
             
             // Setup both nets at the same depth as shoal
-            int spriteId = getSpriteIdForDepth(depth);
-            when(starboardDepthWidget.getSpriteId()).thenReturn(spriteId);
-            when(portDepthWidget.getSpriteId()).thenReturn(spriteId);
+            when(netDepthTracker.getPortNetDepth()).thenReturn(depth);
+            when(netDepthTracker.getStarboardNetDepth()).thenReturn(depth);
             
             // Test the core logic: when depths match, should highlighting be disabled?
             NetDepth requiredDepth = callDetermineRequiredDepth();
@@ -215,15 +216,7 @@ public class NetDepthButtonHighlighterTest {
         }
     }
 
-    // Helper method to convert NetDepth to sprite ID
-    private int getSpriteIdForDepth(NetDepth depth) {
-        switch (depth) {
-            case SHALLOW: return 7081; // SPRITE_SHALLOW
-            case MODERATE: return 7082; // SPRITE_MODERATE  
-            case DEEP: return 7083; // SPRITE_DEEP
-            default: return -1;
-        }
-    }
+
 
     // Test case data structure
     private static class TestCase {

@@ -40,6 +40,7 @@ import com.duckblade.osrs.sailing.features.trawling.NetCapacityOverlay;
 import com.duckblade.osrs.sailing.features.trawling.NetCapacityTracker;
 import com.duckblade.osrs.sailing.features.trawling.NetDepthButtonHighlighter;
 import com.duckblade.osrs.sailing.features.trawling.NetDepthTimer;
+import com.duckblade.osrs.sailing.features.trawling.NetDepthTracker;
 import com.duckblade.osrs.sailing.features.trawling.NetDepthTimerOverlay;
 import com.duckblade.osrs.sailing.features.trawling.ShoalDepthTracker;
 import com.duckblade.osrs.sailing.features.trawling.ShoalOverlay;
@@ -102,6 +103,7 @@ public class SailingModule extends AbstractModule
 		NetCapacityTracker netCapacityTracker,
 		NetDepthButtonHighlighter netDepthButtonHighlighter,
 		NetDepthTimer netDepthTimer,
+		NetDepthTracker netDepthTracker,
 		NetDepthTimerOverlay netDepthTimerOverlay,
 		OceanMan oceanMan,
 		ShoalDepthTracker shoalDepthTracker,
@@ -156,6 +158,7 @@ public class SailingModule extends AbstractModule
 			.add(netDepthButtonHighlighter)
 			.add(netDepthTimer)
 			.add(netDepthTimerOverlay)
+			.add(netDepthTracker)
 			.add(navigationOverlay)
 			.add(oceanMan)
 			.add(prioritizeCargoHold)

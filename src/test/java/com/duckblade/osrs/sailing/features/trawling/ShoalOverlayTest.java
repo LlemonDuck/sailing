@@ -35,6 +35,9 @@ public class ShoalOverlayTest {
     private ShoalDepthTracker shoalDepthTracker;
     
     @Mock
+    private NetDepthTracker netDepthTracker;
+    
+    @Mock
     private BoatTracker boatTracker;
     
     @Mock
@@ -48,15 +51,12 @@ public class ShoalOverlayTest {
     
     private ShoalOverlay overlay;
 
-    // Sprite IDs for each depth level (from ShoalOverlay)
-    private static final int SPRITE_SHALLOW = 7081;
-    private static final int SPRITE_MODERATE = 7082;
-    private static final int SPRITE_DEEP = 7083;
+
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        overlay = new ShoalOverlay(client, config, shoalDepthTracker, boatTracker);
+        overlay = new ShoalOverlay(client, config, shoalDepthTracker, netDepthTracker, boatTracker);
         
         // Setup default config color
         when(config.trawlingShoalHighlightColour()).thenReturn(Color.CYAN);
@@ -109,33 +109,16 @@ public class ShoalOverlayTest {
     }
 
     /**
-     * Helper method to setup player net depth mocking
+     * Helper method to setup player net depth mocking using NetDepthTracker
      */
     private void setupPlayerNetDepth(NetDepth depth) {
         // Mock boat with nets
         when(boatTracker.getBoat()).thenReturn(boat);
         when(boat.getNetTiers()).thenReturn(Arrays.asList(FishingNetTier.ROPE)); // Non-empty list
         
-        // Mock facilities widget
-        when(client.getWidget(InterfaceID.SailingSidepanel.FACILITIES_ROWS)).thenReturn(facilitiesWidget);
-        when(facilitiesWidget.getChild(96)).thenReturn(depthWidget); // Starboard depth widget
-        
-        // Set sprite based on depth
-        int spriteId;
-        switch (depth) {
-            case SHALLOW:
-                spriteId = SPRITE_SHALLOW;
-                break;
-            case MODERATE:
-                spriteId = SPRITE_MODERATE;
-                break;
-            case DEEP:
-                spriteId = SPRITE_DEEP;
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown depth: " + depth);
-        }
-        when(depthWidget.getSpriteId()).thenReturn(spriteId);
+        // Mock NetDepthTracker to return the specified depth
+        when(netDepthTracker.getStarboardNetDepth()).thenReturn(depth);
+        when(netDepthTracker.getPortNetDepth()).thenReturn(depth);
     }
 
     /**
