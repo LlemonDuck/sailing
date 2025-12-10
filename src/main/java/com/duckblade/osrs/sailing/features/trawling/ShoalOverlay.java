@@ -1,13 +1,17 @@
 package com.duckblade.osrs.sailing.features.trawling;
 
 import com.duckblade.osrs.sailing.SailingConfig;
+import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
+import com.duckblade.osrs.sailing.model.Boat;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.Perspective;
+import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.widgets.Widget;
 
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
@@ -33,6 +37,15 @@ public class ShoalOverlay extends Overlay
 
     private static final int SHOAL_HIGHLIGHT_SIZE = 10;
 
+    // Widget indices for net depth indicators
+    private static final int STARBOARD_DEPTH_WIDGET_INDEX = 96;
+    private static final int PORT_DEPTH_WIDGET_INDEX = 131;
+    
+    // Sprite IDs for each depth level
+    private static final int SPRITE_SHALLOW = 7081;
+    private static final int SPRITE_MODERATE = 7082;
+    private static final int SPRITE_DEEP = 7083;
+
     // Clickbox IDs
     private static final Set<Integer> SHOAL_CLICKBOX_IDS = ImmutableSet.of(
             TrawlingData.ShoalObjectID.BLUEFIN,
@@ -48,12 +61,17 @@ public class ShoalOverlay extends Overlay
     @Nonnull
     private final Client client;
     private final SailingConfig config;
+    private final ShoalDepthTracker shoalDepthTracker;
+    private final BoatTracker boatTracker;
     private final Set<GameObject> shoals = new HashSet<>();
 
     @Inject
-    public ShoalOverlay(@Nonnull Client client, SailingConfig config) {
+    public ShoalOverlay(@Nonnull Client client, SailingConfig config, 
+                       ShoalDepthTracker shoalDepthTracker, BoatTracker boatTracker) {
         this.client = client;
         this.config = config;
+        this.shoalDepthTracker = shoalDepthTracker;
+        this.boatTracker = boatTracker;
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_SCENE);
         setPriority(PRIORITY_HIGH);
@@ -149,14 +167,79 @@ public class ShoalOverlay extends Overlay
     }
 
     private Color getShoalColor(int objectId) {
-        // Special shoals (Vibrant, Glistening, Shimmering) are green
-        if (objectId == TrawlingData.ShoalObjectID.VIBRANT ||
-            objectId == TrawlingData.ShoalObjectID.GLISTENING ||
-            objectId == TrawlingData.ShoalObjectID.SHIMMERING) {
+        // Priority 1: Check depth matching (highest priority)
+        NetDepth shoalDepth = shoalDepthTracker.getCurrentDepth();
+        if (shoalDepth != null) {
+            NetDepth playerDepth = getPlayerNetDepth();
+            if (playerDepth != null && playerDepth != shoalDepth) {
+                return Color.RED; // Wrong depth - highest priority
+            }
+        }
+        
+        // Priority 2: Special shoals use green (medium priority)
+        if (isSpecialShoal(objectId)) {
             return Color.GREEN;
         }
-        // Default color from config
+        
+        // Priority 3: Default to configured color (lowest priority)
         return config.trawlingShoalHighlightColour();
+    }
+
+    /**
+     * Helper method to get player's current net depth from BoatTracker
+     * Returns null if player has no nets equipped or nets are not available
+     */
+    private NetDepth getPlayerNetDepth() {
+        Boat boat = boatTracker.getBoat();
+        if (boat == null || boat.getNetTiers().isEmpty()) {
+            return null;
+        }
+
+        // Get the facilities widget to read net depth from UI
+        Widget widgetSailingRows = client.getWidget(InterfaceID.SailingSidepanel.FACILITIES_ROWS);
+        if (widgetSailingRows == null) {
+            return null;
+        }
+
+        // Try to get depth from starboard net first, then port net
+        NetDepth starboardDepth = getNetDepthFromWidget(widgetSailingRows, STARBOARD_DEPTH_WIDGET_INDEX);
+        if (starboardDepth != null) {
+            return starboardDepth;
+        }
+
+        NetDepth portDepth = getNetDepthFromWidget(widgetSailingRows, PORT_DEPTH_WIDGET_INDEX);
+        return portDepth;
+    }
+
+    /**
+     * Get the current net depth from widget sprite
+     */
+    private NetDepth getNetDepthFromWidget(Widget parent, int widgetIndex) {
+        Widget depthWidget = parent.getChild(widgetIndex);
+        if (depthWidget == null) {
+            return null;
+        }
+
+        int spriteId = depthWidget.getSpriteId();
+        
+        if (spriteId == SPRITE_SHALLOW) {
+            return NetDepth.SHALLOW;
+        } else if (spriteId == SPRITE_MODERATE) {
+            return NetDepth.MODERATE;
+        } else if (spriteId == SPRITE_DEEP) {
+            return NetDepth.DEEP;
+        }
+
+        return null;
+    }
+
+    /**
+     * Check if the shoal is a special type (VIBRANT, GLISTENING, SHIMMERING)
+     */
+    private boolean isSpecialShoal(int objectId) {
+        return objectId == TrawlingData.ShoalObjectID.VIBRANT ||
+               objectId == TrawlingData.ShoalObjectID.GLISTENING ||
+               objectId == TrawlingData.ShoalObjectID.SHIMMERING;
     }
 
 }

@@ -38,8 +38,10 @@ import com.duckblade.osrs.sailing.features.oceanencounters.OceanMan;
 import com.duckblade.osrs.sailing.features.salvaging.SalvagingHighlight;
 import com.duckblade.osrs.sailing.features.trawling.NetCapacityOverlay;
 import com.duckblade.osrs.sailing.features.trawling.NetCapacityTracker;
+import com.duckblade.osrs.sailing.features.trawling.NetDepthButtonHighlighter;
 import com.duckblade.osrs.sailing.features.trawling.NetDepthTimer;
 import com.duckblade.osrs.sailing.features.trawling.NetDepthTimerOverlay;
+import com.duckblade.osrs.sailing.features.trawling.ShoalDepthTracker;
 import com.duckblade.osrs.sailing.features.trawling.ShoalOverlay;
 import com.duckblade.osrs.sailing.features.trawling.ShoalPathTrackerOverlay;
 import com.duckblade.osrs.sailing.features.trawling.ShoalPathTracker;
@@ -98,9 +100,11 @@ public class SailingModule extends AbstractModule
 		MysteriousGlow mysteriousGlow,
 		NetCapacityOverlay netCapacityOverlay,
 		NetCapacityTracker netCapacityTracker,
+		NetDepthButtonHighlighter netDepthButtonHighlighter,
 		NetDepthTimer netDepthTimer,
 		NetDepthTimerOverlay netDepthTimerOverlay,
 		OceanMan oceanMan,
+		ShoalDepthTracker shoalDepthTracker,
 		PrioritizeCargoHold prioritizeCargoHold,
 		RapidsOverlay rapidsOverlay,
 		ReverseBeep reverseBeep,
@@ -149,6 +153,7 @@ public class SailingModule extends AbstractModule
 			.add(mysteriousGlow)
 			.add(netCapacityOverlay)
 			.add(netCapacityTracker)
+			.add(netDepthButtonHighlighter)
 			.add(netDepthTimer)
 			.add(netDepthTimerOverlay)
 			.add(navigationOverlay)
@@ -160,6 +165,7 @@ public class SailingModule extends AbstractModule
 			.add(seaChartOverlay)
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
+			.add(shoalDepthTracker)
 			.add(shoalOverlay)
 			.add(shoalPathOverlay)
 			.add(shoalPathTracker)

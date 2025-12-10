@@ -15,8 +15,6 @@ import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.WorldEntitySpawned;
-import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -73,24 +71,12 @@ public class NetDepthTimer extends Overlay
             new ShoalTiming(TrawlingData.ShoalStopDuration.YELLOWFIN, NetDepth.SHALLOW, NetDepth.MODERATE));
     }
     
-    // Widget indices for fishing net controls
-    private static final int STARBOARD_DOWN = 97;
-    private static final int STARBOARD_UP = 108;
-    private static final int PORT_DOWN = 132;
-    private static final int PORT_UP = 143;
-    
-    // Widget indices for net depth indicators
-    private static final int STARBOARD_DEPTH_WIDGET_INDEX = 96;
-    private static final int PORT_DEPTH_WIDGET_INDEX = 131;
-    
-    // Sprite IDs for each depth level
-    private static final int SPRITE_SHALLOW = 7081;
-    private static final int SPRITE_MODERATE = 7082;
-    private static final int SPRITE_DEEP = 7083;
+
 
     private final Client client;
     private final SailingConfig config;
     private final BoatTracker boatTracker;
+    private final ShoalDepthTracker shoalDepthTracker;
 
     // Track WorldEntity (moving shoal) for position monitoring
     private WorldEntity movingShoal = null;
@@ -104,10 +90,11 @@ public class NetDepthTimer extends Overlay
 
 
     @Inject
-    public NetDepthTimer(Client client, SailingConfig config, BoatTracker boatTracker) {
+    public NetDepthTimer(Client client, SailingConfig config, BoatTracker boatTracker, ShoalDepthTracker shoalDepthTracker) {
         this.client = client;
         this.config = config;
         this.boatTracker = boatTracker;
+        this.shoalDepthTracker = shoalDepthTracker;
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
         setPriority(1000.0f);
@@ -264,168 +251,12 @@ public class NetDepthTimer extends Overlay
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        if (!config.trawlingShowNetDepthTimer()) {
-            return null;
-        }
-
-        Boat boat = boatTracker.getBoat();
-        if (boat == null || boat.getNetTiers().isEmpty()) {
-            return null;
-        }
-
-        Widget widgetSailingRows = client.getWidget(InterfaceID.SailingSidepanel.FACILITIES_ROWS);
-        if (widgetSailingRows == null) {
-            return null;
-        }
-
-        // Check if we have an active tracker and highlight buttons if needed
-        if (activeTracker != null) {
-            NetDepth requiredDepth = activeTracker.getCurrentRequiredDepth();
-            if (requiredDepth != null) {
-                highlightButtonsForDepth(graphics, widgetSailingRows, requiredDepth);
-            }
-        }
-
+        // Timer overlay display is handled by other components if needed
+        // This component now focuses only on timing logic and depth change notifications
         return null;
     }
 
-    private void highlightButtonsForDepth(Graphics2D graphics, Widget parent, NetDepth requiredDepth) {
-        Color highlightColor = config.trawlingShoalHighlightColour();
 
-        // Check starboard net - only highlight if opacity is 0 (player can interact)
-        Widget starboardDepthWidget = parent.getChild(STARBOARD_DEPTH_WIDGET_INDEX);
-        if (starboardDepthWidget != null && starboardDepthWidget.getOpacity() == 0) {
-            NetDepth currentDepth = getNetDepth(parent, STARBOARD_DEPTH_WIDGET_INDEX);
-            if (currentDepth != null && currentDepth != requiredDepth) {
-                highlightNetButton(graphics, parent, currentDepth, requiredDepth, 
-                                  STARBOARD_UP, STARBOARD_DOWN, highlightColor);
-            }
-        }
-
-        // Check port net - only highlight if opacity is 0 (player can interact)
-        Widget portDepthWidget = parent.getChild(PORT_DEPTH_WIDGET_INDEX);
-        if (portDepthWidget != null && portDepthWidget.getOpacity() == 0) {
-            NetDepth currentDepth = getNetDepth(parent, PORT_DEPTH_WIDGET_INDEX);
-            if (currentDepth != null && currentDepth != requiredDepth) {
-                highlightNetButton(graphics, parent, currentDepth, requiredDepth,
-                                  PORT_UP, PORT_DOWN, highlightColor);
-            }
-        }
-    }
-
-    private void highlightNetButton(Graphics2D graphics, Widget parent, NetDepth current, 
-                                    NetDepth required, int upIndex, int downIndex, Color color) {
-        // Determine which button to highlight
-        int buttonIndex;
-        if (required.ordinal() < current.ordinal()) {
-            // Need to go shallower (up)
-            buttonIndex = upIndex;
-        } else {
-            // Need to go deeper (down)
-            buttonIndex = downIndex;
-        }
-
-        Widget button = getNetWidget(parent, buttonIndex);
-        if (button != null && !button.isHidden()) {
-            Rectangle bounds = button.getBounds();
-            if (bounds.width > 0 && bounds.height > 0) {
-                // Check if button is actually visible in the viewport (not scrolled out of view)
-                if (isWidgetInViewport(button, parent)) {
-                    graphics.setColor(color);
-                    graphics.setStroke(new BasicStroke(3));
-                    graphics.drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
-                }
-            }
-        }
-    }
-
-    private boolean isWidgetInViewport(Widget widget, Widget scrollContainer) {
-        if (widget == null || scrollContainer == null) {
-            return false;
-        }
-        
-        Rectangle widgetBounds = widget.getBounds();
-        
-        // Find the actual scroll viewport by looking for the parent with scroll properties
-        Widget scrollViewport = scrollContainer;
-        while (scrollViewport != null && scrollViewport.getScrollHeight() == 0) {
-            scrollViewport = scrollViewport.getParent();
-        }
-        
-        if (scrollViewport == null) {
-            // No scroll container found, use the original container
-            Rectangle containerBounds = scrollContainer.getBounds();
-            return containerBounds.contains(widgetBounds);
-        }
-        
-        // Get the visible viewport bounds (accounting for scroll position)
-        Rectangle viewportBounds = scrollViewport.getBounds();
-        
-        // Adjust the viewport to account for scroll position
-        Rectangle visibleArea = new Rectangle(
-            viewportBounds.x,
-            viewportBounds.y,
-            viewportBounds.width,
-            viewportBounds.height
-        );
-        
-        // Check if the widget is fully visible within the scrolled viewport
-        return visibleArea.contains(widgetBounds);
-    }
-
-    private NetDepth getNetDepth(Widget parent, int widgetIndex) {
-        Widget depthWidget = parent.getChild(widgetIndex);
-        if (depthWidget == null) {
-            return null;
-        }
-
-        int spriteId = depthWidget.getSpriteId();
-        
-        if (spriteId == SPRITE_SHALLOW) {
-            return NetDepth.SHALLOW;
-        } else if (spriteId == SPRITE_MODERATE) {
-            return NetDepth.MODERATE;
-        } else if (spriteId == SPRITE_DEEP) {
-            return NetDepth.DEEP;
-        }
-
-        return null;
-    }
-
-    private Widget getNetWidget(Widget parent, int index) {
-        Widget parentWidget = parent.getChild(index);
-        if (parentWidget == null) {
-            return null;
-        }
-
-        Rectangle bounds = parentWidget.getBounds();
-
-        // Parent widgets have invalid bounds, get their children
-        if (bounds.x == -1 && bounds.y == -1) {
-            Widget[] children = parentWidget.getChildren();
-            if (children != null && children.length > 0) {
-                for (Widget child : children) {
-                    if (child != null) {
-                        Rectangle childBounds = child.getBounds();
-                        if (childBounds.x != -1 && childBounds.y != -1) {
-                            return child;
-                        }
-                    }
-                }
-            }
-        } else {
-            return parentWidget;
-        }
-
-        return null;
-    }
-
-    // Enum for net depths
-    private enum NetDepth {
-        SHALLOW,
-        MODERATE,
-        DEEP
-    }
 
     /**
      * Data class for exposing timer information to overlay
@@ -512,11 +343,18 @@ public class NetDepthTimer extends Overlay
             if (timing != null) {
                 int depthChangeTime = timing.getDepthChangeTime();
                 
+                if (ticksAtWaypoint == depthChangeTime) {
+                    // Depth change has occurred - notify ShoalDepthTracker
+                    NetDepth newDepth = timing.endDepth;
+                    shoalDepthTracker.notifyDepthChange(newDepth);
+                    log.debug("Shoal at {} depth change occurred at tick {}, notified ShoalDepthTracker of new depth: {}", 
+                             location, ticksAtWaypoint, newDepth);
+                }
+                
                 if (ticksAtWaypoint >= depthChangeTime) {
-                    // Depth change has occurred, deactivate timer until shoal moves and stops again
+                    // Deactivate timer until shoal moves and stops again
                     timerActive = false;
-                    log.debug("Shoal at {} depth change occurred at tick {}, timer deactivated", 
-                             location, ticksAtWaypoint);
+                    log.debug("Shoal at {} timer deactivated after depth change", location);
                 }
             }
         }
