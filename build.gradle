@@ -88,34 +88,6 @@ tasks.register('runTestClient', JavaExec) {
 		'-ea',
 		'-Drunelite.pluginhub.skip=true'
 	]
-	
-	// Add Jagex account credentials if file exists
-	doFirst {
-		def credentialsFile = file('jagex_launcher_accounts.json')
-		if (credentialsFile.exists()) {
-			jvmArgs += '-Drunelite.launcher.accounts=' + credentialsFile.absolutePath
-			println "Using Jagex account credentials from: ${credentialsFile.absolutePath}"
-		} else {
-			println "No Jagex account credentials found. You'll need to log in manually."
-		}
-	}
-}
-
-tasks.register('runTestClientNoAuth', JavaExec) {
-	group = 'application'
-	description = 'Runs the SailingPluginTest main class without Jagex account integration'
-	
-	dependsOn testClasses
-	
-	classpath = sourceSets.test.runtimeClasspath
-	mainClass = 'com.duckblade.osrs.sailing.SailingPluginTest'
-	
-	args = ['--developer-mode']
-	
-	jvmArgs = [
-		'-ea',
-		'-Drunelite.pluginhub.skip=true'
-	]
 }
 
 idea {
