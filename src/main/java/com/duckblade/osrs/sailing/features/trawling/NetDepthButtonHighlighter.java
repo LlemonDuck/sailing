@@ -85,6 +85,12 @@ public class NetDepthButtonHighlighter extends Overlay
         }
 
         NetDepth requiredDepth = determineRequiredDepth();
+        log.debug("Highlighting buttons - shoal: {}, 3-depth: {}, direction: {}, required: {}", 
+                 shoalDepthTracker.getCurrentDepth(),
+                 shoalDepthTracker.isThreeDepthArea(),
+                 shoalDepthTracker.getNextMovementDirection(),
+                 requiredDepth);
+        
         if (requiredDepth != null) {
             highlightButtonsForDepth(graphics, widgetSailingRows, requiredDepth);
         }
@@ -116,26 +122,25 @@ public class NetDepthButtonHighlighter extends Overlay
             return null;
         }
 
+        boolean isThreeDepth = shoalDepthTracker.isThreeDepthArea();
+
         // Handle three-depth area special case
-        if (shoalDepthTracker.isThreeDepthArea()) {
+        if (isThreeDepth) {
             if (currentShoalDepth == NetDepth.MODERATE) {
                 // At moderate depth in three-depth area, check movement direction
                 MovementDirection direction = shoalDepthTracker.getNextMovementDirection();
+                
                 if (direction == MovementDirection.UNKNOWN) {
-                    // No direction known, don't highlight any buttons
                     return null;
                 } else if (direction == MovementDirection.DEEPER) {
-                    // Moving to deep, highlight deep button
                     return NetDepth.DEEP;
                 } else if (direction == MovementDirection.SHALLOWER) {
-                    // Moving to shallow, highlight shallow button
                     return NetDepth.SHALLOW;
                 }
             } else if (currentShoalDepth == NetDepth.DEEP || currentShoalDepth == NetDepth.SHALLOW) {
                 // At deep or shallow in three-depth area, highlight moderate
                 return NetDepth.MODERATE;
             }
-            // For three-depth areas, if we reach here, something is wrong - don't highlight
             return null;
         }
 
@@ -148,25 +153,40 @@ public class NetDepthButtonHighlighter extends Overlay
      */
     private void highlightButtonsForDepth(Graphics2D graphics, Widget parent, NetDepth requiredDepth) {
         Color highlightColor = config.trawlingShoalHighlightColour();
+        log.debug("Highlighting buttons for required depth: {}", requiredDepth);
 
         // Check starboard net - only highlight if opacity is 0 (player can interact)
         Widget starboardDepthWidget = parent.getChild(STARBOARD_DEPTH_WIDGET_INDEX);
         if (starboardDepthWidget != null && starboardDepthWidget.getOpacity() == 0) {
             NetDepth currentDepth = getNetDepth(parent, STARBOARD_DEPTH_WIDGET_INDEX);
+            log.debug("Starboard net: current={}, required={}, opacity={}", 
+                     currentDepth, requiredDepth, starboardDepthWidget.getOpacity());
             if (currentDepth != null && currentDepth != requiredDepth) {
+                log.debug("Highlighting starboard net button");
                 highlightNetButton(graphics, parent, currentDepth, requiredDepth, 
                                   STARBOARD_UP, STARBOARD_DOWN, highlightColor);
             }
+        } else {
+            log.debug("Starboard widget: present={}, opacity={}", 
+                     starboardDepthWidget != null, 
+                     starboardDepthWidget != null ? starboardDepthWidget.getOpacity() : "N/A");
         }
 
         // Check port net - only highlight if opacity is 0 (player can interact)
         Widget portDepthWidget = parent.getChild(PORT_DEPTH_WIDGET_INDEX);
         if (portDepthWidget != null && portDepthWidget.getOpacity() == 0) {
             NetDepth currentDepth = getNetDepth(parent, PORT_DEPTH_WIDGET_INDEX);
+            log.debug("Port net: current={}, required={}, opacity={}", 
+                     currentDepth, requiredDepth, portDepthWidget.getOpacity());
             if (currentDepth != null && currentDepth != requiredDepth) {
+                log.debug("Highlighting port net button");
                 highlightNetButton(graphics, parent, currentDepth, requiredDepth,
                                   PORT_UP, PORT_DOWN, highlightColor);
             }
+        } else {
+            log.debug("Port widget: present={}, opacity={}", 
+                     portDepthWidget != null, 
+                     portDepthWidget != null ? portDepthWidget.getOpacity() : "N/A");
         }
     }
 

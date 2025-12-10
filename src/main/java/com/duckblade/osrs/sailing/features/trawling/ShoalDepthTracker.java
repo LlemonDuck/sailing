@@ -105,8 +105,10 @@ public class ShoalDepthTracker implements PluginLifecycleComponent {
         GameObject obj = e.getGameObject();
         int objectId = obj.getId();
         
+        log.debug("GameObject spawned: ID={}, location={}", objectId, obj.getWorldLocation());
+        
         if (SHOAL_OBJECT_IDS.contains(objectId)) {
-            log.debug("Shoal GameObject detected (ID={}), waiting for WorldEntity to get proper coordinates", objectId);
+            log.info("*** SHOAL GAMEOBJECT DETECTED *** ID={}, location={}", objectId, obj.getWorldLocation());
             // Don't initialize state yet - wait for WorldEntity spawn to get proper top-level coordinates
         }
     }
@@ -115,11 +117,19 @@ public class ShoalDepthTracker implements PluginLifecycleComponent {
     public void onWorldEntitySpawned(WorldEntitySpawned e) {
         WorldEntity entity = e.getWorldEntity();
         
+        log.info("*** ShoalDepthTracker - WorldEntity spawned: config={}, configId={} ***", 
+                 entity.getConfig(), 
+                 entity.getConfig() != null ? entity.getConfig().getId() : "null");
+        
         // Only track shoal WorldEntity
         if (entity.getConfig() != null && entity.getConfig().getId() == SHOAL_WORLD_ENTITY_CONFIG_ID) {
             LocalPoint localPos = entity.getCameraFocus();
+            log.info("*** SHOAL WORLDENTITY DETECTED IN SHOALDEPTHTRACKER *** configId={}, localPos={}", 
+                    entity.getConfig().getId(), localPos);
+            
             if (localPos != null) {
                 WorldPoint worldPos = WorldPoint.fromLocal(client, localPos);
+                log.info("Converted to WorldPoint: {}", worldPos);
                 if (worldPos != null) {
                     initializeShoalState(worldPos);
                 }
@@ -150,33 +160,51 @@ public class ShoalDepthTracker implements PluginLifecycleComponent {
 
     @Subscribe
     public void onChatMessage(ChatMessage e) {
+        String message = e.getMessage();
+        log.info("=== CHAT MESSAGE DEBUG ===");
+        log.info("Type: {}", e.getType());
+        log.info("Message: '{}'", message);
+        log.info("Current state - threeDepthArea: {}, currentDepth: {}, nextMovementDirection: {}", 
+                 isThreeDepthArea, currentDepth, nextMovementDirection);
+        log.info("Active shoal location: {}", activeShoalLocation);
+        
         // Only process messages when in three-depth areas
         if (!isThreeDepthArea || currentDepth == null) {
+            log.info("IGNORING: Not in three-depth area ({}) or no current depth ({})", isThreeDepthArea, currentDepth);
             return;
         }
 
         // Only process game messages
         if (e.getType() != ChatMessageType.GAMEMESSAGE) {
+            log.info("IGNORING: Not a game message (type: {})", e.getType());
             return;
         }
 
-        String message = e.getMessage();
         if (message == null) {
+            log.info("IGNORING: Null message");
             return;
         }
+
+        String lowerMessage = message.toLowerCase();
+        log.info("Checking message for depth keywords: '{}'", lowerMessage);
 
         // Parse messages for "deeper" keywords and set nextMovementDirection to DEEPER
-        if (message.toLowerCase().contains("deeper")) {
+        if (lowerMessage.contains("deeper")) {
+            MovementDirection oldDirection = this.nextMovementDirection;
             this.nextMovementDirection = MovementDirection.DEEPER;
-            log.debug("Chat message indicates deeper movement: {}", message);
+            log.info("*** DEEPER MOVEMENT DETECTED *** - changed from {} to {}", oldDirection, this.nextMovementDirection);
+            log.info("Full message: '{}'", message);
         }
         // Parse messages for "shallower" keywords and set nextMovementDirection to SHALLOWER
-        else if (message.toLowerCase().contains("shallower")) {
+        else if (lowerMessage.contains("shallower")) {
+            MovementDirection oldDirection = this.nextMovementDirection;
             this.nextMovementDirection = MovementDirection.SHALLOWER;
-            log.debug("Chat message indicates shallower movement: {}", message);
+            log.info("*** SHALLOWER MOVEMENT DETECTED *** - changed from {} to {}", oldDirection, this.nextMovementDirection);
+            log.info("Full message: '{}'", message);
+        } else {
+            log.info("No depth keywords found in message");
         }
-        // Store only the most recent movement direction - this is handled automatically
-        // since we overwrite the field on each matching message
+        log.info("=== END CHAT MESSAGE DEBUG ===");
     }
 
     private void initializeShoalState(WorldPoint location) {
