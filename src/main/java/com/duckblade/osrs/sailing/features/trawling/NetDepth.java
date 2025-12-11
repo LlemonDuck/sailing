@@ -4,9 +4,9 @@ package com.duckblade.osrs.sailing.features.trawling;
  * Represents the depth levels for fishing nets in trawling
  */
 public enum NetDepth {
-    SHALLOW(0),
-    MODERATE(1),
-    DEEP(2);
+    SHALLOW(1),
+    MODERATE(2),
+    DEEP(3);
 
     private final int level;
 

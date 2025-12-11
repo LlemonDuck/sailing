@@ -111,13 +111,15 @@ public class NetDepthTracker implements PluginLifecycleComponent {
     private NetDepth getNetDepthFromVarbit(int varbitId) {
         int varbitValue = client.getVarbitValue(varbitId);
         
-        // Convert varbit value to NetDepth (0=shallow, 1=moderate, 2=deep)
+        // Convert varbit value to NetDepth (0=net not lowered, 1=shallow, 2=moderate, 3=deep)
         switch (varbitValue) {
             case 0:
-                return NetDepth.SHALLOW;
+                return null; // Net not lowered
             case 1:
-                return NetDepth.MODERATE;
+                return NetDepth.SHALLOW;
             case 2:
+                return NetDepth.MODERATE;
+            case 3:
                 return NetDepth.DEEP;
             default:
                 log.warn("Unknown varbit value for net depth: {} (varbit: {})", varbitValue, varbitId);
