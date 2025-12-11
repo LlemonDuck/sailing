@@ -1,6 +1,7 @@
 package com.duckblade.osrs.sailing.features.trawling;
 
 import com.duckblade.osrs.sailing.SailingConfig;
+import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,11 +37,13 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 	private static final int SHOAL_WORLD_ENTITY_CONFIG_ID = 4;
 	
 	// Bluefin/Vibrant shoal GameObject IDs - same route, different spawns change these to trace other shoals
-	private static final int BLUEFIN_SHOAL_ID = TrawlingData.ShoalObjectID.BLUEFIN;
-	private static final int VIBRANT_SHOAL_ID = TrawlingData.ShoalObjectID.VIBRANT;
+	private static final int BLUEFIN_SHOAL_ID = TrawlingData.ShoalObjectID.GIANT_KRILL;
+	private static final int VIBRANT_SHOAL_ID = TrawlingData.ShoalObjectID.SHIMMERING;
 	
-	private static final int MIN_PATH_POINTS = 8; // Minimum points before we consider it a valid path
-	private static final int POSITION_TOLERANCE = 4; // World coordinate units (tiles)
+	private static final int MIN_PATH_POINTS = 2; // Minimum points before we consider it a valid path
+	private static final int MIN_WAYPOINT_DISTANCE = 1; // World coordinate units (tiles)
+	private static final int MAX_PLAYER_DISTANCE = 300; // World coordinate units (tiles)
+	private static final int AREA_MARGIN = 10; // World coordinate units (tiles)
 
 	private final Client client;
 	private final SailingConfig config;
@@ -162,10 +165,9 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 	}
 
     @Getter
-	public static class ShoalPath {
+	public class ShoalPath {
 		private final int shoalId;
-		private final List<Waypoint> waypoints = new ArrayList<>();
-		private WorldPoint lastRecordedPosition;
+		private final LinkedList<Waypoint> waypoints = new LinkedList<>();
 		private int ticksAtCurrentPosition = 0;
 
 		public ShoalPath(int shoalId) {
@@ -173,39 +175,48 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 		}
 
 		public void addPosition(WorldPoint position) {
+			WorldPoint playerLocation = SailingUtil.getTopLevelWorldPoint(client);
+			boolean isTooFar = !isNearPosition(playerLocation, position, MAX_PLAYER_DISTANCE);
+
+			// First position
 			if (waypoints.isEmpty()) {
-				// First position
-				waypoints.add(new Waypoint(position, false));
-				lastRecordedPosition = position;
+				if (!isTooFar) {
+					waypoints.add(new Waypoint(position, false));
+				}
+
 				ticksAtCurrentPosition = 0;
 				return;
 			}
 
-			// Only add if it's a new position (not too close to last recorded)
-			if (lastRecordedPosition == null || !isNearPosition(position, lastRecordedPosition)) {
-				// Mark previous waypoint as a stop point if we stayed there for 10+ ticks
-				if (!waypoints.isEmpty() && ticksAtCurrentPosition >= 10) {
-					waypoints.get(waypoints.size() - 1).setStopPoint(true);
-				}
-				
-				waypoints.add(new Waypoint(position, false));
-				lastRecordedPosition = position;
-				ticksAtCurrentPosition = 0;
-			} else {
-				// Still at same position, increment tick counter
+			Waypoint lastWaypoint = waypoints.peekLast();
+
+			// Only add if it's a new position (not too close to last recorded) and
+			// not a buggy location (from when a shoal turns into a mixed fish shoal)
+			boolean isTooClose = isNearPosition(lastWaypoint.getPosition(), position, MIN_WAYPOINT_DISTANCE);
+			if (isTooClose || isTooFar) {
 				ticksAtCurrentPosition++;
+				return;
 			}
+
+			waypoints.add(new Waypoint(position, false));
+
+			// Mark previous waypoint as a stop point if we stayed there for 10+ ticks
+			if (ticksAtCurrentPosition >= 10) {
+				lastWaypoint.setStopPoint(true);
+			}
+
+			ticksAtCurrentPosition = 0;
 		}
 
 		public void updatePosition(WorldPoint position) {
 			addPosition(position);
 		}
 
-		private boolean isNearPosition(WorldPoint p1, WorldPoint p2) {
+		private boolean isNearPosition(WorldPoint p1, WorldPoint p2, int range) {
 			int dx = p1.getX() - p2.getX();
 			int dy = p1.getY() - p2.getY();
 			int distanceSquared = dx * dx + dy * dy;
-			return distanceSquared < (POSITION_TOLERANCE * POSITION_TOLERANCE);
+			return distanceSquared < (range * range);
 		}
 
 		public boolean hasValidPath() {
@@ -217,24 +228,47 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 		}
 
 		public void logCompletedPath() {
+			// make sure first waypoint is a stop
+			while (!waypoints.peekFirst().isStopPoint()) {
+				waypoints.add(waypoints.pop());
+			}
+
 			log.debug("=== SHOAL PATH EXPORT (ID: {}) ===", shoalId);
 			log.debug("Total waypoints: {}", waypoints.size());
 			log.debug("");
 			log.debug("// Shoal ID: {} - Copy this into ShoalPaths.java:", shoalId);
-			log.debug("public static final WorldPoint[] SHOAL_{}_PATH = {{", shoalId);
-			
+			log.debug("public static final WorldPoint[] SHOAL_{}_PATH = {", shoalId);
+
+			int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
+			int minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
+			List<Integer> stopPoints = new ArrayList<>();
 			for (int i = 0; i < waypoints.size(); i++) {
 				Waypoint wp = waypoints.get(i);
 				WorldPoint pos = wp.getPosition();
 				String comment = wp.isStopPoint() ? " // STOP POINT" : "";
-				String comma = (i < waypoints.size() - 1) ? "," : "";
-				log.debug("    new WorldPoint({}, {}, {}){}{}",
-					pos.getX(), pos.getY(), pos.getPlane(), comma, comment);
+				log.debug("    new WorldPoint({}, {}, {}),{}",
+					pos.getX(), pos.getY(), pos.getPlane(), comment);
+
+				minX = Math.min(minX, pos.getX());
+				minY = Math.min(minY, pos.getY());
+				maxX = Math.max(maxX, pos.getX());
+				maxY = Math.max(maxY, pos.getY());
+
+				if (wp.isStopPoint()) {
+					stopPoints.add(i);
+				}
 			}
 			
-			log.debug("}};");
+			log.debug("};");
 			log.debug("");
 			log.debug("Stop points: {}", waypoints.stream().filter(Waypoint::isStopPoint).count());
+			log.debug("");
+			log.debug("// Copy this into TrawlingData.java:");
+			log.debug("AREA = {}, {}, {}, {}",
+				minX - AREA_MARGIN, maxX + AREA_MARGIN, minY - AREA_MARGIN, maxY + AREA_MARGIN
+			);
+			log.debug("// Copy this into ShoalPathOverlay.java:");
+			log.debug("STOP_INDICES = {};", stopPoints);
 			log.debug("=====================================");
 		}
 	}

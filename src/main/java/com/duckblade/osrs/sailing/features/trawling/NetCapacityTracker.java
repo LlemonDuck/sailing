@@ -82,7 +82,7 @@ public class NetCapacityTracker implements PluginLifecycleComponent {
         String lowerMessage = message.toLowerCase();
         
         // Check for "a fish" or "an fish" (singular)
-        if (lowerMessage.contains(" a ") && !lowerMessage.contains(" catch a ")) {
+        if (lowerMessage.contains(" a ") || lowerMessage.contains(" catch an ")) {
             return 1;
         }
         

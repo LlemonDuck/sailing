@@ -80,7 +80,8 @@ public class ShoalPathTrackerOverlay extends Overlay implements PluginLifecycleC
 
 		net.runelite.api.Point previousCanvasPoint = null;
 
-        for (ShoalPathTracker.Waypoint waypoint : waypoints) {
+        for (int i = 0; i < waypoints.size(); i++) {
+            ShoalPathTracker.Waypoint waypoint = waypoints.get(i);
             net.runelite.api.coords.WorldPoint worldPos = waypoint.getPosition();
 
             // Convert WorldPoint to LocalPoint for rendering
@@ -120,6 +121,9 @@ public class ShoalPathTrackerOverlay extends Overlay implements PluginLifecycleC
                 graphics.setColor(pathColor);
                 graphics.fillOval(canvasPoint.getX() - 3, canvasPoint.getY() - 3, 6, 6);
             }
+            // draw waypoint index
+            graphics.setColor(Color.GREEN);
+            graphics.drawString(String.valueOf(i), canvasPoint.getX() - 3, canvasPoint.getY() - 3);
 
             previousCanvasPoint = canvasPoint;
         }
