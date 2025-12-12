@@ -3,6 +3,7 @@ package com.duckblade.osrs.sailing.features.trawling;
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
+import com.google.common.math.DoubleMath;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +59,6 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 	private Integer currentShoalId = null;
 	
 	private boolean wasTracking = false;
-	private int tickCounter = 0;
 
 	@Inject
 	public ShoalPathTracker(Client client, SailingConfig config, ShoalPathTracerCommand tracerCommand) {
@@ -88,7 +88,6 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 		movingShoal = null;
 		currentShoalId = null;
 		wasTracking = false;
-		tickCounter = 0;
 	}
 
 	private void exportPath() {
@@ -152,15 +151,12 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 
 	@Subscribe
 	public void onGameTick(GameTick e) {
-		// Track the moving shoal's position every 3 ticks
-		tickCounter++;
-		if (tickCounter >= 2 && movingShoal != null && currentShoalId != null && currentPath != null) {
+		if (movingShoal != null && currentShoalId != null && currentPath != null) {
 			LocalPoint localPos = movingShoal.getCameraFocus();
 			if (localPos != null) {
 				WorldPoint worldPos = WorldPoint.fromLocal(client, localPos);
                 currentPath.updatePosition(worldPos);
             }
-			tickCounter = 0;
 		}
 	}
 
@@ -189,22 +185,32 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 			}
 
 			Waypoint lastWaypoint = waypoints.peekLast();
+			ticksAtCurrentPosition++;
 
 			// Only add if it's a new position (not too close to last recorded) and
 			// not a buggy location (from when a shoal turns into a mixed fish shoal)
 			boolean isTooClose = isNearPosition(lastWaypoint.getPosition(), position, MIN_WAYPOINT_DISTANCE);
 			if (isTooClose || isTooFar) {
-				ticksAtCurrentPosition++;
 				return;
 			}
-
-			waypoints.add(new Waypoint(position, false));
 
 			// Mark previous waypoint as a stop point if we stayed there for 10+ ticks
 			if (ticksAtCurrentPosition >= 10) {
 				lastWaypoint.setStopPoint(true);
 			}
 
+			// combine sequential segments with the same slope to reduce number of waypoints
+			if (!lastWaypoint.isStopPoint() && waypoints.size() >= 2) {
+				Waypoint penultimateWaypoint = waypoints.get(waypoints.size() - 2);
+				double previousSlope = getSlope(penultimateWaypoint.getPosition(), lastWaypoint.getPosition());
+				double currentSlope = getSlope(lastWaypoint.getPosition(), position);
+
+				if (DoubleMath.fuzzyEquals(previousSlope, currentSlope, 0.01)) {
+					waypoints.removeLast();
+				}
+			}
+
+			waypoints.add(new Waypoint(position, false));
 			ticksAtCurrentPosition = 0;
 		}
 
@@ -219,8 +225,15 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 			return distanceSquared < (range * range);
 		}
 
+		private double getSlope(WorldPoint p1, WorldPoint p2) {
+			double dx = p1.getX() - p2.getX();
+			double dy = p1.getY() - p2.getY();
+			return dx / dy;
+		}
+
 		public boolean hasValidPath() {
-			return waypoints.size() >= MIN_PATH_POINTS;
+			return waypoints.size() >= MIN_PATH_POINTS
+				&& waypoints.stream().anyMatch(Waypoint::isStopPoint);
 		}
 
 		public List<Waypoint> getWaypoints() {

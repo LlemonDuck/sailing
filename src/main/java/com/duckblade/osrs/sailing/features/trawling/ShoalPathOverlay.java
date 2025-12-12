@@ -34,9 +34,10 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 	private static final int[] RAINBOW_REEF_STOP_INDICES = {0, 20, 52, 73, 108, 155, 188, 221, 264, 313};
 	private static final int[] BUCCANEERS_HAVEN_STOP_INDICES = {0, 22, 57, 92, 126, 165, 194, 229, 269, 304, 352, 386};
 	private static final int[] WEISSMERE_STOP_INDICES = {0, 6, 42, 72, 89, 104, 138, 148};
-	private static final int[] SIMIAN_SEA_STOP_INDICES = {0, 10, 21, 30, 43, 52, 61};
-	private static final int[] TURTLE_BELT_STOP_INDICES = {0, 10, 25, 36, 50, 65, 76, 85};
-	private static final int[] GREAT_SOUND_STOP_INDICES = {0, 11, 24, 33, 45, 71, 81};
+	private static final int[] SIMIAN_SEA_STOP_INDICES = {0, 12, 22, 26, 32, 37, 42};
+	private static final int[] TURTLE_BELT_STOP_INDICES = {0, 11, 17, 23, 37, 44, 50, 73};
+	private static final int[] GREAT_SOUND_STOP_INDICES = {0, 10, 19, 29, 43, 48, 53};
+	private static final int[] SUNSET_BAY_STOP_INDICES = {0, 17, 29, 36, 46, 64, 73};
 
 	// Color for stop point overlays (red)
 	private static final Color STOP_POINT_COLOR = Color.RED;
@@ -116,6 +117,11 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 		else if (TrawlingData.FishingAreas.GREAT_SOUND.contains(playerLocation)) {
 			renderPath(graphics, ShoalPaths.GIANT_KRILL_GREAT_SOUND, pathColor);
 			renderStopPoints(graphics, ShoalPaths.GIANT_KRILL_GREAT_SOUND, GREAT_SOUND_STOP_INDICES);
+		}
+
+		else if (TrawlingData.FishingAreas.SUNSET_BAY.contains(playerLocation)) {
+			renderPath(graphics, ShoalPaths.GIANT_KRILL_SUNSET_BAY, pathColor);
+			renderStopPoints(graphics, ShoalPaths.GIANT_KRILL_SUNSET_BAY, SUNSET_BAY_STOP_INDICES);
 		}
 
 		return null;
