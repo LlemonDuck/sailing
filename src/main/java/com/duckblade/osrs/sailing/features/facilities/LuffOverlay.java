@@ -22,7 +22,10 @@ import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
 
 @Slf4j
 @Singleton
-public class LuffOverlay extends Overlay implements PluginLifecycleComponent {
+public class LuffOverlay
+	extends Overlay
+	implements PluginLifecycleComponent
+{
 	private final Client client;
 	private final SailingConfig config;
 	private final BoatTracker boatTracker;
@@ -34,7 +37,8 @@ public class LuffOverlay extends Overlay implements PluginLifecycleComponent {
 			SailingConfig config,
 			BoatTracker boatTracker,
 			ModelOutlineRenderer modelOutlineRenderer
-	) {
+	)
+	{
 		this.client = client;
 		this.config = config;
 		this.boatTracker = boatTracker;
@@ -45,36 +49,45 @@ public class LuffOverlay extends Overlay implements PluginLifecycleComponent {
 	}
 
 	@Override
-	public boolean isEnabled(SailingConfig config) {
+	public boolean isEnabled(SailingConfig config)
+	{
 		return config.highlightTrimmableSails();
 	}
 
 	@Override
-	public Dimension render(Graphics2D g) {
-		if (!SailingUtil.isSailing(client) || !config.highlightTrimmableSails()) {
+	public Dimension render(Graphics2D g)
+	{
+		if (!SailingUtil.isSailing(client) || !config.highlightTrimmableSails())
+		{
 			return null;
 		}
 
 		Boat boat = boatTracker.getBoat();
 		GameObject sail = boat != null ? boat.getSail() : null;
 
-		if (sail == null) {
+		if (sail == null)
+		{
 			return null;
 		}
 
 		// Core behaviour: only show when the luff action is actually available
-		if (!sail.isOpShown(0)) {
+		if (!sail.isOpShown(0))
+		{
 			return null;
 		}
 
 		SailingConfig.SailHighlightMode mode = config.sailHighlightMode();
 
-		if (mode == SailingConfig.SailHighlightMode.AREA) {
+		if (mode == SailingConfig.SailHighlightMode.AREA)
+		{
 			Shape hull = sail.getConvexHull();
-			if (hull != null) {
+			if (hull != null)
+			{
 				OverlayUtil.renderPolygon(g, hull, Color.GREEN);
 			}
-		} else if (mode == SailingConfig.SailHighlightMode.SAIL) {
+		}
+		else if (mode == SailingConfig.SailHighlightMode.SAIL)
+		{
 			modelOutlineRenderer.drawOutline(sail, 2, Color.GREEN, 250);
 		}
 
