@@ -346,7 +346,7 @@ public class CargoHoldTracker
 	@Subscribe
 	public void onMenuOptionClicked(MenuOptionClicked e)
 	{
-        if (e.getMenuOption().contains("Quick-deposit")){
+        if (e.getMenuOption().contains("Quick-deposit") && (maxCapacity() - usedCapacity() > 0)){
             log.debug("Quick deposited");
             memoizedInventory = getInventoryMap();
             sawQuickDeposit = true;
