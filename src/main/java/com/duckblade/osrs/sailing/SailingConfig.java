@@ -401,6 +401,18 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "trawlingShowFishCaught",
+		name = "Show Fish Caught",
+		description = "Display the number of each fish caught in the session.",
+		section = SECTION_TRAWLING,
+		position = 3
+	)
+	default boolean trawlingShowFishCaught()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "trawlingShowNetDepthTimer",
 		name = "Show Net Depth Timer",
 		description = "Display an overlay showing ticks until net depth change.",

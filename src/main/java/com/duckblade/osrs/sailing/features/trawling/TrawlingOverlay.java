@@ -3,6 +3,7 @@ package com.duckblade.osrs.sailing.features.trawling;
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.OverlayPanel;
@@ -13,6 +14,7 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
+import org.apache.commons.text.WordUtils;
 
 /**
  * Combined overlay for trawling features including net capacity and depth timer
@@ -23,14 +25,14 @@ public class TrawlingOverlay extends OverlayPanel
         implements PluginLifecycleComponent {
 
     private final Client client;
-    private final NetCapacityTracker netCapacityTracker;
+    private final FishCaughtTracker fishCaughtTracker;
     private final NetDepthTimer netDepthTimer;
     private final SailingConfig config;
 
     @Inject
-    public TrawlingOverlay(Client client, NetCapacityTracker netCapacityTracker, NetDepthTimer netDepthTimer, SailingConfig config) {
+    public TrawlingOverlay(Client client, FishCaughtTracker fishCaughtTracker, NetDepthTimer netDepthTimer, SailingConfig config) {
         this.client = client;
-        this.netCapacityTracker = netCapacityTracker;
+        this.fishCaughtTracker = fishCaughtTracker;
         this.netDepthTimer = netDepthTimer;
         this.config = config;
         setPosition(OverlayPosition.TOP_LEFT);
@@ -65,12 +67,8 @@ public class TrawlingOverlay extends OverlayPanel
         if (shouldShowDepthTimer()) {
             NetDepthTimer.TimerInfo timerInfo = netDepthTimer.getTimerInfo();
             if (timerInfo != null) {
-                if (!hasContent) {
-                    panelComponent.getChildren().add(TitleComponent.builder()
-                            .text("Trawling")
-                            .color(Color.CYAN)
-                            .build());
-                    hasContent = true;
+                if (hasContent) {
+                    panelComponent.getChildren().add(LineComponent.builder().build());
                 }
 
                 if (!timerInfo.isActive()) {
@@ -92,22 +90,45 @@ public class TrawlingOverlay extends OverlayPanel
                             .leftColor(tickColor)
                             .build());
                 }
+
+                hasContent = true;
+            }
+        }
+
+        // Add fish caught section if enabled and available
+        if (shouldShowFishCaught()) {
+            Map<String, Integer> fishCaught = fishCaughtTracker.getFishCaught();
+            if (!fishCaught.isEmpty()) {
+                if (hasContent) {
+                    panelComponent.getChildren().add(LineComponent.builder().build());
+                }
+
+                int totalFish = fishCaught.values().stream().reduce(Integer::sum).orElse(0);
+                for (Map.Entry<String, Integer> fish : fishCaught.entrySet()) {
+                    panelComponent.getChildren().add(LineComponent.builder()
+                        .left(WordUtils.capitalize(fish.getKey()))
+                        .right(String.format("%d (%.0f%%)", fish.getValue(), 100f * fish.getValue() / totalFish))
+                        .build());
+                }
+
+                panelComponent.getChildren().add(LineComponent.builder()
+                    .left("TOTAL")
+                    .right(String.valueOf(totalFish))
+                    .build());
+
+                hasContent = true;
             }
         }
 
         // Add net capacity section if enabled and available
         if (shouldShowNetCapacity()) {
-            int maxCapacity = netCapacityTracker.getMaxCapacity();
+            int maxCapacity = fishCaughtTracker.getNetCapacity();
             if (maxCapacity > 0) {
-                if (!hasContent) {
-                    panelComponent.getChildren().add(TitleComponent.builder()
-                            .text("Trawling")
-                            .color(Color.CYAN)
-                            .build());
-                    hasContent = true;
+                if (hasContent) {
+                    panelComponent.getChildren().add(LineComponent.builder().build());
                 }
 
-                int totalFishCount = netCapacityTracker.getTotalFishCount();
+                int totalFishCount = fishCaughtTracker.getFishInNet();
 
                 // Choose color based on how full the nets are
                 Color textColor;
@@ -121,14 +142,25 @@ public class TrawlingOverlay extends OverlayPanel
                 }
 
                 panelComponent.getChildren().add(LineComponent.builder()
-                        .left("Net Capacity:")
+                        .left("Net:")
                         .right(totalFishCount + "/" + maxCapacity)
                         .rightColor(textColor)
                         .build());
+
+                hasContent = true;
             }
         }
 
-        return hasContent ? super.render(graphics) : null;
+        if (hasContent) {
+            panelComponent.getChildren().add(0, TitleComponent.builder()
+                .text("Trawling")
+                .color(Color.CYAN)
+                .build());
+
+            return super.render(graphics);
+        }
+
+        return null;
     }
 
     private boolean shouldShowDepthTimer() {
@@ -137,5 +169,9 @@ public class TrawlingOverlay extends OverlayPanel
 
     private boolean shouldShowNetCapacity() {
         return config.trawlingShowNetCapacity();
+    }
+
+    private boolean shouldShowFishCaught() {
+        return config.trawlingShowFishCaught();
     }
 }
