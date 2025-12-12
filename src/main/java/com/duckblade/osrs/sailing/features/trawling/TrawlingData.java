@@ -43,12 +43,13 @@ public class TrawlingData {
         
         // Bluefin areas (66 tick duration) - THREE_DEPTH
         protected static final ShoalFishingArea RAINBOW_REEF = new ShoalFishingArea(2099, 2386, 2211, 2401, ShoalStopDuration.BLUEFIN);
-        protected static final ShoalFishingArea BUCCANEERS_HAVEN = new ShoalFishingArea(1984, 2268, 3594, 3771, ShoalStopDuration.BLUEFIN);
+        protected static final ShoalFishingArea BUCCANEERS_HAVEN = new ShoalFishingArea(1962, 2274, 3590, 3792, ShoalStopDuration.BLUEFIN);
         
         // Marlin areas (50 tick duration) - THREE_DEPTH
         // Weissmere coordinates based on actual in-game location (top-level coordinates)
         // Expanded to ensure full coverage of shoal routes
         protected static final ShoalFishingArea WEISSMERE = new ShoalFishingArea(2590, 2870, 3945, 4146, ShoalStopDuration.MARLIN);
+        protected static final ShoalFishingArea BRITTLE_ISLE = new ShoalFishingArea(1856, 2078, 3963, 4121, ShoalStopDuration.MARLIN);
 
         // One-depth areas (Giant Krill)
         // TODO: Add haddock areas
@@ -63,7 +64,8 @@ public class TrawlingData {
         private static final ShoalFishingArea[] THREE_DEPTH_AREAS = {
             RAINBOW_REEF,
             BUCCANEERS_HAVEN,
-            WEISSMERE
+            WEISSMERE,
+            BRITTLE_ISLE
         };
 
         // All fishing areas for lookup
@@ -77,7 +79,8 @@ public class TrawlingData {
             DEEPFIN_POINT,
             RAINBOW_REEF,
             BUCCANEERS_HAVEN,
-            WEISSMERE
+            WEISSMERE,
+            BRITTLE_ISLE
         };
 
         /**

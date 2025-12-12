@@ -33,8 +33,9 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 	private static final int[] SOUTHERN_EXPANSE_STOP_INDICES = {0, 23, 46, 80, 128, 145, 176, 201, 229, 241};
 	private static final int[] DEEPFIN_POINT_STOP_INDICES = {0, 34, 52, 70, 79, 98, 122, 158};
 	private static final int[] RAINBOW_REEF_STOP_INDICES = {0, 13, 45, 75, 93, 119, 136, 160, 169, 192};
-	private static final int[] BUCCANEERS_HAVEN_STOP_INDICES = {0, 22, 57, 92, 126, 165, 194, 229, 269, 304, 352, 386};
+	private static final int[] BUCCANEERS_HAVEN_STOP_INDICES = {0, 17, 27, 59, 79, 93, 111, 126, 145, 153, 173, 191};
 	private static final int[] WEISSMERE_STOP_INDICES = {0, 1, 54, 61, 75, 84, 108, 123};
+	private static final int[] BRITTLE_ISLE_STOP_INDICES = {0, 13, 29, 58, 80, 103, 134, 165, 200};
 	private static final int[] SIMIAN_SEA_STOP_INDICES = {0, 12, 22, 26, 32, 37, 42};
 	private static final int[] TURTLE_BELT_STOP_INDICES = {0, 11, 17, 23, 37, 44, 50, 73};
 	private static final int[] GREAT_SOUND_STOP_INDICES = {0, 10, 19, 29, 43, 48, 53};
@@ -108,6 +109,11 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 		else if (TrawlingData.FishingAreas.WEISSMERE.contains(playerLocation)) {
 			renderPath(graphics, ShoalPaths.MARLIN_WEISSMERE, pathColor);
 			renderStopPoints(graphics, ShoalPaths.MARLIN_WEISSMERE, WEISSMERE_STOP_INDICES);
+		}
+
+		else if (TrawlingData.FishingAreas.BRITTLE_ISLE.contains(playerLocation)) {
+			renderPath(graphics, ShoalPaths.MARLIN_BRITTLE_ISLE, pathColor);
+			renderStopPoints(graphics, ShoalPaths.MARLIN_BRITTLE_ISLE, BRITTLE_ISLE_STOP_INDICES);
 		}
 
 		else if (TrawlingData.FishingAreas.SIMIAN_SEA.contains(playerLocation)) {
