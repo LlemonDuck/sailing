@@ -36,7 +36,7 @@ import com.duckblade.osrs.sailing.features.oceanencounters.LostShipment;
 import com.duckblade.osrs.sailing.features.oceanencounters.MysteriousGlow;
 import com.duckblade.osrs.sailing.features.oceanencounters.OceanMan;
 import com.duckblade.osrs.sailing.features.salvaging.SalvagingHighlight;
-import com.duckblade.osrs.sailing.features.trawling.NetCapacityTracker;
+import com.duckblade.osrs.sailing.features.trawling.FishCaughtTracker;
 import com.duckblade.osrs.sailing.features.trawling.NetDepthTimer;
 import com.duckblade.osrs.sailing.features.trawling.TrawlingOverlay;
 import com.duckblade.osrs.sailing.features.trawling.ShoalDepthTracker;
@@ -96,7 +96,7 @@ public class SailingModule extends AbstractModule
 		CrystalExtractorHighlight crystalExtractorHighlight,
 		MermaidTaskSolver mermaidTaskSolver,
 		MysteriousGlow mysteriousGlow,
-		NetCapacityTracker netCapacityTracker,
+		FishCaughtTracker fishCaughtTracker,
 		NetDepthTimer netDepthTimer,
 		TrawlingOverlay trawlingOverlay,
 		OceanMan oceanMan,
@@ -147,7 +147,7 @@ public class SailingModule extends AbstractModule
 			.add(crystalExtractorHighlight)
 			.add(mermaidTaskSolver)
 			.add(mysteriousGlow)
-			.add(netCapacityTracker)
+			.add(fishCaughtTracker)
 //			.add(netDepthButtonHighlighter)
 			.add(netDepthTimer)
 			.add(trawlingOverlay)
