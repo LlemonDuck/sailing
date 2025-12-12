@@ -41,6 +41,7 @@ import com.duckblade.osrs.sailing.features.trawling.NetDepthTimer;
 import com.duckblade.osrs.sailing.features.trawling.TrawlingOverlay;
 import com.duckblade.osrs.sailing.features.trawling.ShoalDepthTracker;
 import com.duckblade.osrs.sailing.features.trawling.ShoalOverlay;
+import com.duckblade.osrs.sailing.features.trawling.ShoalTracker;
 import com.duckblade.osrs.sailing.features.trawling.ShoalPathTrackerOverlay;
 import com.duckblade.osrs.sailing.features.trawling.ShoalPathTracker;
 import com.duckblade.osrs.sailing.features.trawling.ShoalPathTracerCommand;
@@ -101,6 +102,7 @@ public class SailingModule extends AbstractModule
 		TrawlingOverlay trawlingOverlay,
 		OceanMan oceanMan,
 		ShoalDepthTracker shoalDepthTracker,
+		ShoalTracker shoalTracker,
 		PrioritizeCargoHold prioritizeCargoHold,
 		RapidsOverlay rapidsOverlay,
 		ReverseBeep reverseBeep,
@@ -163,6 +165,7 @@ public class SailingModule extends AbstractModule
 			.add(seaChartTaskIndex)
 			.add(shoalDepthTracker)
 			.add(shoalOverlay)
+			.add(shoalTracker)
 			.add(shoalPathOverlay)
 			.add(shoalPathTracker)
 			.add(hardcodedShoalPathOverlay)

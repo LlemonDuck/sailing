@@ -9,17 +9,19 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
-import net.runelite.api.WorldEntity;
+
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.events.WorldEntitySpawned;
+
 import net.runelite.client.eventbus.Subscribe;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.*;
+
+import com.google.common.collect.ImmutableSet;
 
 
 /*
@@ -34,12 +36,20 @@ import java.util.*;
 @Singleton
 public class ShoalPathTracker implements PluginLifecycleComponent {
 
-	// WorldEntity config ID for moving shoals
-	private static final int SHOAL_WORLD_ENTITY_CONFIG_ID = 4;
+
 	
-	// Bluefin/Vibrant shoal GameObject IDs - same route, different spawns change these to trace other shoals
-	private static final int BLUEFIN_SHOAL_ID = TrawlingData.ShoalObjectID.GIANT_KRILL;
-	private static final int VIBRANT_SHOAL_ID = TrawlingData.ShoalObjectID.SHIMMERING;
+	// All shoal object IDs from TrawlingData
+	private static final Set<Integer> ALL_SHOAL_IDS = ImmutableSet.of(
+		TrawlingData.ShoalObjectID.GIANT_KRILL,
+		TrawlingData.ShoalObjectID.HADDOCK,
+		TrawlingData.ShoalObjectID.YELLOWFIN,
+		TrawlingData.ShoalObjectID.HALIBUT,
+		TrawlingData.ShoalObjectID.BLUEFIN,
+		TrawlingData.ShoalObjectID.MARLIN,
+		TrawlingData.ShoalObjectID.SHIMMERING,
+		TrawlingData.ShoalObjectID.GLISTENING,
+		TrawlingData.ShoalObjectID.VIBRANT
+	);
 	
 	private static final int MIN_PATH_POINTS = 2; // Minimum points before we consider it a valid path
 	private static final int MIN_WAYPOINT_DISTANCE = 1; // World coordinate units (tiles)
@@ -49,22 +59,22 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 	private final Client client;
 	private final SailingConfig config;
 	private final ShoalPathTracerCommand tracerCommand;
+	private final ShoalTracker shoalTracker;
 	
-	// Track the shoal path (Halibut or Glistening - same route)
+	// Track the shoal path
 	@Getter
     private ShoalPath currentPath = null;
 	
-	// Track the WorldEntity (moving shoal)
-	private WorldEntity movingShoal = null;
 	private Integer currentShoalId = null;
-	
 	private boolean wasTracking = false;
+	private int tickCounter = 0;
 
 	@Inject
-	public ShoalPathTracker(Client client, SailingConfig config, ShoalPathTracerCommand tracerCommand) {
+	public ShoalPathTracker(Client client, SailingConfig config, ShoalPathTracerCommand tracerCommand, ShoalTracker shoalTracker) {
 		this.client = client;
 		this.config = config;
 		this.tracerCommand = tracerCommand;
+		this.shoalTracker = shoalTracker;
 	}
 
 	@Override
@@ -75,8 +85,14 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 
 	@Override
 	public void startUp() {
-		log.debug("Route tracing ENABLED - tracking Bluefin/Vibrant shoal (IDs: {}, {})", 
-			BLUEFIN_SHOAL_ID, VIBRANT_SHOAL_ID);
+		log.debug("Route tracing ENABLED - tracking ALL shoal types");
+		log.debug("Supported shoal IDs: {}", ALL_SHOAL_IDS);
+		log.debug("ShoalTracker has shoal: {}", shoalTracker.hasShoal());
+		if (shoalTracker.hasShoal()) {
+			log.debug("Current shoal objects: {}", shoalTracker.getShoalObjects().size());
+			shoalTracker.getShoalObjects().forEach(obj -> 
+				log.debug("  - Shoal object ID: {} ({})", obj.getId(), getShoalName(obj.getId())));
+		}
 		wasTracking = true;
 	}
 
@@ -85,7 +101,6 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 		log.debug("Route tracing DISABLED");
 		exportPath();
 		currentPath = null;
-		movingShoal = null;
 		currentShoalId = null;
 		wasTracking = false;
 	}
@@ -106,36 +121,23 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 	}
 
 	@Subscribe
-	public void onWorldEntitySpawned(WorldEntitySpawned e) {
-		WorldEntity entity = e.getWorldEntity();
-		
-		// Only track shoal WorldEntity
-		if (entity.getConfig() != null && entity.getConfig().getId() == SHOAL_WORLD_ENTITY_CONFIG_ID) {
-			movingShoal = entity;
-			log.debug("Shoal WorldEntity spawned, tracking movement");
-		}
-	}
-
-	@Subscribe
 	public void onGameObjectSpawned(GameObjectSpawned e) {
 		GameObject obj = e.getGameObject();
 		int objectId = obj.getId();
 		
-		// Only track Bluefin or Vibrant shoals
-		if (objectId != BLUEFIN_SHOAL_ID && objectId != VIBRANT_SHOAL_ID) {
+		// Track any shoal type
+		if (!ALL_SHOAL_IDS.contains(objectId)) {
 			return;
 		}
 
 		// Initialize path if needed
 		if (currentPath == null) {
 			currentPath = new ShoalPath(objectId);
-			log.debug("Started tracking shoal ID {} ({})", objectId, 
-				objectId == BLUEFIN_SHOAL_ID ? "Bluefin" : "Vibrant");
+			log.debug("Started tracking shoal ID {} ({})", objectId, getShoalName(objectId));
 		} else if (currentShoalId != null && currentShoalId != objectId) {
-			// Shoal changed type (e.g., Bluefin -> Vibrant)
+			// Shoal changed type (e.g., Halibut -> Glistening)
 			log.debug("Shoal changed from {} to {} - continuing same path", 
-				currentShoalId == BLUEFIN_SHOAL_ID ? "Bluefin" : "Vibrant",
-				objectId == BLUEFIN_SHOAL_ID ? "Bluefin" : "Vibrant");
+				getShoalName(currentShoalId), getShoalName(objectId));
 		}
 		
 		// Store the current shoal type
@@ -146,17 +148,54 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 		WorldPoint worldPos = WorldPoint.fromLocal(client, localPos);
 
         currentPath.addPosition(worldPos);
-        log.debug("Shoal ID {} at {} (path size: {})", objectId, worldPos, currentPath.getWaypoints().size());
+        log.debug("Shoal ID {} ({}) at {} (path size: {})", objectId, getShoalName(objectId), worldPos, currentPath.getWaypoints().size());
+    }
+    
+    private String getShoalName(int objectId) {
+    	if (objectId == TrawlingData.ShoalObjectID.GIANT_KRILL) return "Giant Krill";
+    	if (objectId == TrawlingData.ShoalObjectID.HADDOCK) return "Haddock";
+    	if (objectId == TrawlingData.ShoalObjectID.YELLOWFIN) return "Yellowfin";
+    	if (objectId == TrawlingData.ShoalObjectID.HALIBUT) return "Halibut";
+    	if (objectId == TrawlingData.ShoalObjectID.BLUEFIN) return "Bluefin";
+    	if (objectId == TrawlingData.ShoalObjectID.MARLIN) return "Marlin";
+    	if (objectId == TrawlingData.ShoalObjectID.SHIMMERING) return "Shimmering";
+    	if (objectId == TrawlingData.ShoalObjectID.GLISTENING) return "Glistening";
+    	if (objectId == TrawlingData.ShoalObjectID.VIBRANT) return "Vibrant";
+    	return "Unknown(" + objectId + ")";
     }
 
 	@Subscribe
 	public void onGameTick(GameTick e) {
-		if (movingShoal != null && currentShoalId != null && currentPath != null) {
-			LocalPoint localPos = movingShoal.getCameraFocus();
-			if (localPos != null) {
-				WorldPoint worldPos = WorldPoint.fromLocal(client, localPos);
-                currentPath.updatePosition(worldPos);
-            }
+		tickCounter++;
+		
+		if (!shoalTracker.hasShoal()) {
+			// Only log occasionally to avoid spam
+			if (tickCounter % 100 == 0) {
+				log.debug("No shoal detected by ShoalTracker");
+			}
+			return;
+		}
+		
+		if (currentPath == null) {
+			if (tickCounter % 50 == 0) {
+				log.debug("ShoalTracker has shoal but no currentPath - waiting for GameObject spawn");
+				log.debug("Available shoal objects: {}", shoalTracker.getShoalObjects().size());
+				shoalTracker.getShoalObjects().forEach(obj -> 
+					log.debug("  - Available: {} ({})", obj.getId(), getShoalName(obj.getId())));
+			}
+			return;
+		}
+		
+		// Update location from ShoalTracker
+		shoalTracker.updateLocation();
+		WorldPoint currentLocation = shoalTracker.getCurrentLocation();
+		
+		if (currentLocation != null) {
+			currentPath.updatePosition(currentLocation);
+			// Log occasionally to show it's working
+			if (tickCounter % 30 == 0) {
+				log.debug("Tracking shoal at {} (path size: {})", currentLocation, currentPath.getWaypoints().size());
+			}
 		}
 	}
 
@@ -246,10 +285,11 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 				waypoints.add(waypoints.pop());
 			}
 
-			log.debug("=== SHOAL PATH EXPORT (ID: {}) ===", shoalId);
+			String shoalName = ShoalPathTracker.this.getShoalName(shoalId);
+			log.debug("=== SHOAL PATH EXPORT (ID: {}, Name: {}) ===", shoalId, shoalName);
 			log.debug("Total waypoints: {}", waypoints.size());
 			log.debug("");
-			log.debug("// Shoal ID: {} - Copy this into ShoalPaths.java:", shoalId);
+			log.debug("// Shoal: {} (ID: {}) - Copy this into ShoalPaths.java:", shoalName, shoalId);
 			log.debug("public static final WorldPoint[] SHOAL_{}_PATH = {", shoalId);
 
 			int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;

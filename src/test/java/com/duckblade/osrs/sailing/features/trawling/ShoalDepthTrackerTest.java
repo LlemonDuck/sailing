@@ -40,14 +40,14 @@ public class ShoalDepthTrackerTest {
     private ChatMessage chatMessage;
     
     @Mock
-    private NetDepthTracker netDepthTracker;
+    private ShoalTracker shoalTracker;
     
     private ShoalDepthTracker tracker;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        tracker = new ShoalDepthTracker(client);
+        tracker = new ShoalDepthTracker(client, shoalTracker);
     }
 
     /**
@@ -147,10 +147,11 @@ public class ShoalDepthTrackerTest {
             GameObjectDespawned despawnEvent = mock(GameObjectDespawned.class);
             when(despawnEvent.getGameObject()).thenReturn(gameObject);
             
-            // Trigger despawn
-            tracker.onGameObjectDespawned(despawnEvent);
+            // Note: Despawn handling is now managed by ShoalTracker
+            // Simulate shoal being gone by mocking ShoalTracker
+            when(shoalTracker.hasShoal()).thenReturn(false);
             
-            // Verify the property: all state should be cleared
+            // Verify the property: depth tracking should be inactive when no shoal
             assertNull("Current depth should be null after despawn for shoal ID " + shoalId,
                       tracker.getCurrentDepth());
             assertFalse("Shoal should be inactive after despawn for shoal ID " + shoalId,
@@ -390,8 +391,8 @@ public class ShoalDepthTrackerTest {
 
     // Helper method to simulate shoal activation
     private void simulateWorldEntitySpawn(WorldPoint location) {
-        // Activate shoal tracking for testing
-        tracker.setShoalActiveForTesting(true);
+        // Activate shoal tracking for testing by mocking ShoalTracker
+        when(shoalTracker.hasShoal()).thenReturn(true);
     }
     
     // Helper methods for testing - movement direction no longer supported

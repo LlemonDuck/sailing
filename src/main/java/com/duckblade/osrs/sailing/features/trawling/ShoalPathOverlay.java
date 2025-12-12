@@ -29,7 +29,7 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 
 
 	// Stop points that mark fishing spots on a given route
-	private static final int[] PORT_ROBERTS_STOP_INDICES = {0, 45, 79, 139, 168, 214, 258, 306, 337};
+	private static final int[] PORT_ROBERTS_STOP_INDICES = {0, 35, 54, 74, 97, 123, 143, 170, 187};
 	private static final int[] SOUTHERN_EXPANSE_STOP_INDICES = {0, 15, 60, 97, 132, 185, 273, 343, 369, 419};
 	private static final int[] RAINBOW_REEF_STOP_INDICES = {0, 20, 52, 73, 108, 155, 188, 221, 264, 313};
 	private static final int[] BUCCANEERS_HAVEN_STOP_INDICES = {0, 22, 57, 92, 126, 165, 194, 229, 269, 304, 352, 386};

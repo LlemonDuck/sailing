@@ -2,17 +2,10 @@ package com.duckblade.osrs.sailing.features.trawling;
 
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
-import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.GameObject;
-import net.runelite.api.WorldEntity;
-import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.GameObjectDespawned;
-import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.events.WorldEntitySpawned;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -21,50 +14,36 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
-import java.util.Set;
 
 @Slf4j
 @Singleton
 public class NetDepthTimer extends Overlay implements PluginLifecycleComponent {
 
-    // WorldEntity config ID for moving shoals
-    private static final int SHOAL_WORLD_ENTITY_CONFIG_ID = 4;
-    
     // Number of ticks shoal must be moving before we consider it "was moving"
     private static final int MOVEMENT_THRESHOLD_TICKS = 5;
     
     // Number of ticks at same position to consider shoal "stopped"
     private static final int STOPPED_THRESHOLD_TICKS = 2;
-    
-    // Shoal object IDs - used to detect any shoal presence
-    private static final Set<Integer> SHOAL_OBJECT_IDS = ImmutableSet.of(
-        TrawlingData.ShoalObjectID.MARLIN,
-        TrawlingData.ShoalObjectID.BLUEFIN,
-        TrawlingData.ShoalObjectID.VIBRANT,
-        TrawlingData.ShoalObjectID.HALIBUT,
-        TrawlingData.ShoalObjectID.GLISTENING,
-        TrawlingData.ShoalObjectID.YELLOWFIN
-    );
 
     private final Client client;
     private final SailingConfig config;
+    private final ShoalTracker shoalTracker;
 
     // Movement tracking
-    private WorldEntity movingShoal = null;
     private WorldPoint lastShoalPosition = null;
     private int ticksAtSamePosition = 0;
     private int ticksMoving = 0;
     private boolean hasBeenMoving = false;
     
     // Timer state
-    private int shoalDuration = 0;
     private int timerTicks = 0;
     private boolean timerActive = false;
 
     @Inject
-    public NetDepthTimer(Client client, SailingConfig config) {
+    public NetDepthTimer(Client client, SailingConfig config, ShoalTracker shoalTracker) {
         this.client = client;
         this.config = config;
+        this.shoalTracker = shoalTracker;
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
         setPriority(1000.0f);
@@ -90,7 +69,7 @@ public class NetDepthTimer extends Overlay implements PluginLifecycleComponent {
      * Get current timer information for display in overlay
      */
     public TimerInfo getTimerInfo() {
-        if (movingShoal == null) {
+        if (!shoalTracker.hasShoal()) {
             return null;
         }
         
@@ -105,70 +84,29 @@ public class NetDepthTimer extends Overlay implements PluginLifecycleComponent {
         }
         
         // Timer counts down to depth change (half duration)
+        int shoalDuration = shoalTracker.getShoalDuration();
         int depthChangeTime = shoalDuration / 2;
         int ticksUntilDepthChange = depthChangeTime - timerTicks;
         return new TimerInfo(true, false, Math.max(0, ticksUntilDepthChange));
     }
 
-    @Subscribe
-    public void onWorldEntitySpawned(WorldEntitySpawned e) {
-        WorldEntity entity = e.getWorldEntity();
-        
-        // Only track shoal WorldEntity
-        if (entity.getConfig() != null && entity.getConfig().getId() == SHOAL_WORLD_ENTITY_CONFIG_ID) {
-            boolean hadExistingShoal = movingShoal != null;
-            movingShoal = entity;
-            
-            // Only reset movement tracking if this is a completely new shoal
-            if (!hadExistingShoal) {
-                resetMovementTracking();
-                log.debug("New shoal WorldEntity spawned - resetting movement tracking");
-            } else {
-                log.debug("Shoal WorldEntity updated (type change) - preserving movement state");
-            }
-            
-            // Get shoal duration from location
-            LocalPoint localPos = entity.getCameraFocus();
-            if (localPos != null) {
-                WorldPoint worldPos = WorldPoint.fromLocal(client, localPos);
-                shoalDuration = TrawlingData.FishingAreas.getStopDurationForLocation(worldPos);
-                log.debug("Shoal WorldEntity at {}, duration: {} ticks, timer active: {}", 
-                         worldPos, shoalDuration, timerActive);
-            }
-        }
-    }
 
-    @Subscribe
-    public void onGameObjectSpawned(GameObjectSpawned e) {
-        GameObject obj = e.getGameObject();
-        if (SHOAL_OBJECT_IDS.contains(obj.getId())) {
-            log.debug("Shoal GameObject spawned (ID={}) - timer active: {}, movingShoal exists: {}", 
-                     obj.getId(), timerActive, movingShoal != null);
-            // Don't reset state - this might be a shoal type change
-        }
-    }
-
-    @Subscribe
-    public void onGameObjectDespawned(GameObjectDespawned e) {
-        GameObject obj = e.getGameObject();
-        if (SHOAL_OBJECT_IDS.contains(obj.getId())) {
-            log.debug("Shoal GameObject despawned (ID={})", obj.getId());
-            // Don't reset state immediately - shoal might just be changing type
-            // Only reset if WorldEntity is also gone (checked in onGameTick)
-        }
-    }
 
     @Subscribe
     public void onGameTick(GameTick e) {
-        if (movingShoal == null) {
+        if (!shoalTracker.hasShoal()) {
+            // No shoal - reset state
+            if (timerActive || hasBeenMoving) {
+                log.debug("No shoal detected - resetting timer state");
+                resetState();
+            }
             return;
         }
         
-        // Check if WorldEntity is still valid
-        if (movingShoal.getCameraFocus() == null) {
-            // Try to find the shoal entity again
-            findShoalEntity();
-            if (movingShoal == null) {
+        // Check if WorldEntity is valid, try to find it if not
+        if (!shoalTracker.isShoalEntityValid()) {
+            shoalTracker.findShoalEntity();
+            if (!shoalTracker.isShoalEntityValid()) {
                 // WorldEntity is truly gone - reset state
                 log.debug("WorldEntity no longer exists - resetting timer state");
                 resetState();
@@ -176,18 +114,17 @@ public class NetDepthTimer extends Overlay implements PluginLifecycleComponent {
             }
         }
         
-        // Track movement
-        LocalPoint localPos = movingShoal.getCameraFocus();
-        if (localPos != null) {
-            WorldPoint currentPos = WorldPoint.fromLocal(client, localPos);
-            if (currentPos != null) {
-                trackMovement(currentPos);
-            }
+        // Update location in tracker and track movement
+        shoalTracker.updateLocation();
+        WorldPoint currentPos = shoalTracker.getCurrentLocation();
+        if (currentPos != null) {
+            trackMovement(currentPos);
         }
         
         // Update timer if active
         if (timerActive) {
             timerTicks++;
+            int shoalDuration = shoalTracker.getShoalDuration();
             int depthChangeTime = shoalDuration / 2;
             if (timerTicks >= depthChangeTime) {
                 // Depth change reached - stop timer
@@ -227,6 +164,7 @@ public class NetDepthTimer extends Overlay implements PluginLifecycleComponent {
     }
 
     private void startTimer() {
+        int shoalDuration = shoalTracker.getShoalDuration();
         if (shoalDuration > 0) {
             timerActive = true;
             timerTicks = 0;
@@ -234,31 +172,13 @@ public class NetDepthTimer extends Overlay implements PluginLifecycleComponent {
         }
     }
 
-    private void findShoalEntity() {
-        if (client.getTopLevelWorldView() != null) {
-            for (WorldEntity entity : client.getTopLevelWorldView().worldEntities()) {
-                if (entity.getConfig() != null && entity.getConfig().getId() == SHOAL_WORLD_ENTITY_CONFIG_ID) {
-                    movingShoal = entity;
-                    log.debug("Found shoal WorldEntity in scene");
-                    break;
-                }
-            }
-        }
-    }
-
-    private void resetMovementTracking() {
+    private void resetState() {
         lastShoalPosition = null;
         ticksAtSamePosition = 0;
         ticksMoving = 0;
         hasBeenMoving = false;
         timerActive = false;
         timerTicks = 0;
-    }
-
-    private void resetState() {
-        movingShoal = null;
-        shoalDuration = 0;
-        resetMovementTracking();
     }
 
     @Override

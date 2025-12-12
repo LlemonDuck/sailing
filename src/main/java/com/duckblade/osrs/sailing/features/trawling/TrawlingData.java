@@ -35,7 +35,7 @@ public class TrawlingData {
         protected static final ShoalFishingArea SUNSET_BAY = new ShoalFishingArea(1477, 1604, 2860, 2959, ShoalStopDuration.GIANT_KRILL);
 
         // Halibut areas (80 tick duration) - TWO_DEPTH
-        protected static final ShoalFishingArea PORT_ROBERTS = new ShoalFishingArea(1822, 2050, 3129, 3414, ShoalStopDuration.HALIBUT);
+        protected static final ShoalFishingArea PORT_ROBERTS = new ShoalFishingArea(1821, 2032, 3120, 3420, ShoalStopDuration.HALIBUT);
         protected static final ShoalFishingArea SOUTHERN_EXPANSE = new ShoalFishingArea(1870, 2180, 2171, 2512, ShoalStopDuration.HALIBUT);
         
         // Bluefin areas (66 tick duration) - THREE_DEPTH

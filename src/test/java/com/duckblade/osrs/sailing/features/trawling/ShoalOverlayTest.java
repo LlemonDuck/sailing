@@ -26,17 +26,14 @@ public class ShoalOverlayTest {
     private SailingConfig config;
     
     @Mock
-    private ShoalDepthTracker shoalDepthTracker;
-    
-    @Mock
-    private BoatTracker boatTracker;
+    private ShoalTracker shoalTracker;
     
     private ShoalOverlay overlay;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        overlay = new ShoalOverlay(client, config, shoalDepthTracker, boatTracker);
+        overlay = new ShoalOverlay(client, config, shoalTracker);
         
         // Setup default config color
         when(config.trawlingShoalHighlightColour()).thenReturn(Color.CYAN);

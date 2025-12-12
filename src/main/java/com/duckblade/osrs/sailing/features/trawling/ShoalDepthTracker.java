@@ -37,17 +37,17 @@ public class ShoalDepthTracker implements PluginLifecycleComponent {
     );
 
     private final Client client;
+    private final ShoalTracker shoalTracker;
 
     // State fields
     private NetDepth currentDepth;
-    private boolean shoalActive;
 
     @Inject
-    public ShoalDepthTracker(Client client) {
+    public ShoalDepthTracker(Client client, ShoalTracker shoalTracker) {
         this.client = client;
+        this.shoalTracker = shoalTracker;
         // Initialize with default values
         this.currentDepth = null;
-        this.shoalActive = false;
     }
 
     @Override
@@ -73,7 +73,7 @@ public class ShoalDepthTracker implements PluginLifecycleComponent {
     }
 
     public boolean isShoalActive() {
-        return shoalActive;
+        return shoalTracker.hasShoal();
     }
 
     /**
@@ -82,7 +82,7 @@ public class ShoalDepthTracker implements PluginLifecycleComponent {
      */
     @Deprecated
     public boolean isThreeDepthArea() {
-        return shoalActive;
+        return shoalTracker.hasShoal();
     }
 
     /**
@@ -94,35 +94,12 @@ public class ShoalDepthTracker implements PluginLifecycleComponent {
         return MovementDirection.UNKNOWN;
     }
 
-    @Subscribe
-    public void onGameObjectSpawned(GameObjectSpawned e) {
-        GameObject obj = e.getGameObject();
-        int objectId = obj.getId();
-        
-        if (SHOAL_OBJECT_IDS.contains(objectId)) {
-            // Shoal detected - activate tracking
-            shoalActive = true;
-            log.debug("*** SHOAL DETECTED *** ID={}, location={} - Chat message tracking activated", 
-                     objectId, obj.getWorldLocation());
-        }
-    }
 
-    @Subscribe
-    public void onGameObjectDespawned(GameObjectDespawned e) {
-        GameObject obj = e.getGameObject();
-        int objectId = obj.getId();
-        
-        if (SHOAL_OBJECT_IDS.contains(objectId)) {
-            // Shoal left world view - clear state
-            log.debug("Shoal despawned (ID={}), clearing depth tracking state", objectId);
-            clearState();
-        }
-    }
 
     @Subscribe
     public void onChatMessage(ChatMessage e) {
         // Only process when shoal is active
-        if (!shoalActive) {
+        if (!shoalTracker.hasShoal()) {
             return;
         }
 
@@ -240,13 +217,7 @@ public class ShoalDepthTracker implements PluginLifecycleComponent {
      */
     private void clearState() {
         this.currentDepth = null;
-        this.shoalActive = false;
         log.debug("ShoalDepthTracker state cleared");
-    }
-
-    // Package-private methods for testing
-    void setShoalActiveForTesting(boolean active) {
-        this.shoalActive = active;
     }
     
     void setCurrentDepthForTesting(NetDepth depth) {

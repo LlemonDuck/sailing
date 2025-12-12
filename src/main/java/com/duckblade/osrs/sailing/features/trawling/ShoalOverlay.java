@@ -1,21 +1,11 @@
 package com.duckblade.osrs.sailing.features.trawling;
 
 import com.duckblade.osrs.sailing.SailingConfig;
-import com.duckblade.osrs.sailing.features.util.BoatTracker;
-import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
-import com.google.common.collect.ImmutableSet;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.Perspective;
-
-
-import net.runelite.api.events.GameObjectDespawned;
-import net.runelite.api.events.GameObjectSpawned;
-
-import net.runelite.api.events.WorldViewUnloaded;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -25,7 +15,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
-import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
@@ -35,36 +24,16 @@ public class ShoalOverlay extends Overlay
 
     private static final int SHOAL_HIGHLIGHT_SIZE = 10;
 
-
-    
-
-
-    // Clickbox IDs
-    private static final Set<Integer> SHOAL_CLICKBOX_IDS = ImmutableSet.of(
-            TrawlingData.ShoalObjectID.BLUEFIN,
-            TrawlingData.ShoalObjectID.GIANT_KRILL,
-            TrawlingData.ShoalObjectID.GLISTENING,
-            TrawlingData.ShoalObjectID.HADDOCK,
-            TrawlingData.ShoalObjectID.HALIBUT,
-            TrawlingData.ShoalObjectID.MARLIN,
-            TrawlingData.ShoalObjectID.SHIMMERING,
-            TrawlingData.ShoalObjectID.VIBRANT,
-            TrawlingData.ShoalObjectID.YELLOWFIN);
-
     @Nonnull
     private final Client client;
     private final SailingConfig config;
-    private final ShoalDepthTracker shoalDepthTracker;
-    private final BoatTracker boatTracker;
-    private final Set<GameObject> shoals = new HashSet<>();
+    private final ShoalTracker shoalTracker;
 
     @Inject
-    public ShoalOverlay(@Nonnull Client client, SailingConfig config, 
-                       ShoalDepthTracker shoalDepthTracker, BoatTracker boatTracker) {
+    public ShoalOverlay(@Nonnull Client client, SailingConfig config, ShoalTracker shoalTracker) {
         this.client = client;
         this.config = config;
-        this.shoalDepthTracker = shoalDepthTracker;
-        this.boatTracker = boatTracker;
+        this.shoalTracker = shoalTracker;
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_SCENE);
         setPriority(PRIORITY_HIGH);
@@ -83,58 +52,23 @@ public class ShoalOverlay extends Overlay
     @Override
     public void shutDown() {
         log.debug("ShoalOverlay shutting down");
-        shoals.clear();
-    }
-
-    @Subscribe
-    public void onGameObjectSpawned(GameObjectSpawned e) {
-        GameObject obj = e.getGameObject();
-        int objectId = obj.getId();
-        if (SHOAL_CLICKBOX_IDS.contains(objectId)) {
-            shoals.add(obj);
-            log.debug("Shoal spawned with ID {} at {} (total shoals: {})", objectId, obj.getLocalLocation(), shoals.size());
-        }
-    }
-
-    @Subscribe
-    public void onGameObjectDespawned(GameObjectDespawned e) {
-        GameObject obj = e.getGameObject();
-        if (shoals.remove(obj)) {
-            log.debug("Shoal despawned with ID {}", obj.getId());
-        }
-    }
-
-    @Subscribe
-    public void onWorldViewUnloaded(WorldViewUnloaded e) {
-        // Only clear shoals when we're not actively sailing
-        // During sailing, shoals move and respawn frequently, so we keep them tracked
-        if (!e.getWorldView().isTopLevel()) {
-            return;
-        }
-        
-        // Check if player and worldview are valid before calling isSailing
-        if (client.getLocalPlayer() == null || client.getLocalPlayer().getWorldView() == null) {
-            log.debug("Top-level world view unloaded (player/worldview null), clearing {} shoals", shoals.size());
-            shoals.clear();
-            return;
-        }
-        
-        if (!SailingUtil.isSailing(client)) {
-            log.debug("Top-level world view unloaded while not sailing, clearing {} shoals", shoals.size());
-            shoals.clear();
-        }
     }
 
 
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        if (!config.trawlingHighlightShoals() || shoals.isEmpty()) {
+        if (!config.trawlingHighlightShoals()) {
+            return null;
+        }
+
+        Set<GameObject> shoals = shoalTracker.getShoalObjects();
+        if (shoals.isEmpty()) {
             return null;
         }
 
         // Only highlight one shoal at a time - choose the first available shoal
-        GameObject shoalToHighlight = selectShoalToHighlight();
+        GameObject shoalToHighlight = selectShoalToHighlight(shoals);
         if (shoalToHighlight != null) {
             renderShoalHighlight(graphics, shoalToHighlight);
         }
@@ -146,7 +80,7 @@ public class ShoalOverlay extends Overlay
      * Select which shoal to highlight when multiple shoals are present.
      * Priority: Special shoals (green) > Regular shoals (config color)
      */
-    private GameObject selectShoalToHighlight() {
+    private GameObject selectShoalToHighlight(Set<GameObject> shoals) {
         GameObject firstSpecialShoal = null;
         GameObject firstRegularShoal = null;
         
