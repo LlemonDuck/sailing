@@ -164,14 +164,14 @@ public class ShoalOverlay extends Overlay
     }
 
     private Color getShoalColor(int objectId) {
-        // Priority 1: Check depth matching (highest priority)
-        NetDepth shoalDepth = shoalDepthTracker.getCurrentDepth();
-        if (shoalDepth != null) {
-            NetDepth playerDepth = getPlayerNetDepth();
-            if (playerDepth != null && playerDepth != shoalDepth) {
-                return Color.RED; // Wrong depth - highest priority
-            }
-        }
+        // Priority 1: Check depth matching (highest priority) - DISABLED
+        // NetDepth shoalDepth = shoalDepthTracker.getCurrentDepth();
+        // if (shoalDepth != null) {
+        //     NetDepth playerDepth = getPlayerNetDepth();
+        //     if (playerDepth != null && playerDepth != shoalDepth) {
+        //         return Color.RED; // Wrong depth - highest priority
+        //     }
+        // }
         
         // Priority 2: Special shoals use green (medium priority)
         if (isSpecialShoal(objectId)) {
