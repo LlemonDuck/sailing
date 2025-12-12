@@ -4,6 +4,7 @@ import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import com.google.common.collect.ImmutableSet;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Actor;
 import net.runelite.api.Client;
@@ -52,15 +53,35 @@ public class ShoalTracker implements PluginLifecycleComponent {
 
     private final Client client;
 
+    /**
+     * -- GETTER --
+     *  Get the current shoal WorldEntity (for movement tracking)
+     */
     // Tracked state
+    @Getter
     private WorldEntity currentShoalEntity = null;
     private final Set<GameObject> shoalObjects = new HashSet<>();
+    /**
+     * -- GETTER --
+     *  Get the current shoal location
+     */
+    @Getter
     private WorldPoint currentLocation = null;
+    /**
+     * -- GETTER --
+     *  Get the shoal duration for the current location
+     */
+    @Getter
     private int shoalDuration = 0;
     
     // Movement tracking
     private WorldPoint previousLocation = null;
     private boolean wasMoving = false;
+    /**
+     * -- GETTER --
+     *  Get the number of ticks the shoal has been stationary
+     */
+    @Getter
     private int stationaryTicks = 0;
 
     @Inject
@@ -88,13 +109,6 @@ public class ShoalTracker implements PluginLifecycleComponent {
     // Public API methods
 
     /**
-     * Get the current shoal WorldEntity (for movement tracking)
-     */
-    public WorldEntity getCurrentShoalEntity() {
-        return currentShoalEntity;
-    }
-
-    /**
      * Get all current shoal GameObjects (for rendering/highlighting)
      */
     public Set<GameObject> getShoalObjects() {
@@ -102,31 +116,10 @@ public class ShoalTracker implements PluginLifecycleComponent {
     }
 
     /**
-     * Get the current shoal location
-     */
-    public WorldPoint getCurrentLocation() {
-        return currentLocation;
-    }
-
-    /**
-     * Get the shoal duration for the current location
-     */
-    public int getShoalDuration() {
-        return shoalDuration;
-    }
-
-    /**
      * Check if the shoal is currently moving
      */
     public boolean isShoalMoving() {
         return wasMoving;
-    }
-
-    /**
-     * Get the number of ticks the shoal has been stationary
-     */
-    public int getStationaryTicks() {
-        return stationaryTicks;
     }
 
     /**
@@ -223,7 +216,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
             LocalPoint localPos = currentShoalEntity.getCameraFocus();
             if (localPos != null) {
                 WorldPoint newLocation = WorldPoint.fromLocal(client, localPos);
-                if (newLocation != null && !newLocation.equals(currentLocation)) {
+                if (!newLocation.equals(currentLocation)) {
                     previousLocation = currentLocation;
                     currentLocation = newLocation;
                     // Update duration when location changes
@@ -261,21 +254,13 @@ public class ShoalTracker implements PluginLifecycleComponent {
         boolean isMoving = previousLocation != null && !currentLocation.equals(previousLocation);
         
         if (isMoving) {
-            // Shoal is moving
-            if (!wasMoving && stationaryTicks > 0) {
-                // Shoal just started moving after being stationary
-                // Note: Stop duration logging moved to ShoalPathTracker export
-            }
             wasMoving = true;
             stationaryTicks = 0;
         } else {
-            // Shoal is not moving
             if (wasMoving) {
-                // Shoal just stopped moving
-                // Note: Stop duration logging moved to ShoalPathTracker export
                 wasMoving = false;
                 stationaryTicks = 1; // Start counting from 1
-            } else if (currentLocation != null) {
+            } else {
                 // Shoal continues to be stationary
                 stationaryTicks++;
             }

@@ -39,12 +39,11 @@ import com.duckblade.osrs.sailing.features.salvaging.SalvagingHighlight;
 import com.duckblade.osrs.sailing.features.trawling.FishCaughtTracker;
 import com.duckblade.osrs.sailing.features.trawling.NetDepthTimer;
 import com.duckblade.osrs.sailing.features.trawling.TrawlingOverlay;
-import com.duckblade.osrs.sailing.features.trawling.ShoalDepthTracker;
 import com.duckblade.osrs.sailing.features.trawling.ShoalOverlay;
 import com.duckblade.osrs.sailing.features.trawling.ShoalTracker;
 import com.duckblade.osrs.sailing.features.trawling.ShoalPathTrackerOverlay;
 import com.duckblade.osrs.sailing.features.trawling.ShoalPathTracker;
-import com.duckblade.osrs.sailing.features.trawling.ShoalPathTracerCommand;
+import com.duckblade.osrs.sailing.features.trawling.ShoalPathTrackerCommand;
 import com.duckblade.osrs.sailing.features.trawling.ShoalPathOverlay;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.google.common.collect.ImmutableSet;
@@ -101,7 +100,6 @@ public class SailingModule extends AbstractModule
 		NetDepthTimer netDepthTimer,
 		TrawlingOverlay trawlingOverlay,
 		OceanMan oceanMan,
-		ShoalDepthTracker shoalDepthTracker,
 		ShoalTracker shoalTracker,
 		PrioritizeCargoHold prioritizeCargoHold,
 		RapidsOverlay rapidsOverlay,
@@ -113,7 +111,7 @@ public class SailingModule extends AbstractModule
 		ShoalOverlay shoalOverlay,
 		ShoalPathTrackerOverlay shoalPathOverlay,
 		ShoalPathTracker shoalPathTracker,
-		ShoalPathTracerCommand shoalPathTracerCommand,
+		ShoalPathTrackerCommand shoalPathTrackerCommand,
 		ShoalPathOverlay hardcodedShoalPathOverlay,
 		SpeedBoostInfoBox speedBoostInfoBox,
 		NavigationOverlay navigationOverlay,
@@ -150,10 +148,8 @@ public class SailingModule extends AbstractModule
 			.add(mermaidTaskSolver)
 			.add(mysteriousGlow)
 			.add(fishCaughtTracker)
-//			.add(netDepthButtonHighlighter)
 			.add(netDepthTimer)
 			.add(trawlingOverlay)
-//			.add(netDepthTracker)
 			.add(navigationOverlay)
 			.add(oceanMan)
 			.add(prioritizeCargoHold)
@@ -163,7 +159,6 @@ public class SailingModule extends AbstractModule
 			.add(seaChartOverlay)
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
-			.add(shoalDepthTracker)
 			.add(shoalOverlay)
 			.add(shoalTracker)
 			.add(shoalPathOverlay)
@@ -178,7 +173,7 @@ public class SailingModule extends AbstractModule
 		{
 			builder
 				.add(cargoHoldTracker)
-				.add(shoalPathTracerCommand);
+				.add(shoalPathTrackerCommand);
 		}
 
 		return builder.build();

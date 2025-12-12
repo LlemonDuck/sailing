@@ -25,10 +25,10 @@ public class ShoalPathTrackerOverlay extends Overlay implements PluginLifecycleC
 	private final Client client;
 	private final SailingConfig config;
 	private final ShoalPathTracker shoalPathTracker;
-	private final ShoalPathTracerCommand tracerCommand;
+	private final ShoalPathTrackerCommand tracerCommand;
 
 	@Inject
-	public ShoalPathTrackerOverlay(@Nonnull Client client, SailingConfig config, ShoalPathTracker shoalPathTracker, ShoalPathTracerCommand tracerCommand) {
+	public ShoalPathTrackerOverlay(@Nonnull Client client, SailingConfig config, ShoalPathTracker shoalPathTracker, ShoalPathTrackerCommand tracerCommand) {
 		this.client = client;
 		this.config = config;
 		this.shoalPathTracker = shoalPathTracker;

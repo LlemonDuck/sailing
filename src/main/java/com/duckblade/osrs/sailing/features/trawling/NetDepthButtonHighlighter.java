@@ -2,12 +2,9 @@ package com.duckblade.osrs.sailing.features.trawling;
 
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
-import com.duckblade.osrs.sailing.model.Boat;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -35,30 +32,17 @@ public class NetDepthButtonHighlighter extends Overlay
     // Widget indices for net depth indicators
     private static final int STARBOARD_DEPTH_WIDGET_INDEX = 96;
     private static final int PORT_DEPTH_WIDGET_INDEX = 131;
-    
-    // Sprite IDs for each depth level (kept for reference, but using varbits now)
-    private static final int SPRITE_SHALLOW = 7081;
-    private static final int SPRITE_MODERATE = 7082;
-    private static final int SPRITE_DEEP = 7083;
-    
-    // Varbit IDs for trawling net depths (kept for reference, but using NetDepthTracker now)
-    // Net 0 = Port, Net 1 = Starboard
-    private static final int TRAWLING_NET_PORT_VARBIT = VarbitID.SAILING_SIDEPANEL_BOAT_TRAWLING_NET_0_DEPTH;
-    private static final int TRAWLING_NET_STARBOARD_VARBIT = VarbitID.SAILING_SIDEPANEL_BOAT_TRAWLING_NET_1_DEPTH;
 
-    private final ShoalDepthTracker shoalDepthTracker;
     private final NetDepthTracker netDepthTracker;
     private final BoatTracker boatTracker;
     private final Client client;
     private final SailingConfig config;
 
     @Inject
-    public NetDepthButtonHighlighter(ShoalDepthTracker shoalDepthTracker,
-                                   NetDepthTracker netDepthTracker,
+    public NetDepthButtonHighlighter(NetDepthTracker netDepthTracker,
                                    BoatTracker boatTracker, 
                                    Client client, 
                                    SailingConfig config) {
-        this.shoalDepthTracker = shoalDepthTracker;
         this.netDepthTracker = netDepthTracker;
         this.boatTracker = boatTracker;
         this.client = client;
@@ -85,25 +69,11 @@ public class NetDepthButtonHighlighter extends Overlay
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        if (!shouldHighlightButtons()) {
-            return null;
-        }
+//        if (!shouldHighlightButtons()) {
+//            return null;
+//        }
 
-        Widget widgetSailingRows = client.getWidget(InterfaceID.SailingSidepanel.FACILITIES_ROWS);
-        if (widgetSailingRows == null) {
-            return null;
-        }
-
-        NetDepth requiredDepth = determineRequiredDepth();
-        log.debug("Highlighting buttons - shoal active: {}, shoal depth: {}, required: {}", 
-                 shoalDepthTracker.isShoalActive(),
-                 shoalDepthTracker.getCurrentDepth(),
-                 requiredDepth);
-        
-        if (requiredDepth != null) {
-            highlightButtonsForDepth(graphics, widgetSailingRows, requiredDepth);
-        }
-
+        // Widget widgetSailingRows = client.getWidget(InterfaceID.SailingSidepanel.FACILITIES_ROWS);
         return null;
     }
 
@@ -111,37 +81,14 @@ public class NetDepthButtonHighlighter extends Overlay
      * Check if button highlighting should be active
      */
     private boolean shouldHighlightButtons() {
-        // Check if we have a boat with nets
-        Boat boat = boatTracker.getBoat();
-        if (boat == null || boat.getNetTiers().isEmpty()) {
-            return false;
-        }
-
-        // Check if shoal is active and we know its depth
-        if (!shoalDepthTracker.isShoalActive() || shoalDepthTracker.getCurrentDepth() == null) {
-            return false;
-        }
-
-        // Only highlight if at least one net is at the wrong depth
-        NetDepth requiredDepth = shoalDepthTracker.getCurrentDepth();
-        NetDepth portDepth = netDepthTracker.getPortNetDepth();
-        NetDepth starboardDepth = netDepthTracker.getStarboardNetDepth();
-        
-        return (portDepth != null && portDepth != requiredDepth) || 
-               (starboardDepth != null && starboardDepth != requiredDepth);
+        return false;
     }
 
     /**
      * Determine which depth the nets should be set to
      */
     private NetDepth determineRequiredDepth() {
-        NetDepth currentShoalDepth = shoalDepthTracker.getCurrentDepth();
-        if (currentShoalDepth == null) {
-            return null;
-        }
-
-        // Simple approach: nets should match the current shoal depth
-        return currentShoalDepth;
+        return null;
     }
 
     /**
@@ -244,7 +191,7 @@ public class NetDepthButtonHighlighter extends Overlay
         // Parent widgets have invalid bounds, get their children
         if (bounds.x == -1 && bounds.y == -1) {
             Widget[] children = parentWidget.getChildren();
-            if (children != null && children.length > 0) {
+            if (children != null) {
                 for (Widget child : children) {
                     if (child != null) {
                         Rectangle childBounds = child.getBounds();

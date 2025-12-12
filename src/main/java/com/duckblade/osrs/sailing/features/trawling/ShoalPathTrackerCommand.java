@@ -4,6 +4,7 @@ import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.module.ComponentManager;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import com.google.inject.Provider;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.events.CommandExecuted;
@@ -17,17 +18,18 @@ import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
-public class ShoalPathTracerCommand implements PluginLifecycleComponent {
+public class ShoalPathTrackerCommand implements PluginLifecycleComponent {
 
-	private static final String COMMAND_NAME = "traceroutes";
+	private static final String COMMAND_NAME = "trackroutes";
 	
 	private final ChatMessageManager chatMessageManager;
 	private final Provider<ComponentManager> componentManagerProvider;
 	private final boolean developerMode;
-	private boolean tracingEnabled = false;
+	@Getter
+    private boolean tracingEnabled = false;
 
 	@Inject
-	public ShoalPathTracerCommand(ChatMessageManager chatMessageManager, Provider<ComponentManager> componentManagerProvider, @Named("developerMode") boolean developerMode) {
+	public ShoalPathTrackerCommand(ChatMessageManager chatMessageManager, Provider<ComponentManager> componentManagerProvider, @Named("developerMode") boolean developerMode) {
 		this.chatMessageManager = chatMessageManager;
 		this.componentManagerProvider = componentManagerProvider;
 		this.developerMode = developerMode;
@@ -69,7 +71,7 @@ public class ShoalPathTracerCommand implements PluginLifecycleComponent {
 			} else if (arg.equals("off") || arg.equals("false") || arg.equals("0")) {
 				tracingEnabled = false;
 			} else {
-				sendChatMessage("Usage: ::traceroutes [on|off] - Current status: " + (tracingEnabled ? "ON" : "OFF"));
+				sendChatMessage("Usage: ::trackroutes [on|off] - Current status: " + (tracingEnabled ? "ON" : "OFF"));
 				return;
 			}
 		}
@@ -88,7 +90,4 @@ public class ShoalPathTracerCommand implements PluginLifecycleComponent {
 			.build());
 	}
 
-	public boolean isTracingEnabled() {
-		return tracingEnabled;
-	}
 }

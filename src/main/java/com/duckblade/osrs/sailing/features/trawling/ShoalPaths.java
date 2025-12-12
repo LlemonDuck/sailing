@@ -7,9 +7,9 @@ import net.runelite.api.coords.WorldPoint;
  * These paths are traced using the ShoalPathTracker feature by following shoals with the player's boat.
  * To trace a route:
  * 1. Launch the client with --developer-mode flag
- * 2. Type "::traceroutes on" in chat to enable tracing
+ * 2. Type "::trackroutes on" in chat to enable tracing
  * 3. Follow a shoal through its complete loop
- * 4. Type "::traceroutes off" in chat to disable and auto-export the traced path to logs
+ * 4. Type "::trackroutes off" in chat to disable and auto-export the traced path to logs
  * 5. Copy the exported path from logs into this file
  * 6. Add the path to the appropriate overlay to display it
  */

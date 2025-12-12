@@ -42,7 +42,7 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 	private static final int AREA_MARGIN = 10; // World coordinate units (tiles)
 
 	private final Client client;
-	private final ShoalPathTracerCommand tracerCommand;
+	private final ShoalPathTrackerCommand tracerCommand;
 	private final ShoalTracker shoalTracker;
 	
 	// Track the shoal path
@@ -50,10 +50,9 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
     private ShoalPath currentPath = null;
 	
 	private Integer currentShoalId = null;
-	private int tickCounter = 0;
 
 	@Inject
-	public ShoalPathTracker(Client client, SailingConfig config, ShoalPathTracerCommand tracerCommand, ShoalTracker shoalTracker) {
+	public ShoalPathTracker(Client client, ShoalPathTrackerCommand tracerCommand, ShoalTracker shoalTracker) {
 		this.client = client;
 		this.tracerCommand = tracerCommand;
 		this.shoalTracker = shoalTracker;
@@ -110,8 +109,6 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 
 	@Subscribe
 	public void onGameTick(GameTick e) {
-		tickCounter++;
-		
 		if (!shoalTracker.hasShoal()) {
 			return;
 		}
@@ -240,7 +237,7 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 
 		public void logCompletedPath() {
 			// make sure first waypoint is a stop
-			while (!waypoints.peekFirst().isStopPoint()) {
+			while (!Objects.requireNonNull(waypoints.peekFirst()).isStopPoint()) {
 				waypoints.add(waypoints.pop());
 			}
 
@@ -298,7 +295,7 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 				double avgDuration = durations.stream().mapToInt(Integer::intValue).average().orElse(0.0);
 				int minDuration = durations.stream().mapToInt(Integer::intValue).min().orElse(0);
 				int maxDuration = durations.stream().mapToInt(Integer::intValue).max().orElse(0);
-				log.debug("Duration stats - Avg: {:.1f}, Min: {}, Max: {} ticks", avgDuration, minDuration, maxDuration);
+				log.debug("Duration stats - Avg: {}, Min: {}, Max: {} ticks", avgDuration, minDuration, maxDuration);
 			}
 			else
 			{

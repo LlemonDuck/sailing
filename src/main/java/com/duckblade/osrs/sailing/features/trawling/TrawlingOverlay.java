@@ -67,9 +67,6 @@ public class TrawlingOverlay extends OverlayPanel
         if (shouldShowDepthTimer()) {
             NetDepthTimer.TimerInfo timerInfo = netDepthTimer.getTimerInfo();
             if (timerInfo != null) {
-                if (hasContent) {
-                    panelComponent.getChildren().add(LineComponent.builder().build());
-                }
 
                 if (!timerInfo.isActive()) {
                     // Show waiting or calibrating message

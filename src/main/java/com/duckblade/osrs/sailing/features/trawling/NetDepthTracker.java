@@ -1,6 +1,5 @@
 package com.duckblade.osrs.sailing.features.trawling;
 
-import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -35,15 +34,8 @@ public class NetDepthTracker implements PluginLifecycleComponent {
     }
 
     @Override
-    public boolean isEnabled(SailingConfig config) {
-        // Service component - always enabled
-        return true;
-    }
-
-    @Override
     public void startUp() {
         log.debug("NetDepthTracker started");
-        // Initialize cached values
         updateCachedValues();
     }
 

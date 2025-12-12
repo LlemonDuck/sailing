@@ -1,5 +1,6 @@
 package com.duckblade.osrs.sailing.features.trawling;
 
+import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
 
 public class ShoalFishingArea {
@@ -7,7 +8,8 @@ public class ShoalFishingArea {
 	public final int east;
 	public final int south;
 	public final int north;
-	private final int stopDuration;
+	@Getter
+    private final int stopDuration;
 
 	public ShoalFishingArea(int west, int east, int south, int north) {
 		this(west, east, south, north, -1);
@@ -27,7 +29,4 @@ public class ShoalFishingArea {
 		return x >= west && x <= east && y >= south && y <= north;
 	}
 
-	public int getStopDuration() {
-		return stopDuration;
-	}
 }

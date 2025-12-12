@@ -3,6 +3,7 @@ package com.duckblade.osrs.sailing.features.trawling;
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.coords.WorldPoint;
@@ -210,7 +211,9 @@ public class NetDepthTimer extends Overlay implements PluginLifecycleComponent {
      * Data class for exposing timer information to overlay
      */
     public static class TimerInfo {
+        @Getter
         private final boolean active;
+        @Getter
         private final boolean waiting;
         private final int ticksRemaining;
 
@@ -218,14 +221,6 @@ public class NetDepthTimer extends Overlay implements PluginLifecycleComponent {
             this.active = active;
             this.waiting = waiting;
             this.ticksRemaining = ticksRemaining;
-        }
-
-        public boolean isActive() {
-            return active;
-        }
-
-        public boolean isWaiting() {
-            return waiting;
         }
 
         public int getTicksUntilDepthChange() {

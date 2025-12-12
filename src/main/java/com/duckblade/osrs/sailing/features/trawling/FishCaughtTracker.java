@@ -1,6 +1,5 @@
 package com.duckblade.osrs.sailing.features.trawling;
 
-import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.model.Boat;
@@ -28,7 +27,7 @@ public class FishCaughtTracker implements PluginLifecycleComponent {
     private final BoatTracker boatTracker;
 
     @Getter
-    private Map<String, Integer> fishCaught = new HashMap<>();
+    private final Map<String, Integer> fishCaught = new HashMap<>();
 
     @Getter
     private int fishInNet = 0;

@@ -1,8 +1,11 @@
 package com.duckblade.osrs.sailing.features.trawling;
 
+import lombok.Getter;
+
 /**
  * Represents the depth levels for fishing nets in trawling
  */
+@Getter
 public enum NetDepth {
     SHALLOW(1),
     MODERATE(2),
@@ -12,10 +15,6 @@ public enum NetDepth {
 
     NetDepth(int level) {
         this.level = level;
-    }
-
-    public int getLevel() {
-        return level;
     }
 
     public boolean isShallowerThan(NetDepth other) {
