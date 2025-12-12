@@ -355,6 +355,25 @@ public interface SailingConfig extends Config
 		return Color.YELLOW;
 	}
 
+	enum SailHighlightMode
+	{
+		AREA,
+		SAIL,
+		;
+	}
+
+	@ConfigItem(
+		keyName = "sailHighlightMode",
+		name = "Highlight Sails Mode",
+		description = "How to highlight trimmable sails. Area highlights the full clickable area, Sail highlights the sail outline.",
+		section = SECTION_FACILITIES,
+		position = 8
+	)
+	default SailHighlightMode sailHighlightMode()
+	{
+		return SailHighlightMode.AREA;
+	}
+
 	enum CrewmateMuteMode
 	{
 		NONE,
