@@ -32,7 +32,7 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 	private static final int[] PORT_ROBERTS_STOP_INDICES = {0, 35, 54, 74, 97, 123, 143, 170, 187};
 	private static final int[] SOUTHERN_EXPANSE_STOP_INDICES = {0, 23, 46, 80, 128, 145, 176, 201, 229, 241};
 	private static final int[] DEEPFIN_POINT_STOP_INDICES = {0, 34, 52, 70, 79, 98, 122, 158};
-	private static final int[] RAINBOW_REEF_STOP_INDICES = {0, 20, 52, 73, 108, 155, 188, 221, 264, 313};
+	private static final int[] RAINBOW_REEF_STOP_INDICES = {0, 13, 45, 75, 93, 119, 136, 160, 169, 192};
 	private static final int[] BUCCANEERS_HAVEN_STOP_INDICES = {0, 22, 57, 92, 126, 165, 194, 229, 269, 304, 352, 386};
 	private static final int[] WEISSMERE_STOP_INDICES = {0, 6, 42, 72, 89, 104, 138, 148};
 	private static final int[] SIMIAN_SEA_STOP_INDICES = {0, 12, 22, 26, 32, 37, 42};

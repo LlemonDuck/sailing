@@ -42,7 +42,7 @@ public class TrawlingData {
         protected static final ShoalFishingArea DEEPFIN_POINT = new ShoalFishingArea(1633, 1819, 2533, 2731, ShoalStopDuration.YELLOWFIN);
         
         // Bluefin areas (66 tick duration) - THREE_DEPTH
-        protected static final ShoalFishingArea RAINBOW_REEF = new ShoalFishingArea(2075, 2406, 2179, 2450, ShoalStopDuration.BLUEFIN);
+        protected static final ShoalFishingArea RAINBOW_REEF = new ShoalFishingArea(2099, 2386, 2211, 2401, ShoalStopDuration.BLUEFIN);
         protected static final ShoalFishingArea BUCCANEERS_HAVEN = new ShoalFishingArea(1984, 2268, 3594, 3771, ShoalStopDuration.BLUEFIN);
         
         // Marlin areas (50 tick duration) - THREE_DEPTH
