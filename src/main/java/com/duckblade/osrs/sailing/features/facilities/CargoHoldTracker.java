@@ -112,6 +112,7 @@ public class CargoHoldTracker
 	private int pendingInventoryAction;
 	private boolean sawItemContainerUpdate;
 	private boolean sawInventoryContainerUpdate;
+    private boolean sawQuickDeposit;
 
 	private int lastXp;
 	private boolean pendingJenkinsAction;
@@ -238,6 +239,30 @@ public class CargoHoldTracker
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged e)
 	{
+        if (sawQuickDeposit){
+            Multiset<Integer> cargoHoldToUpdate = cargoHold();
+            ItemContainer containerInv = e.getItemContainer();
+            Multiset<Integer> trackedInv = cargoHold();
+            log.debug("read cargo hold inventory from event {}", trackedInv);
+            Multiset<Integer> newInventory = HashMultiset.create();
+            for (Item item : containerInv.getItems())
+            {
+                if (item == null || item.getId() == UNKNOWN_ITEM)
+                {
+                    continue;
+                }
+
+                // todo fix stackable items
+                newInventory.add(item.getId());
+            }
+            Multiset<Integer> deposited = Multisets.difference(memoizedInventory, newInventory);
+            deposited.entrySet().forEach(entry -> cargoHoldToUpdate.add(entry.getElement(), entry.getCount()));
+            log.trace("deposited: {}", deposited);
+            writeToConfig();
+            sawQuickDeposit = false;
+            return;
+        }
+
 		if (e.getContainerId() == InventoryID.INV)
 		{
 			sawInventoryContainerUpdate = true;
@@ -321,12 +346,19 @@ public class CargoHoldTracker
 	@Subscribe
 	public void onMenuOptionClicked(MenuOptionClicked e)
 	{
-		if (!e.getMenuOption().contains("Withdraw") && !e.getMenuOption().contains("Deposit"))
+        if (e.getMenuOption().contains("Quick-deposit")){
+            log.debug("Quick deposited");
+            memoizedInventory = getInventoryMap();
+            sawQuickDeposit = true;
+            return;
+        }
+
+		if (!e.getMenuOption().contains("Withdraw") && !e.getMenuOption().contains("deposit"))
 		{
 			return;
 		}
 
-		Widget cargoHoldWidget = client.getWidget(InterfaceID.SailingBoatCargohold.UNIVERSE); // todo confirm
+        Widget cargoHoldWidget = client.getWidget(InterfaceID.SailingBoatCargohold.UNIVERSE); // todo confirm
 		if (cargoHoldWidget != null && !cargoHoldWidget.isHidden())
 		{
 			pendingInventoryAction = INVENTORY_DELTA_MAX_DELAY;
