@@ -43,14 +43,13 @@ public class NetDepthTracker implements PluginLifecycleComponent {
     @Override
     public void startUp() {
         log.debug("NetDepthTracker started");
-        updateCachedValues();
+        // Don't read varbits during startup - they will be read lazily when needed
     }
 
     @Override
     public void shutDown() {
         log.debug("NetDepthTracker shut down");
-        portNetDepth = null;
-        starboardNetDepth = null;
+        invalidateCache();
     }
 
     /**
@@ -59,8 +58,9 @@ public class NetDepthTracker implements PluginLifecycleComponent {
      * @return the port net depth, or null if net is not lowered
      */
     public ShoalDepth getPortNetDepth() {
-        if (portNetDepth == null) {
+        if (!portCacheValid) {
             portNetDepth = getNetDepthFromVarbit(TRAWLING_NET_PORT_VARBIT);
+            portCacheValid = true;
             log.debug("Port net depth (fresh): {}", portNetDepth);
         }
         return portNetDepth;
@@ -72,8 +72,9 @@ public class NetDepthTracker implements PluginLifecycleComponent {
      * @return the starboard net depth, or null if net is not lowered
      */
     public ShoalDepth getStarboardNetDepth() {
-        if (starboardNetDepth == null) {
+        if (!starboardCacheValid) {
             starboardNetDepth = getNetDepthFromVarbit(TRAWLING_NET_STARBOARD_VARBIT);
+            starboardCacheValid = true;
             log.debug("Starboard net depth (fresh): {}", starboardNetDepth);
         }
         return starboardNetDepth;
@@ -106,14 +107,18 @@ public class NetDepthTracker implements PluginLifecycleComponent {
         
         if (varbitId == TRAWLING_NET_PORT_VARBIT) {
             ShoalDepth oldDepth = portNetDepth;
+            int varbitValue = e.getValue();
             portNetDepth = getNetDepthFromVarbit(TRAWLING_NET_PORT_VARBIT);
-            log.debug("Port net depth changed: {} -> {} (varbit: {}, value: {})", 
-                     oldDepth, portNetDepth, varbitId, e.getValue());
+            portCacheValid = true;
+            log.debug("Port net depth changed: {} -> {} (varbit: {}, value: {}, converted: {})", 
+                     oldDepth, portNetDepth, varbitId, varbitValue, portNetDepth);
         } else if (varbitId == TRAWLING_NET_STARBOARD_VARBIT) {
             ShoalDepth oldDepth = starboardNetDepth;
+            int varbitValue = e.getValue();
             starboardNetDepth = getNetDepthFromVarbit(TRAWLING_NET_STARBOARD_VARBIT);
-            log.debug("Starboard net depth changed: {} -> {} (varbit: {}, value: {})", 
-                     oldDepth, starboardNetDepth, varbitId, e.getValue());
+            starboardCacheValid = true;
+            log.debug("Starboard net depth changed: {} -> {} (varbit: {}, value: {}, converted: {})", 
+                     oldDepth, starboardNetDepth, varbitId, varbitValue, starboardNetDepth);
         }
     }
 
@@ -145,6 +150,8 @@ public class NetDepthTracker implements PluginLifecycleComponent {
     private void updateCachedValues() {
         portNetDepth = getNetDepthFromVarbit(TRAWLING_NET_PORT_VARBIT);
         starboardNetDepth = getNetDepthFromVarbit(TRAWLING_NET_STARBOARD_VARBIT);
+        portCacheValid = true;
+        starboardCacheValid = true;
         log.debug("Updated cached net depths - Port: {}, Starboard: {}", portNetDepth, starboardNetDepth);
     }
 
@@ -153,8 +160,17 @@ public class NetDepthTracker implements PluginLifecycleComponent {
      */
     public void refreshCache() {
         log.debug("Force refreshing net depth cache");
+        invalidateCache();
+        updateCachedValues();
+    }
+
+    /**
+     * Invalidates the cache, forcing fresh reads on next access.
+     */
+    private void invalidateCache() {
         portNetDepth = null;
         starboardNetDepth = null;
-        updateCachedValues();
+        portCacheValid = false;
+        starboardCacheValid = false;
     }
 }

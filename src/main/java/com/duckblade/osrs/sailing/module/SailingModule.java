@@ -90,6 +90,7 @@ public class SailingModule extends AbstractModule
 		CrewmateOverheadMuter crewmateOverheadMuter,
 		CurrentDuckTaskTracker currentDuckTaskTracker,
 		DeprioSailsOffHelm deprioSailsOffHelm,
+        FishCaughtTracker fishCaughtTracker,
 		HideStopNavigatingDuringTrials hideStopNavigatingDuringTrials,
 		GiantClam giantClam,
 		HidePortalTransitions hidePortalTransitions,
@@ -102,6 +103,9 @@ public class SailingModule extends AbstractModule
 		CrystalExtractorHighlight crystalExtractorHighlight,
 		MermaidTaskSolver mermaidTaskSolver,
 		MysteriousGlow mysteriousGlow,
+        NetDepthButtonHighlighter netDepthButtonHighlighter,
+        NetDepthTimer netDepthTimer,
+        NetDepthTracker netDepthTracker,
 		OceanMan oceanMan,
 		PrioritizeCargoHold prioritizeCargoHold,
 		RapidsOverlay rapidsOverlay,
@@ -110,9 +114,16 @@ public class SailingModule extends AbstractModule
 		SeaChartOverlay seaChartOverlay,
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
+        ShoalOverlay shoalOverlay,
+        ShoalPathTrackerOverlay shoalPathTrackerOverlay,
+        ShoalPathTracker shoalPathTracker,
+        ShoalPathTrackerCommand shoalPathTrackerCommand,
+        ShoalPathOverlay shoalPathOverlay,
+        ShoalTracker shoalTracker,
 		SpeedBoostInfoBox speedBoostInfoBox,
 		NavigationOverlay navigationOverlay,
 		TrueTileIndicator trueTileIndicator,
+        TrawlingOverlay trawlingOverlay,
 		WeatherTaskTracker weatherTaskTracker
 	)
 	{
@@ -143,6 +154,11 @@ public class SailingModule extends AbstractModule
 			.add(crystalExtractorHighlight)
 			.add(mermaidTaskSolver)
 			.add(mysteriousGlow)
+            .add(fishCaughtTracker)
+            .add(netDepthButtonHighlighter)
+            .add(netDepthTimer)
+            .add(netDepthTracker)
+            .add(trawlingOverlay)
 			.add(navigationOverlay)
 			.add(oceanMan)
 			.add(prioritizeCargoHold)
@@ -153,6 +169,10 @@ public class SailingModule extends AbstractModule
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
 			.add(speedBoostInfoBox)
+            .add(shoalOverlay)
+            .add(shoalPathOverlay)
+            .add(shoalPathTracker)
+            .add(shoalTracker)
 			.add(trueTileIndicator)
 			.add(weatherTaskTracker);
 
@@ -160,7 +180,8 @@ public class SailingModule extends AbstractModule
 		if (developerMode)
 		{
 			builder
-				.add(cargoHoldTracker);
+                .add(shoalPathTrackerCommand)
+                .add(shoalPathTrackerOverlay);
 		}
 
 		return builder.build();
