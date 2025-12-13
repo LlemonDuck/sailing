@@ -38,13 +38,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Singleton
 public class ShoalPathTracker implements PluginLifecycleComponent {
-
-
-	
-
-	
 	private static final int MIN_PATH_POINTS = 2; // Minimum points before we consider it a valid path
 	private static final int MIN_WAYPOINT_DISTANCE = 1; // World coordinate units (tiles)
+	private static final int MAX_WAYPOINT_DISTANCE = 30; // World coordinate units (tiles)
 	private static final int MAX_PLAYER_DISTANCE = 300; // World coordinate units (tiles)
 	private static final int AREA_MARGIN = 10; // World coordinate units (tiles)
 
@@ -184,11 +180,12 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 			}
 
 			Waypoint lastWaypoint = waypoints.peekLast();
+			WorldPoint lastPosition = lastWaypoint.getPosition();
 			ticksAtCurrentPosition++;
 
 			// Only add if it's a new position (not too close to last recorded) and
 			// not a buggy location (from when a shoal turns into a mixed fish shoal)
-			boolean isTooClose = isNearPosition(lastWaypoint.getPosition(), position, MIN_WAYPOINT_DISTANCE);
+			boolean isTooClose = isNearPosition(lastPosition, position, MIN_WAYPOINT_DISTANCE);
 			if (isTooClose || isTooFar) {
 				return;
 			}
@@ -204,10 +201,13 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 			// combine sequential segments with the same slope to reduce number of waypoints
 			if (!lastWaypoint.isStopPoint() && waypoints.size() >= 2) {
 				Waypoint penultimateWaypoint = waypoints.get(waypoints.size() - 2);
-				double previousSlope = getSlope(penultimateWaypoint.getPosition(), lastWaypoint.getPosition());
-				double currentSlope = getSlope(lastWaypoint.getPosition(), position);
+				WorldPoint penultimatePosition = penultimateWaypoint.getPosition();
+				double previousSlope = getSlope(penultimatePosition, lastPosition);
+				double currentSlope = getSlope(lastPosition, position);
 
-				if (DoubleMath.fuzzyEquals(previousSlope, currentSlope, 0.01)) {
+				boolean isSameSlope = DoubleMath.fuzzyEquals(previousSlope, currentSlope, 0.01);
+				boolean isSegmentTooLong = !isNearPosition(lastPosition, penultimatePosition, MAX_WAYPOINT_DISTANCE);
+				if (isSameSlope && !isSegmentTooLong) {
 					waypoints.removeLast();
 				}
 			}
