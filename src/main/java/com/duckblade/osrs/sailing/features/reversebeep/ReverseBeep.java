@@ -77,7 +77,8 @@ public class ReverseBeep implements PluginLifecycleComponent
                 || e.getGameState() == GameState.CONNECTION_LOST
                 || e.getGameState() == GameState.LOGIN_SCREEN
                 || e.getGameState() == GameState.LOGIN_SCREEN_AUTHENTICATOR
-                || e.getGameState() == GameState.UNKNOWN) {
+                || e.getGameState() == GameState.UNKNOWN)
+        {
             beepTask.cancel(false);
             beepTask = null;
         }
