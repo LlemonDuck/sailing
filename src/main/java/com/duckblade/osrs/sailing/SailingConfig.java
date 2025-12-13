@@ -795,6 +795,30 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
+    @ConfigItem(
+            keyName = "cargoHoldCustomizeTextColour",
+            name = "Customize Item Count Text Colour",
+            description = "Use a custom text colour for the cargo hold item count.",
+            section = SECTION_CARGO_HOLD_TRACKING,
+            position = 2
+    )
+    default boolean cargoHoldCustomizeTextColour()
+    {
+        return false;
+    }
+
+    @ConfigItem(
+            keyName = "cargoHoldCustomTextColour",
+            name = "Item Count Colour",
+            description = "Colour to use for cargo hold item count text.",
+            section = SECTION_CARGO_HOLD_TRACKING,
+            position = 3
+    )
+    default Color cargoHoldCustomTextColour()
+    {
+        return Color.GREEN;
+    }
+
 	@ConfigItem(
 		keyName = "notifyGiantClamSpawn",
 		name = "Notify on Giant clam",
