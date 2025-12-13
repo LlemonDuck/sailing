@@ -1,4 +1,4 @@
-package com.duckblade.osrs.sailing.features.trawling;
+package com.duckblade.osrs.sailing.model;
 
 /**
  * Represents the type of fishing area based on depth patterns

@@ -1,5 +1,6 @@
 package com.duckblade.osrs.sailing.features.trawling;
 
+import com.duckblade.osrs.sailing.model.FishingAreaType;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.ObjectID;
 

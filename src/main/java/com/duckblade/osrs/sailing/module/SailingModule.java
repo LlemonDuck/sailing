@@ -37,7 +37,9 @@ import com.duckblade.osrs.sailing.features.oceanencounters.MysteriousGlow;
 import com.duckblade.osrs.sailing.features.oceanencounters.OceanMan;
 import com.duckblade.osrs.sailing.features.salvaging.SalvagingHighlight;
 import com.duckblade.osrs.sailing.features.trawling.FishCaughtTracker;
+import com.duckblade.osrs.sailing.features.trawling.NetDepthButtonHighlighter;
 import com.duckblade.osrs.sailing.features.trawling.NetDepthTimer;
+import com.duckblade.osrs.sailing.features.trawling.NetDepthTracker;
 import com.duckblade.osrs.sailing.features.trawling.TrawlingOverlay;
 import com.duckblade.osrs.sailing.features.trawling.ShoalOverlay;
 import com.duckblade.osrs.sailing.features.trawling.ShoalTracker;
@@ -97,7 +99,9 @@ public class SailingModule extends AbstractModule
 		MermaidTaskSolver mermaidTaskSolver,
 		MysteriousGlow mysteriousGlow,
 		FishCaughtTracker fishCaughtTracker,
+		NetDepthButtonHighlighter netDepthButtonHighlighter,
 		NetDepthTimer netDepthTimer,
+		NetDepthTracker netDepthTracker,
 		TrawlingOverlay trawlingOverlay,
 		OceanMan oceanMan,
 		ShoalTracker shoalTracker,
@@ -148,7 +152,9 @@ public class SailingModule extends AbstractModule
 			.add(mermaidTaskSolver)
 			.add(mysteriousGlow)
 			.add(fishCaughtTracker)
+			.add(netDepthButtonHighlighter)
 			.add(netDepthTimer)
+			.add(netDepthTracker)
 			.add(trawlingOverlay)
 			.add(navigationOverlay)
 			.add(oceanMan)

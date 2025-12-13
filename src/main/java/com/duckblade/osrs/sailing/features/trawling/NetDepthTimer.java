@@ -2,6 +2,7 @@ package com.duckblade.osrs.sailing.features.trawling;
 
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
+import com.duckblade.osrs.sailing.model.FishingAreaType;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,6 @@ public class NetDepthTimer extends Overlay implements PluginLifecycleComponent {
     private static final int STOPPED_THRESHOLD_TICKS = 2;
 
     private final Client client;
-    private final SailingConfig config;
     private final ShoalTracker shoalTracker;
 
     // Movement tracking
@@ -42,9 +42,8 @@ public class NetDepthTimer extends Overlay implements PluginLifecycleComponent {
     private boolean timerActive = false;
 
     @Inject
-    public NetDepthTimer(Client client, SailingConfig config, ShoalTracker shoalTracker) {
+    public NetDepthTimer(Client client, ShoalTracker shoalTracker) {
         this.client = client;
-        this.config = config;
         this.shoalTracker = shoalTracker;
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
