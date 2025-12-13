@@ -34,6 +34,8 @@ public class TrawlingData {
         protected static final ShoalFishingArea GREAT_SOUND = new ShoalFishingArea(1536, 1648, 3317, 3411, ShoalStopDuration.GIANT_KRILL);
         protected static final ShoalFishingArea SUNSET_BAY = new ShoalFishingArea(1477, 1604, 2860, 2959, ShoalStopDuration.GIANT_KRILL);
         protected static final ShoalFishingArea MISTY_SEA = new ShoalFishingArea(1377, 1609, 2607, 2788, ShoalStopDuration.HADDOCK);
+        protected static final ShoalFishingArea ANGLERFISHS_LIGHT = new ShoalFishingArea(2672, 2833, 2295, 2453, ShoalStopDuration.HADDOCK);
+        protected static final ShoalFishingArea THE_ONYX_CREST = new ShoalFishingArea(2929, 3124, 2157, 2375, ShoalStopDuration.HADDOCK);
 
         // Halibut areas (76 tick duration) - TWO_DEPTH
         protected static final ShoalFishingArea PORT_ROBERTS = new ShoalFishingArea(1821, 2032, 3120, 3420, ShoalStopDuration.HALIBUT);
@@ -58,7 +60,9 @@ public class TrawlingData {
             TURTLE_BELT,
             GREAT_SOUND,
             SUNSET_BAY,
-            MISTY_SEA
+            MISTY_SEA,
+            ANGLERFISHS_LIGHT,
+            THE_ONYX_CREST
         };
 
         // Three-depth areas (Bluefin and Marlin)
@@ -76,6 +80,8 @@ public class TrawlingData {
             GREAT_SOUND,
             SUNSET_BAY,
             MISTY_SEA,
+            ANGLERFISHS_LIGHT,
+            THE_ONYX_CREST,
             PORT_ROBERTS,
             SOUTHERN_EXPANSE,
             DEEPFIN_POINT,

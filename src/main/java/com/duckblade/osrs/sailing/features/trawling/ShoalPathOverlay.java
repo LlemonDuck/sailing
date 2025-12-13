@@ -19,7 +19,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Polygon;
 import java.awt.Stroke;
 
 @Slf4j
@@ -45,7 +44,9 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 	private static final int[] TURTLE_BELT_STOP_INDICES = {0, 11, 17, 23, 37, 44, 50, 73};
 	private static final int[] GREAT_SOUND_STOP_INDICES = {0, 10, 19, 29, 43, 48, 53};
 	private static final int[] SUNSET_BAY_STOP_INDICES = {0, 17, 29, 36, 46, 64, 73};
-	private static final int[] HADDOCK_MISTY_SEA_STOP_INDICES = {0, 14, 28, 34, 52, 76, 105, 118, 125, 134};
+	private static final int[] MISTY_SEA_STOP_INDICES = {0, 14, 28, 34, 52, 76, 105, 118, 125, 134};
+	private static final int[] ANGLERFISHS_LIGHT_STOP_INDICES = {0, 14, 33, 40, 52, 65, 74};
+	private static final int[] THE_ONYX_CREST_STOP_INDICES = {0, 18, 37, 53, 68, 91, 112, 124, 137, 141};
 
 	// Color for stop point overlays (red)
 	private static final Color STOP_POINT_COLOR = Color.RED;
@@ -144,7 +145,17 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 
 		else if (TrawlingData.FishingAreas.MISTY_SEA.contains(playerLocation)) {
 			renderPath(graphics, ShoalPaths.HADDOCK_MISTY_SEA, pathColor);
-			renderStopPoints(graphics, ShoalPaths.HADDOCK_MISTY_SEA, HADDOCK_MISTY_SEA_STOP_INDICES);
+			renderStopPoints(graphics, ShoalPaths.HADDOCK_MISTY_SEA, MISTY_SEA_STOP_INDICES);
+		}
+
+		else if (TrawlingData.FishingAreas.ANGLERFISHS_LIGHT.contains(playerLocation)) {
+			renderPath(graphics, ShoalPaths.HADDOCK_ANGLERFISHS_LIGHT, pathColor);
+			renderStopPoints(graphics, ShoalPaths.HADDOCK_ANGLERFISHS_LIGHT, ANGLERFISHS_LIGHT_STOP_INDICES);
+		}
+
+		else if (TrawlingData.FishingAreas.THE_ONYX_CREST.contains(playerLocation)) {
+			renderPath(graphics, ShoalPaths.HADDOCK_THE_ONYX_CREST, pathColor);
+			renderStopPoints(graphics, ShoalPaths.HADDOCK_THE_ONYX_CREST, THE_ONYX_CREST_STOP_INDICES);
 		}
 
 		return null;
