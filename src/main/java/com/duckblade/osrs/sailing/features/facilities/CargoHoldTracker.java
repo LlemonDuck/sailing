@@ -113,7 +113,7 @@ public class CargoHoldTracker
 	private boolean sawItemContainerUpdate;
 	private boolean sawInventoryContainerUpdate;
     private boolean sawQuickDeposit;
-
+    private int tickCount;
 	private int lastXp;
 	private boolean pendingJenkinsAction;
 
@@ -239,7 +239,7 @@ public class CargoHoldTracker
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged e)
 	{
-        if (sawQuickDeposit){
+        if (sawQuickDeposit && tickCount <= 8){
             Multiset<Integer> cargoHoldToUpdate = cargoHold();
             ItemContainer containerInv = e.getItemContainer();
             Multiset<Integer> trackedInv = cargoHold();
@@ -256,8 +256,10 @@ public class CargoHoldTracker
                 newInventory.add(item.getId());
             }
             Multiset<Integer> deposited = Multisets.difference(memoizedInventory, newInventory);
+            log.debug(Long.toString(deposited.size()));
             deposited.entrySet().forEach(entry -> cargoHoldToUpdate.add(entry.getElement(), entry.getCount()));
             log.trace("deposited: {}", deposited);
+            sawItemContainerUpdate = true;
             writeToConfig();
             sawQuickDeposit = false;
             return;
@@ -303,6 +305,15 @@ public class CargoHoldTracker
 	{
 		pendingJenkinsAction = false;
 
+        //8 is the max ticks it takes between clicking Quick-deposit, walking to cargo hold, and depositing items in a sloop
+        //if sawQuickDeposit is still enabled after 8 ticks, it is most likely due to inventory not changing
+        if (sawQuickDeposit && tickCount <= 8) {
+            tickCount++;
+            log.debug(Integer.toString(tickCount));
+        } else if (sawQuickDeposit) {
+            sawQuickDeposit = false;
+        }
+
 		if (--pendingInventoryAction < 0)
 		{
 			sawItemContainerUpdate = false;
@@ -347,7 +358,8 @@ public class CargoHoldTracker
 	public void onMenuOptionClicked(MenuOptionClicked e)
 	{
         if (e.getMenuOption().contains("Quick-deposit") && (maxCapacity() - usedCapacity() > 0)){
-            log.debug("Quick deposited");
+            log.debug("quick deposit triggered");
+            tickCount = 0;
             memoizedInventory = getInventoryMap();
             sawQuickDeposit = true;
             return;
