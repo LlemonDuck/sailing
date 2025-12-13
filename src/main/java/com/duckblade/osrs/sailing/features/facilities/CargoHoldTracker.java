@@ -329,7 +329,7 @@ public class CargoHoldTracker
 
 		Widget cargoHoldWidget = client.getWidget(InterfaceID.SailingBoatCargohold.UNIVERSE); // todo confirm
 		boolean cargoHoldOpen = cargoHoldWidget != null && !cargoHoldWidget.isHidden();
-		
+
 		if (cargoHoldOpen || (SailingUtil.isSailing(client) && menuOption.toLowerCase().contains("deposit")))
 		{
 			pendingInventoryAction = INVENTORY_DELTA_MAX_DELAY;
