@@ -809,7 +809,7 @@ public interface SailingConfig extends Config
 
     @ConfigItem(
             keyName = "cargoHoldCustomTextColour",
-            name = "Item Count Colour",
+            name = "Item Count Text Colour",
             description = "Colour to use for cargo hold item count text.",
             section = SECTION_CARGO_HOLD_TRACKING,
             position = 3
