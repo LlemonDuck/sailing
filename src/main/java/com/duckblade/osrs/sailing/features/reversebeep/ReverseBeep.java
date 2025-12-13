@@ -9,6 +9,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.GameState;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.gameval.VarbitID;
@@ -68,6 +70,18 @@ public class ReverseBeep implements PluginLifecycleComponent
 			beepTask = null;
 		}
 	}
+
+    @Subscribe
+    public void onGameStateChanged(GameStateChanged e) {
+        if (e.getGameState() == GameState.HOPPING
+                || e.getGameState() == GameState.CONNECTION_LOST
+                || e.getGameState() == GameState.LOGIN_SCREEN
+                || e.getGameState() == GameState.LOGIN_SCREEN_AUTHENTICATOR
+                || e.getGameState() == GameState.UNKNOWN) {
+            beepTask.cancel(false);
+            beepTask = null;
+        }
+    }
 
 	// Keep an eye on the PRNDL
 	@Subscribe
