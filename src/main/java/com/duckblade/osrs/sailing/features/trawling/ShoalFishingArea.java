@@ -11,10 +11,6 @@ public class ShoalFishingArea {
 	@Getter
     private final int stopDuration;
 
-	public ShoalFishingArea(int west, int east, int south, int north) {
-		this(west, east, south, north, -1);
-	}
-
 	public ShoalFishingArea(int west, int east, int south, int north, int stopDuration) {
 		this.west = west;
 		this.east = east;

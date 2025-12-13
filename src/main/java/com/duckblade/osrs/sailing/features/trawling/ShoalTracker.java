@@ -124,13 +124,6 @@ public class ShoalTracker implements PluginLifecycleComponent {
     }
 
     /**
-     * Check if the shoal is currently moving
-     */
-    public boolean isShoalMoving() {
-        return wasMoving;
-    }
-
-    /**
      * Check if any shoal is currently active
      */
     public boolean hasShoal() {
@@ -142,18 +135,6 @@ public class ShoalTracker implements PluginLifecycleComponent {
      */
     public boolean isShoalEntityValid() {
         return currentShoalEntity != null && currentShoalEntity.getCameraFocus() != null;
-    }
-
-    /**
-     * Get the animation ID of a shoal GameObject, or -1 if no animation or not supported
-     */
-    public int getShoalAnimationId(GameObject shoalObject) {
-        if (shoalObject == null) {
-            return -1;
-        }
-
-        Renderable renderable = shoalObject.getRenderable();
-        return getAnimationIdFromRenderable(renderable);
     }
 
     /**
@@ -182,38 +163,6 @@ public class ShoalTracker implements PluginLifecycleComponent {
         // Add more types here as needed
 
         return -1;
-    }
-
-    /**
-     * Get the current animation ID of the first available shoal GameObject, or -1 if none available
-     */
-    public int getCurrentShoalAnimationId() {
-        if (shoalObjects.isEmpty()) {
-            return -1;
-        }
-
-        // Get animation from the first available shoal object
-        GameObject firstShoal = shoalObjects.iterator().next();
-        return getShoalAnimationId(firstShoal);
-    }
-
-    /**
-     * Debug method to log the Renderable type of a GameObject
-     */
-    public String getRenderableTypeInfo(GameObject gameObject) {
-        if (gameObject == null) {
-            return "null GameObject";
-        }
-
-        Renderable renderable = gameObject.getRenderable();
-        if (renderable == null) {
-            return "null Renderable";
-        }
-
-        String typeName = renderable.getClass().getSimpleName();
-        int animationId = getAnimationIdFromRenderable(renderable);
-        
-        return String.format("%s (animation: %d)", typeName, animationId);
     }
 
     /**

@@ -133,12 +133,8 @@ public class NetDepthButtonHighlighter extends Overlay
         if (!shoalTracker.hasShoal()) {
             return false;
         }
-        
-        if (!shoalTracker.isShoalDepthKnown()) {
-            return false;
-        }
 
-        return true;
+        return shoalTracker.isShoalDepthKnown();
     }
 
     /**
