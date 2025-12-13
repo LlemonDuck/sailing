@@ -23,6 +23,7 @@ import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.events.WorldEntitySpawned;
 import net.runelite.api.events.WorldViewUnloaded;
+import net.runelite.client.Notifier;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.api.gameval.AnimationID;
 
@@ -61,7 +62,8 @@ public class ShoalTracker implements PluginLifecycleComponent {
     );
 
     private final Client client;
-
+	private final Notifier notifier;
+	private final SailingConfig config;
     private NPC currentShoalNpc;
 
     /**
@@ -109,8 +111,10 @@ public class ShoalTracker implements PluginLifecycleComponent {
      * @param client the RuneLite client instance
      */
     @Inject
-    public ShoalTracker(Client client) {
+    public ShoalTracker(Client client, Notifier notifier, SailingConfig config) {
         this.client = client;
+		this.notifier = notifier;
+		this.config = config;
     }
 
     @Override
@@ -217,6 +221,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
         ShoalDepth newDepth = getShoalDepthFromAnimation(animationId);
         
         if (newDepth != currentShoalDepth) {
+			notifier.notify(config.notifyDepthChange(), "Shoal depth changed");
             logDepthChange(currentShoalDepth, newDepth, animationId);
             currentShoalDepth = newDepth;
         }
