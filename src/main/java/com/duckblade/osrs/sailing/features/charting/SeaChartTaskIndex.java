@@ -47,11 +47,11 @@ public class SeaChartTaskIndex implements PluginLifecycleComponent
 			}
 			if (task.getObjectId() != -1)
 			{
-				tasksByGameObject.computeIfAbsent(task.getObjectId(), ArrayList::new).add(task);
+				tasksByGameObject.computeIfAbsent(task.getObjectId(), (k) -> new ArrayList<>(1)).add(task);
 			}
 			else if (task.getNpcId() != -1)
 			{
-				tasksByNpc.computeIfAbsent(task.getNpcId(), ArrayList::new).add(task);
+				tasksByNpc.computeIfAbsent(task.getNpcId(), (k) -> new ArrayList<>(1)).add(task);
 			}
 		}
 	}
