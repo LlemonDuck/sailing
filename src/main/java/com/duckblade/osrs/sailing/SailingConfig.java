@@ -525,6 +525,27 @@ public interface SailingConfig extends Config
 		CHARTED,
 		ALL,
 		;
+
+		public boolean isHidden(boolean completed, boolean meetsRequirements)
+		{
+			switch (this)
+			{
+				case ALL:
+					return false;
+
+				case CHARTED:
+					return !completed;
+
+				case UNCHARTED:
+					return completed;
+
+				case REQUIREMENTS_MET:
+					return completed || !meetsRequirements;
+
+				default:
+					return true;
+			}
+		}
 	}
 
 	@ConfigItem(
@@ -539,12 +560,26 @@ public interface SailingConfig extends Config
 		return ShowChartsMode.UNCHARTED;
 	}
 
+	String SHOW_CHARTS_ON_MAP = "showChartsOnMap";
+
+	@ConfigItem(
+		keyName = SHOW_CHARTS_ON_MAP,
+		name = "Charting Map Icons",
+		description = "Add icons for sea charting locations to the world map.",
+		section = SECTION_SEA_CHARTING,
+		position = 2
+	)
+	default ShowChartsMode showChartsOnMap()
+	{
+		return ShowChartsMode.UNCHARTED;
+	}
+
 	@ConfigItem(
 		keyName = "chartingUnchartedColor",
 		name = "Uncharted Colour",
 		description = "Colour to highlight nearby uncharted locations.",
 		section = SECTION_SEA_CHARTING,
-		position = 2
+		position = 3
 	)
 	@Alpha
 	default Color chartingUnchartedColor()
@@ -557,7 +592,7 @@ public interface SailingConfig extends Config
 		name = "Charted Colour",
 		description = "Colour to highlight nearby charted locations.",
 		section = SECTION_SEA_CHARTING,
-		position = 3
+		position = 4
 	)
 	@Alpha
 	default Color chartingChartedColor()
@@ -570,7 +605,7 @@ public interface SailingConfig extends Config
 		name = "Unavailable Colour",
 		description = "Colour to highlight nearby uncharted locations you do not meet requirements for.",
 		section = SECTION_SEA_CHARTING,
-		position = 4
+		position = 5
 	)
 	@Alpha
 	default Color chartingRequirementsUnmetColor()
@@ -583,7 +618,7 @@ public interface SailingConfig extends Config
 		name = "Weather Station Solver",
 		description = "Whether to provide a helper for weather charting.",
 		section = SECTION_SEA_CHARTING,
-		position = 5
+		position = 6
 	)
 	default boolean chartingWeatherSolver()
 	{
@@ -595,7 +630,7 @@ public interface SailingConfig extends Config
 		name = "Current Duck Solver",
 		description = "Whether to provide a helper for current duck trails.",
 		section = SECTION_SEA_CHARTING,
-		position = 6
+		position = 7
 	)
 	default boolean chartingDuckSolver()
 	{
@@ -607,7 +642,7 @@ public interface SailingConfig extends Config
 		name = "Mermaid Task Solver",
 		description = "Whether to provide a helper for mermaid charting tasks.",
 		section = SECTION_SEA_CHARTING,
-		position = 7
+		position = 8
 	)
 	default boolean chartingMermaidSolver()
 	{
@@ -855,24 +890,11 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "cargoHoldDummy",
-		name = "Under Development",
-		description = "This feature is still under development and will be released soon.",
-		section = SECTION_CARGO_HOLD_TRACKING,
-		position = -999
-	)
-	default boolean cargoHoldDummy()
-	{
-		return true;
-	}
-
-	@ConfigItem(
 		keyName = "cargoHoldShowCounts",
 		name = "Show Item Count",
 		description = "Shows total item counts over the cargo hold.",
 		section = SECTION_CARGO_HOLD_TRACKING,
-		position = 1,
-		hidden = true // todo
+		position = 1
 	)
 	default boolean cargoHoldShowCounts()
 	{

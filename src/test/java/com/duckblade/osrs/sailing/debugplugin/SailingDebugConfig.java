@@ -70,4 +70,14 @@ public interface SailingDebugConfig extends Config
 		return false;
 	}
 
+	@ConfigItem(
+		keyName = "crewmates",
+		name = "Crewmates",
+		description = ""
+	)
+	default boolean crewmates()
+	{
+		return false;
+	}
+
 }

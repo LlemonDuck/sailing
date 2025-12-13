@@ -20,7 +20,10 @@ import com.duckblade.osrs.sailing.features.courier.CourierDestinationOverlay;
 import com.duckblade.osrs.sailing.features.courier.CourierTaskLedgerOverlay;
 import com.duckblade.osrs.sailing.features.courier.CourierTaskTracker;
 import com.duckblade.osrs.sailing.features.crewmates.CrewmateOverheadMuter;
-import com.duckblade.osrs.sailing.features.facilities.*;
+import com.duckblade.osrs.sailing.features.facilities.CargoHoldTracker;
+import com.duckblade.osrs.sailing.features.facilities.CrystalExtractorHighlight;
+import com.duckblade.osrs.sailing.features.facilities.LuffOverlay;
+import com.duckblade.osrs.sailing.features.facilities.SpeedBoostInfoBox;
 import com.duckblade.osrs.sailing.features.mes.DeprioSailsOffHelm;
 import com.duckblade.osrs.sailing.features.mes.HideStopNavigatingDuringTrials;
 import com.duckblade.osrs.sailing.features.mes.PrioritizeCargoHold;
@@ -35,6 +38,7 @@ import com.duckblade.osrs.sailing.features.oceanencounters.GiantClam;
 import com.duckblade.osrs.sailing.features.oceanencounters.LostShipment;
 import com.duckblade.osrs.sailing.features.oceanencounters.MysteriousGlow;
 import com.duckblade.osrs.sailing.features.oceanencounters.OceanMan;
+import com.duckblade.osrs.sailing.features.reversebeep.ReverseBeep;
 import com.duckblade.osrs.sailing.features.salvaging.SalvagingHighlight;
 import com.duckblade.osrs.sailing.features.trawling.FishCaughtTracker;
 import com.duckblade.osrs.sailing.features.trawling.NetDepthButtonHighlighter;
@@ -98,13 +102,7 @@ public class SailingModule extends AbstractModule
 		CrystalExtractorHighlight crystalExtractorHighlight,
 		MermaidTaskSolver mermaidTaskSolver,
 		MysteriousGlow mysteriousGlow,
-		FishCaughtTracker fishCaughtTracker,
-		NetDepthButtonHighlighter netDepthButtonHighlighter,
-		NetDepthTimer netDepthTimer,
-		NetDepthTracker netDepthTracker,
-		TrawlingOverlay trawlingOverlay,
 		OceanMan oceanMan,
-		ShoalTracker shoalTracker,
 		PrioritizeCargoHold prioritizeCargoHold,
 		RapidsOverlay rapidsOverlay,
 		ReverseBeep reverseBeep,
@@ -112,11 +110,6 @@ public class SailingModule extends AbstractModule
 		SeaChartOverlay seaChartOverlay,
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
-		ShoalOverlay shoalOverlay,
-		ShoalPathTrackerOverlay shoalPathOverlay,
-		ShoalPathTracker shoalPathTracker,
-		ShoalPathTrackerCommand shoalPathTrackerCommand,
-		ShoalPathOverlay hardcodedShoalPathOverlay,
 		SpeedBoostInfoBox speedBoostInfoBox,
 		NavigationOverlay navigationOverlay,
 		TrueTileIndicator trueTileIndicator,
@@ -124,7 +117,6 @@ public class SailingModule extends AbstractModule
 	)
 	{
 		var builder = ImmutableSet.<PluginLifecycleComponent>builder()
-			
 			.add(barracudaSplitsTracker)
 			.add(barracudaSplitsChatMessage)
 			.add(barracudaSplitsOverlayPanel)
@@ -151,11 +143,6 @@ public class SailingModule extends AbstractModule
 			.add(crystalExtractorHighlight)
 			.add(mermaidTaskSolver)
 			.add(mysteriousGlow)
-			.add(fishCaughtTracker)
-			.add(netDepthButtonHighlighter)
-			.add(netDepthTimer)
-			.add(netDepthTracker)
-			.add(trawlingOverlay)
 			.add(navigationOverlay)
 			.add(oceanMan)
 			.add(prioritizeCargoHold)
@@ -165,11 +152,6 @@ public class SailingModule extends AbstractModule
 			.add(seaChartOverlay)
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
-			.add(shoalOverlay)
-			.add(shoalTracker)
-			.add(shoalPathOverlay)
-			.add(shoalPathTracker)
-			.add(hardcodedShoalPathOverlay)
 			.add(speedBoostInfoBox)
 			.add(trueTileIndicator)
 			.add(weatherTaskTracker);
@@ -178,8 +160,7 @@ public class SailingModule extends AbstractModule
 		if (developerMode)
 		{
 			builder
-				.add(cargoHoldTracker)
-				.add(shoalPathTrackerCommand);
+				.add(cargoHoldTracker);
 		}
 
 		return builder.build();

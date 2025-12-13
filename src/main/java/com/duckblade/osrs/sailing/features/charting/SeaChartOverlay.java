@@ -14,13 +14,13 @@ import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
+import net.runelite.api.GameState;
 import net.runelite.api.NPC;
 import net.runelite.api.Perspective;
-import net.runelite.api.QuestState;
-import net.runelite.api.Skill;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.events.WorldViewUnloaded;
@@ -101,8 +101,8 @@ public class SeaChartOverlay
 			SeaChartTask task = tracked.getValue();
 
 			boolean completed = task.isComplete(client);
-			boolean meetsRequirements = hasTaskRequirement(task);
-			if (taskIsHidden(mode, completed, meetsRequirements))
+			boolean meetsRequirements = taskIndex.hasTaskRequirement(task);
+			if (mode.isHidden(completed, meetsRequirements))
 			{
 				continue;
 			}
@@ -122,8 +122,8 @@ public class SeaChartOverlay
 			SeaChartTask task = tracked.getValue();
 
 			boolean completed = task.isComplete(client);
-			boolean meetsRequirements = hasTaskRequirement(task);
-			if (taskIsHidden(mode, completed, meetsRequirements))
+			boolean meetsRequirements = taskIndex.hasTaskRequirement(task);
+			if (mode.isHidden(completed, meetsRequirements))
 			{
 				continue;
 			}
@@ -202,15 +202,15 @@ public class SeaChartOverlay
 		}
 	}
 
-	private boolean hasTaskRequirement(SeaChartTask task)
+	@Subscribe
+	public void onGameStateChanged(GameStateChanged e)
 	{
-		var questRequirement = taskIndex.getTaskQuestRequirement(task);
-		if (questRequirement.getState(client) != QuestState.FINISHED)
+		if (e.getGameState() != GameState.LOADING &&
+			e.getGameState() != GameState.LOGGED_IN &&
+			e.getGameState() != GameState.CONNECTION_LOST)
 		{
-			return false;
+			chartNpcs.clear();
 		}
-
-		return client.getRealSkillLevel(Skill.SAILING) >= task.getLevel();
 	}
 
 	private Color getColor(boolean isTaskCompleted, boolean hasTaskRequirement)
@@ -226,26 +226,5 @@ public class SeaChartOverlay
 		}
 
 		return colorRequirementsUnmet;
-	}
-
-	private boolean taskIsHidden(SailingConfig.ShowChartsMode mode, boolean completed, boolean meetsRequirements)
-	{
-		switch (mode)
-		{
-			case ALL:
-				return false;
-
-			case CHARTED:
-				return !completed;
-
-			case UNCHARTED:
-				return completed;
-
-			case REQUIREMENTS_MET:
-				return completed || !meetsRequirements;
-
-			default:
-				return true;
-		}
 	}
 }

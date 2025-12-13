@@ -1,6 +1,7 @@
 package com.duckblade.osrs.sailing.features.facilities;
 
 import com.duckblade.osrs.sailing.SailingConfig;
+import com.duckblade.osrs.sailing.features.courier.CourierTaskTracker;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.model.Boat;
@@ -25,14 +26,17 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Actor;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
+import net.runelite.api.GameState;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.NPC;
 import net.runelite.api.Point;
+import net.runelite.api.Skill;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.OverheadTextChanged;
+import net.runelite.api.events.StatChanged;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
@@ -60,11 +64,21 @@ public class CargoHoldTracker
 	private static final int UNKNOWN_ITEM = -1;
 
 	// todo cargo pickup and dropoff
+	// these aren't necessary as of dec 4 2025 but jagex has said that is temporary (we'll see)
 	private static final String MES_CARGO_PACK_PERSONAL = "You deposit some cargo into the cargo hold."; // always 1
 	private static final String MES_CARGO_PACK_CREW = "Your crew pack the cargo they were holding into the cargo hold."; // todo determine amount?
+
 	private static final String MSG_CREWMATE_SALVAGES = "Managed to hook some salvage! I'll put it in the cargo hold.";
 	private static final String MSG_CREWMATE_SALVAGE_FULL = "The cargo hold is full. I can't salvage anything.";
 	private static final String WIDGET_TEXT_CARGO_HOLD_EMPTY = "This cargo hold has no items to show here.";
+
+	private static final Set<String> JENKINS_MESSAGES = ImmutableSet.of(
+		"Wooo.",
+		"Woooo wooo.",
+		"Woooo wooo wooo.",
+		"Woooo wooooo woooo.",
+		"Woooo wooo wooooo woooo."
+	);
 
 	private static final Set<Integer> CARGO_INVENTORY_IDS = ImmutableSet.of(
 		InventoryID.SAILING_BOAT_1_CARGOHOLD,
@@ -86,9 +100,12 @@ public class CargoHoldTracker
 	private final Client client;
 	private final ConfigManager configManager;
 	private final BoatTracker boatTracker;
+	private final CourierTaskTracker courierTaskTracker;
 
 	// boat slot -> item id+count
 	private final Map<Integer, Multiset<Integer>> cargoHoldItems = new HashMap<>();
+	private final Map<Integer, Boolean> stackabilityCache = new HashMap<>();
+
 	private Multiset<Integer> memoizedInventory;
 
 	private boolean overlayEnabled;
@@ -96,21 +113,19 @@ public class CargoHoldTracker
 	private boolean sawItemContainerUpdate;
 	private boolean sawInventoryContainerUpdate;
 
+	private int lastXp;
+	private boolean pendingJenkinsAction;
+
 	@Inject
-	public CargoHoldTracker(Client client, ConfigManager configManager, BoatTracker boatTracker)
+	public CargoHoldTracker(Client client, ConfigManager configManager, BoatTracker boatTracker, CourierTaskTracker courierTaskTracker)
 	{
 		this.client = client;
 		this.configManager = configManager;
 		this.boatTracker = boatTracker;
+		this.courierTaskTracker = courierTaskTracker;
 
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_SCENE);
-	}
-
-	@Override
-	public void startUp()
-	{
-		loadAllFromConfig();
 	}
 
 	@Override
@@ -122,10 +137,22 @@ public class CargoHoldTracker
 	}
 
 	@Override
+	public void startUp()
+	{
+		loadAllFromConfig();
+
+		if (client.getGameState() == GameState.LOGGED_IN)
+		{
+			lastXp = client.getSkillExperience(Skill.SAILING);
+		}
+	}
+
+	@Override
 	public void shutDown()
 	{
 		cargoHoldItems.clear();
 		memoizedInventory = null;
+		pendingJenkinsAction = false;
 	}
 
 	@Override
@@ -176,13 +203,34 @@ public class CargoHoldTracker
 		if (MSG_CREWMATE_SALVAGES.equals(e.getOverheadText()))
 		{
 			// todo different ones? doesn't matter now since it's count only but will matter later
-			cargoHold().add(ItemID.SAILING_SMALL_SHIPWRECK_SALVAGE);
+			log.trace("crewmate salvage");
+			add(ItemID.SAILING_SMALL_SHIPWRECK_SALVAGE, 1);
 			writeToConfig();
+			return;
 		}
 
 		if (MSG_CREWMATE_SALVAGE_FULL.equals(e.getOverheadText()))
 		{
-			cargoHold().add(UNKNOWN_ITEM, maxCapacity() - usedCapacity());
+			set(UNKNOWN_ITEM, maxCapacity() - usedCapacity());
+			writeToConfig();
+			return;
+		}
+
+		if (JENKINS_MESSAGES.contains(e.getOverheadText()))
+		{
+			pendingJenkinsAction = true;
+		}
+	}
+
+	@Subscribe
+	public void onStatChanged(StatChanged e)
+	{
+		if (e.getSkill() == Skill.SAILING &&
+			lastXp != (lastXp = e.getXp()) &&
+			pendingJenkinsAction)
+		{
+			log.trace("jenkins salvage");
+			add(ItemID.SAILING_SMALL_SHIPWRECK_SALVAGE, 1);
 			writeToConfig();
 		}
 	}
@@ -208,10 +256,17 @@ public class CargoHoldTracker
 		trackedInv.clear();
 		for (Item item : containerInv.getItems())
 		{
-			if (item != null)
+			if (item == null)
 			{
-				trackedInv.add(item.getId(), item.getQuantity());
+				continue;
 			}
+
+			if (courierTaskTracker.getTaskForItemID(item.getId()) != null)
+			{
+				continue;
+			}
+
+			add(item.getId(), item.getQuantity());
 		}
 
 		log.debug("read cargo hold inventory from event {}", trackedInv);
@@ -221,6 +276,8 @@ public class CargoHoldTracker
 	@Subscribe
 	public void onGameTick(GameTick e)
 	{
+		pendingJenkinsAction = false;
+
 		if (--pendingInventoryAction < 0)
 		{
 			sawItemContainerUpdate = false;
@@ -354,6 +411,38 @@ public class CargoHoldTracker
 		}
 
 		return ret;
+	}
+
+	private void add(int item, int count)
+	{
+		if (isStackable(item))
+		{
+			cargoHold().setCount(item, 1);
+		}
+		else
+		{
+			cargoHold().add(item, count);
+		}
+	}
+
+	private void set(int item, int count)
+	{
+		if (isStackable(item))
+		{
+			cargoHold().setCount(item, 1);
+		}
+		else
+		{
+			cargoHold().setCount(item, count);
+		}
+	}
+
+	private boolean isStackable(int itemId)
+	{
+		assert client.isClientThread();
+		return stackabilityCache.computeIfAbsent(itemId, id ->
+			client.getItemDefinition(id).isStackable()
+		);
 	}
 
 	private String configKey(int boatSlot)
