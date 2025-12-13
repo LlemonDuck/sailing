@@ -461,6 +461,18 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
+	@ConfigItem(
+		keyName = "notifyDepthChange",
+		name = "Notify Depth Change",
+		description = "Notify you when the depth of the shoal changes.",
+		section = SECTION_TRAWLING,
+		position = 9
+	)
+	default Notification notifyDepthChange()
+	{
+		return Notification.OFF;
+	}
+
 	enum CrewmateMuteMode
 	{
 		NONE,

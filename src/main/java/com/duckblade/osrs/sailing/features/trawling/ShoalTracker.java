@@ -1,7 +1,9 @@
 package com.duckblade.osrs.sailing.features.trawling;
 
 import com.duckblade.osrs.sailing.SailingConfig;
+import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
+import com.duckblade.osrs.sailing.model.Boat;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import com.duckblade.osrs.sailing.model.ShoalDepth;
 import com.google.common.collect.ImmutableSet;
@@ -23,6 +25,7 @@ import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.events.WorldEntitySpawned;
 import net.runelite.api.events.WorldViewUnloaded;
+import net.runelite.client.Notifier;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.api.gameval.AnimationID;
 
@@ -61,7 +64,9 @@ public class ShoalTracker implements PluginLifecycleComponent {
     );
 
     private final Client client;
-
+	private final Notifier notifier;
+	private final SailingConfig config;
+	private final BoatTracker boatTracker;
     private NPC currentShoalNpc;
 
     /**
@@ -109,8 +114,11 @@ public class ShoalTracker implements PluginLifecycleComponent {
      * @param client the RuneLite client instance
      */
     @Inject
-    public ShoalTracker(Client client) {
+    public ShoalTracker(Client client, Notifier notifier, SailingConfig config, BoatTracker boatTracker) {
         this.client = client;
+		this.notifier = notifier;
+		this.config = config;
+		this.boatTracker = boatTracker;
     }
 
     @Override
@@ -217,12 +225,22 @@ public class ShoalTracker implements PluginLifecycleComponent {
         ShoalDepth newDepth = getShoalDepthFromAnimation(animationId);
         
         if (newDepth != currentShoalDepth) {
+			checkDepthNotification();
             logDepthChange(currentShoalDepth, newDepth, animationId);
             currentShoalDepth = newDepth;
         }
     }
 
-    private void resetDepthToUnknown() {
+	private void checkDepthNotification()
+	{
+		Boat boat = boatTracker.getBoat();
+		if (boat == null || boat.getNetTiers().isEmpty()) {
+			return;
+		}
+		notifier.notify(config.notifyDepthChange(), "Shoal depth changed");
+	}
+
+	private void resetDepthToUnknown() {
         if (currentShoalDepth != ShoalDepth.UNKNOWN) {
             currentShoalDepth = ShoalDepth.UNKNOWN;
             log.debug("Shoal depth reset to UNKNOWN (no NPC)");
