@@ -321,13 +321,16 @@ public class CargoHoldTracker
 	@Subscribe
 	public void onMenuOptionClicked(MenuOptionClicked e)
 	{
-		if (!e.getMenuOption().contains("Withdraw") && !e.getMenuOption().contains("Deposit"))
+		String menuOption = e.getMenuOption();
+		if (!menuOption.toLowerCase().contains("withdraw") && !menuOption.toLowerCase().contains("deposit"))
 		{
 			return;
 		}
 
 		Widget cargoHoldWidget = client.getWidget(InterfaceID.SailingBoatCargohold.UNIVERSE); // todo confirm
-		if (cargoHoldWidget != null && !cargoHoldWidget.isHidden())
+		boolean cargoHoldOpen = cargoHoldWidget != null && !cargoHoldWidget.isHidden();
+		
+		if (cargoHoldOpen || (SailingUtil.isSailing(client) && menuOption.toLowerCase().contains("deposit")))
 		{
 			pendingInventoryAction = INVENTORY_DELTA_MAX_DELAY;
 			memoizedInventory = getInventoryMap();
