@@ -9,8 +9,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.audio.AudioPlayer;
 import net.runelite.client.eventbus.Subscribe;
@@ -31,6 +31,8 @@ public class ReverseBeep implements PluginLifecycleComponent
 	private ScheduledFuture<?> beepTask;
 
 	private float gain;
+
+    private final Client client;
 
 	@Override
 	public boolean isEnabled(SailingConfig config)
@@ -56,6 +58,15 @@ public class ReverseBeep implements PluginLifecycleComponent
 	@Subscribe
 	public void onGameTick(GameTick e)
 	{
+        // Keep an eye on the PRNDL
+        if (client.getVarbitValue(VarbitID.SAILING_SIDEPANEL_BOAT_MOVE_MODE) == VARB_VALUE_REVERSING)
+        {
+            reversing = true;
+        }
+        else
+        {
+            reversing = false;
+        }
 		if (reversing && beepTask == null)
 		{
 			// become a truck
@@ -66,16 +77,6 @@ public class ReverseBeep implements PluginLifecycleComponent
 			// become a boat again
 			beepTask.cancel(false);
 			beepTask = null;
-		}
-	}
-
-	// Keep an eye on the PRNDL
-	@Subscribe
-	public void onVarbitChanged(VarbitChanged e)
-	{
-		if (e.getVarbitId() == VarbitID.SAILING_SIDEPANEL_BOAT_MOVE_MODE)
-		{
-			reversing = e.getValue() == VARB_VALUE_REVERSING;
 		}
 	}
 
