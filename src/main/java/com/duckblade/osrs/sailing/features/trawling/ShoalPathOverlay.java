@@ -15,7 +15,12 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Polygon;
+import java.awt.Stroke;
 
 @Slf4j
 @Singleton
@@ -40,6 +45,7 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 	private static final int[] TURTLE_BELT_STOP_INDICES = {0, 11, 17, 23, 37, 44, 50, 73};
 	private static final int[] GREAT_SOUND_STOP_INDICES = {0, 10, 19, 29, 43, 48, 53};
 	private static final int[] SUNSET_BAY_STOP_INDICES = {0, 17, 29, 36, 46, 64, 73};
+	private static final int[] HADDOCK_MISTY_SEA_STOP_INDICES = {0, 14, 28, 34, 52, 76, 105, 118, 125, 134};
 
 	// Color for stop point overlays (red)
 	private static final Color STOP_POINT_COLOR = Color.RED;
@@ -49,8 +55,8 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 		this.client = client;
 		this.config = config;
 		setPosition(OverlayPosition.DYNAMIC);
-		setLayer(OverlayLayer.ABOVE_SCENE);
-		setPriority(PRIORITY_LOW);
+		setLayer(OverlayLayer.UNDER_WIDGETS);
+		setPriority(PRIORITY_MED);
 	}
 
 	@Override
@@ -134,6 +140,11 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 		else if (TrawlingData.FishingAreas.SUNSET_BAY.contains(playerLocation)) {
 			renderPath(graphics, ShoalPaths.GIANT_KRILL_SUNSET_BAY, pathColor);
 			renderStopPoints(graphics, ShoalPaths.GIANT_KRILL_SUNSET_BAY, SUNSET_BAY_STOP_INDICES);
+		}
+
+		else if (TrawlingData.FishingAreas.MISTY_SEA.contains(playerLocation)) {
+			renderPath(graphics, ShoalPaths.HADDOCK_MISTY_SEA, pathColor);
+			renderStopPoints(graphics, ShoalPaths.HADDOCK_MISTY_SEA, HADDOCK_MISTY_SEA_STOP_INDICES);
 		}
 
 		return null;

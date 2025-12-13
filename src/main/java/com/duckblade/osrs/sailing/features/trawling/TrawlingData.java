@@ -24,16 +24,16 @@ public class TrawlingData {
         protected static final int HALIBUT = 78;
         protected static final int BLUEFIN = 66;
         protected static final int MARLIN = 50;
-        // Note: Haddock duration would be added here when known
-        // protected static final int HADDOCK = ?;
+        protected static final int HADDOCK = 0; // One-depth area - no timer needed
     }
 
     public static class FishingAreas {
-        // Giant krill areas (80 tick duration) - ONE_DEPTH
+        // One-depth areas (no timer needed) - ONE_DEPTH
         protected static final ShoalFishingArea SIMIAN_SEA = new ShoalFishingArea(2745, 2866, 2538, 2649, ShoalStopDuration.GIANT_KRILL);
         protected static final ShoalFishingArea TURTLE_BELT = new ShoalFishingArea(2912, 3037, 2455, 2586, ShoalStopDuration.GIANT_KRILL);
         protected static final ShoalFishingArea GREAT_SOUND = new ShoalFishingArea(1536, 1648, 3317, 3411, ShoalStopDuration.GIANT_KRILL);
         protected static final ShoalFishingArea SUNSET_BAY = new ShoalFishingArea(1477, 1604, 2860, 2959, ShoalStopDuration.GIANT_KRILL);
+        protected static final ShoalFishingArea MISTY_SEA = new ShoalFishingArea(1377, 1609, 2607, 2788, ShoalStopDuration.HADDOCK);
 
         // Halibut areas (76 tick duration) - TWO_DEPTH
         protected static final ShoalFishingArea PORT_ROBERTS = new ShoalFishingArea(1821, 2032, 3120, 3420, ShoalStopDuration.HALIBUT);
@@ -52,13 +52,13 @@ public class TrawlingData {
         protected static final ShoalFishingArea WEISSMERE = new ShoalFishingArea(2590, 2870, 3945, 4146, ShoalStopDuration.MARLIN);
         protected static final ShoalFishingArea BRITTLE_ISLE = new ShoalFishingArea(1856, 2078, 3963, 4121, ShoalStopDuration.MARLIN);
 
-        // One-depth areas (Giant Krill)
-        // TODO: Add haddock areas
+        // One-depth areas (Giant Krill and Haddock)
         private static final ShoalFishingArea[] ONE_DEPTH_AREAS = {
             SIMIAN_SEA,
             TURTLE_BELT,
             GREAT_SOUND,
-            SUNSET_BAY
+            SUNSET_BAY,
+            MISTY_SEA
         };
 
         // Three-depth areas (Bluefin and Marlin)
@@ -75,6 +75,7 @@ public class TrawlingData {
             TURTLE_BELT,
             GREAT_SOUND,
             SUNSET_BAY,
+            MISTY_SEA,
             PORT_ROBERTS,
             SOUTHERN_EXPANSE,
             DEEPFIN_POINT,

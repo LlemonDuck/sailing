@@ -16,7 +16,14 @@ import net.runelite.client.eventbus.Subscribe;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -255,7 +262,7 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 				Waypoint wp = waypoints.get(i);
 				WorldPoint pos = wp.getPosition();
 				String comment = wp.isStopPoint() ? " // STOP POINT" : "";
-				log.info("    new WorldPoint({}, {}, {}),{}",
+				log.debug("    new WorldPoint({}, {}, {}),{}",
 					pos.getX(), pos.getY(), pos.getPlane(), comment);
 
 				minX = Math.min(minX, pos.getX());
@@ -278,7 +285,7 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 			for (int i = 0; i < waypoints.size(); i++) {
 				Waypoint wp = waypoints.get(i);
 				if (wp.isStopPoint() && wp.getStopDuration() > 0) {
-					log.info("  Stop {} (index {}): {} ticks at {}", 
+					log.debug("  Stop {} (index {}): {} ticks at {}", 
 						stopPoints.indexOf(i) + 1, i, wp.getStopDuration(), wp.getPosition());
 				}
 			}

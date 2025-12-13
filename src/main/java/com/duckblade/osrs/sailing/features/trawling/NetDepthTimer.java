@@ -16,7 +16,8 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
 
 @Slf4j
 @Singleton
@@ -36,6 +37,7 @@ public class NetDepthTimer extends Overlay implements PluginLifecycleComponent {
     private int ticksAtSamePosition = 0;
     private int ticksMoving = 0;
     private boolean hasBeenMoving = false;
+    private final int depthsPerStop = 2;
     
     // Timer state
     private int timerTicks = 0;
@@ -93,7 +95,7 @@ public class NetDepthTimer extends Overlay implements PluginLifecycleComponent {
         
         // Timer counts down to depth change (half duration)
         int shoalDuration = shoalTracker.getShoalDuration();
-        int depthChangeTime = shoalDuration / 2;
+        int depthChangeTime = shoalDuration / depthsPerStop;
         int ticksUntilDepthChange = depthChangeTime - timerTicks;
         return new TimerInfo(true, false, Math.max(0, ticksUntilDepthChange));
     }

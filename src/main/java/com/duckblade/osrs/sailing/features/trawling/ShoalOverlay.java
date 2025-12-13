@@ -14,7 +14,12 @@ import net.runelite.client.ui.overlay.OverlayUtil;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Polygon;
+import java.awt.Stroke;
 import java.util.Set;
 
 @Slf4j
@@ -117,21 +122,9 @@ public class ShoalOverlay extends Overlay
     }
 
     private Color getShoalColor(int objectId) {
-        // Priority 1: Check depth matching (highest priority) - DISABLED
-        // NetDepth shoalDepth = shoalDepthTracker.getCurrentDepth();
-        // if (shoalDepth != null) {
-        //     NetDepth playerDepth = getPlayerNetDepth();
-        //     if (playerDepth != null && playerDepth != shoalDepth) {
-        //         return Color.RED; // Wrong depth - highest priority
-        //     }
-        // }
-        
-        // Priority 2: Special shoals use green (medium priority)
         if (isSpecialShoal(objectId)) {
             return Color.GREEN;
         }
-        
-        // Priority 3: Default to configured color (lowest priority)
         return config.trawlingShoalHighlightColour();
     }
 

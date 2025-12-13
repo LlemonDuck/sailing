@@ -7,11 +7,22 @@ import com.duckblade.osrs.sailing.model.ShoalDepth;
 import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
-
+import net.runelite.api.Actor;
+import net.runelite.api.Client;
+import net.runelite.api.DynamicObject;
+import net.runelite.api.GameObject;
+import net.runelite.api.NPC;
+import net.runelite.api.Renderable;
+import net.runelite.api.WorldEntity;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.*;
+import net.runelite.api.events.GameObjectDespawned;
+import net.runelite.api.events.GameObjectSpawned;
+import net.runelite.api.events.GameTick;
+import net.runelite.api.events.NpcDespawned;
+import net.runelite.api.events.NpcSpawned;
+import net.runelite.api.events.WorldEntitySpawned;
+import net.runelite.api.events.WorldViewUnloaded;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.api.gameval.AnimationID;
 
@@ -182,26 +193,34 @@ public class ShoalTracker implements PluginLifecycleComponent {
         }
     }
 
-    /**
-     * Update the current shoal depth based on the NPC animation
-     */
     private void updateShoalDepth() {
         if (currentShoalNpc != null) {
-            int animationId = currentShoalNpc.getAnimation();
-            ShoalDepth newDepth = getShoalDepthFromAnimation(animationId);
-            
-            if (newDepth != currentShoalDepth) {
-                ShoalDepth previousDepth = currentShoalDepth;
-                currentShoalDepth = newDepth;
-                log.debug("Shoal depth changed from {} to {} (animation: {})", 
-                    previousDepth, currentShoalDepth, animationId);
-            }
+            updateDepthFromNpc();
         } else {
-            if (currentShoalDepth != ShoalDepth.UNKNOWN) {
-                currentShoalDepth = ShoalDepth.UNKNOWN;
-                log.debug("Shoal depth reset to UNKNOWN (no NPC)");
-            }
+            resetDepthToUnknown();
         }
+    }
+
+    private void updateDepthFromNpc() {
+        int animationId = currentShoalNpc.getAnimation();
+        ShoalDepth newDepth = getShoalDepthFromAnimation(animationId);
+        
+        if (newDepth != currentShoalDepth) {
+            logDepthChange(currentShoalDepth, newDepth, animationId);
+            currentShoalDepth = newDepth;
+        }
+    }
+
+    private void resetDepthToUnknown() {
+        if (currentShoalDepth != ShoalDepth.UNKNOWN) {
+            currentShoalDepth = ShoalDepth.UNKNOWN;
+            log.debug("Shoal depth reset to UNKNOWN (no NPC)");
+        }
+    }
+
+    private void logDepthChange(ShoalDepth previousDepth, ShoalDepth newDepth, int animationId) {
+        log.debug("Shoal depth changed from {} to {} (animation: {})", 
+            previousDepth, newDepth, animationId);
     }
 
     /**
@@ -212,66 +231,84 @@ public class ShoalTracker implements PluginLifecycleComponent {
         return currentShoalDepth != ShoalDepth.UNKNOWN;
     }
 
-    /**
-     * Update the current location from the WorldEntity
-     */
     public void updateLocation() {
-        if (currentShoalEntity != null) {
-            LocalPoint localPos = currentShoalEntity.getCameraFocus();
-            if (localPos != null) {
-                WorldPoint newLocation = WorldPoint.fromLocal(client, localPos);
-                if (!newLocation.equals(currentLocation)) {
-                    previousLocation = currentLocation;
-                    currentLocation = newLocation;
-                    // Update duration when location changes
-                    shoalDuration = TrawlingData.FishingAreas.getStopDurationForLocation(currentLocation);
-                }
-            }
+        updateLocationFromEntity();
+        trackMovement();
+    }
+
+    private void updateLocationFromEntity() {
+        if (currentShoalEntity == null) {
+            return;
         }
 
-        // Track movement state
-        trackMovement();
+        LocalPoint localPos = currentShoalEntity.getCameraFocus();
+        if (localPos != null) {
+            WorldPoint newLocation = WorldPoint.fromLocal(client, localPos);
+            updateLocationIfChanged(newLocation);
+        }
+    }
+
+    private void updateLocationIfChanged(WorldPoint newLocation) {
+        if (!newLocation.equals(currentLocation)) {
+            previousLocation = currentLocation;
+            currentLocation = newLocation;
+            updateShoalDuration();
+        }
+    }
+
+    private void updateShoalDuration() {
+        shoalDuration = TrawlingData.FishingAreas.getStopDurationForLocation(currentLocation);
     }
 
     @Subscribe
     public void onGameTick(GameTick e) {
         if (!hasShoal()) {
-            // Reset movement tracking when no shoal
             resetMovementTracking();
             return;
         }
         
-        // Update shoal depth based on NPC animation
         updateShoalDepth();
-        
-        // updateLocation() is called by other components, so we don't need to call it here
-        // Just ensure movement tracking happens each tick
         trackMovement();
     }
     
-    /**
-     * Track shoal movement and count stationary ticks
-     */
     private void trackMovement() {
         if (currentLocation == null) {
             return;
         }
         
-        // Check if shoal moved this tick
-        boolean isMoving = previousLocation != null && !currentLocation.equals(previousLocation);
+        boolean isMoving = hasShoalMoved();
         
         if (isMoving) {
-            wasMoving = true;
-            stationaryTicks = 0;
+            handleShoalMoving();
         } else {
-            if (wasMoving) {
-                wasMoving = false;
-                stationaryTicks = 1; // Start counting from 1
-            } else {
-                // Shoal continues to be stationary
-                stationaryTicks++;
-            }
+            handleShoalStationary();
         }
+    }
+
+    private boolean hasShoalMoved() {
+        return previousLocation != null && !currentLocation.equals(previousLocation);
+    }
+
+    private void handleShoalMoving() {
+        wasMoving = true;
+        stationaryTicks = 0;
+    }
+
+    private void handleShoalStationary() {
+        if (wasMoving) {
+            startStationaryCount();
+        } else {
+            incrementStationaryCount();
+        }
+    }
+
+    private void startStationaryCount() {
+        wasMoving = false;
+        stationaryTicks = 1;
+    }
+
+    private void incrementStationaryCount() {
+        stationaryTicks++;
     }
     
     /**
@@ -288,11 +325,8 @@ public class ShoalTracker implements PluginLifecycleComponent {
     @Subscribe
     public void onNpcSpawned(NpcSpawned e) {
         NPC npc = e.getNpc();
-        if (npc.getId() == SAILING_SHOAL_RIPPLES) {
-            currentShoalNpc = npc;
-            log.debug("Shoal NPC spawned (ID={})", npc.getId());
-            // Update depth immediately when NPC spawns
-            updateShoalDepth();
+        if (isShoalNpc(npc)) {
+            handleShoalNpcSpawned(npc);
         }
     }
 
@@ -300,39 +334,56 @@ public class ShoalTracker implements PluginLifecycleComponent {
     public void onNpcDespawned(NpcDespawned e) {
         NPC npc = e.getNpc();
         if (npc == currentShoalNpc) {
-            log.debug("Shoal NPC despawned (ID={})", npc.getId());
-            currentShoalNpc = null;
-            // Reset depth when NPC despawns
-            updateShoalDepth();
+            handleShoalNpcDespawned(npc);
         }
+    }
+
+    private boolean isShoalNpc(NPC npc) {
+        return npc.getId() == SAILING_SHOAL_RIPPLES;
+    }
+
+    private void handleShoalNpcSpawned(NPC npc) {
+        currentShoalNpc = npc;
+        log.debug("Shoal NPC spawned (ID={})", npc.getId());
+        updateShoalDepth();
+    }
+
+    private void handleShoalNpcDespawned(NPC npc) {
+        log.debug("Shoal NPC despawned (ID={})", npc.getId());
+        currentShoalNpc = null;
+        updateShoalDepth();
     }
 
     @Subscribe
     public void onWorldEntitySpawned(WorldEntitySpawned e) {
         WorldEntity entity = e.getWorldEntity();
         
-        // Only track shoal WorldEntity
-        if (entity.getConfig() != null && entity.getConfig().getId() == SHOAL_WORLD_ENTITY_CONFIG_ID) {
-            boolean hadExistingShoal = currentShoalEntity != null;
-            currentShoalEntity = entity;
-            
-            // Update location and duration
-            updateLocation();
-            
-            if (!hadExistingShoal) {
-                log.debug("Shoal WorldEntity spawned at {}", currentLocation);
-            }
+        if (isShoalWorldEntity(entity)) {
+            handleShoalWorldEntitySpawned(entity);
+        }
+    }
+
+    private boolean isShoalWorldEntity(WorldEntity entity) {
+        return entity.getConfig() != null && entity.getConfig().getId() == SHOAL_WORLD_ENTITY_CONFIG_ID;
+    }
+
+    private void handleShoalWorldEntitySpawned(WorldEntity entity) {
+        boolean hadExistingShoal = currentShoalEntity != null;
+        currentShoalEntity = entity;
+        
+        updateLocation();
+        
+        if (!hadExistingShoal) {
+            log.debug("Shoal WorldEntity spawned at {}", currentLocation);
         }
     }
 
     @Subscribe
     public void onGameObjectSpawned(GameObjectSpawned e) {
         GameObject obj = e.getGameObject();
-        int objectId = obj.getId();
         
-        if (SHOAL_OBJECT_IDS.contains(objectId)) {
-            shoalObjects.add(obj);
-            log.debug("Shoal GameObject spawned (ID={})", objectId);
+        if (isShoalGameObject(obj)) {
+            handleShoalGameObjectSpawned(obj);
         }
     }
 
@@ -341,52 +392,93 @@ public class ShoalTracker implements PluginLifecycleComponent {
         GameObject obj = e.getGameObject();
         
         if (shoalObjects.remove(obj)) {
-            log.debug("Shoal GameObject despawned (ID={})", obj.getId());
+            handleShoalGameObjectDespawned(obj);
         }
+    }
+
+    private boolean isShoalGameObject(GameObject obj) {
+        return SHOAL_OBJECT_IDS.contains(obj.getId());
+    }
+
+    private void handleShoalGameObjectSpawned(GameObject obj) {
+        shoalObjects.add(obj);
+        log.debug("Shoal GameObject spawned (ID={})", obj.getId());
+    }
+
+    private void handleShoalGameObjectDespawned(GameObject obj) {
+        log.debug("Shoal GameObject despawned (ID={})", obj.getId());
     }
 
     @Subscribe
     public void onWorldViewUnloaded(WorldViewUnloaded e) {
-        // Only clear shoals when we're not actively sailing
         if (!e.getWorldView().isTopLevel()) {
             return;
         }
         
-        // Check if player and worldview are valid before calling isSailing
-        if (client.getLocalPlayer() == null || client.getLocalPlayer().getWorldView() == null) {
-            log.debug("Top-level world view unloaded (player/worldview null), clearing shoal state");
-            clearState();
-            return;
-        }
-        
-        if (!SailingUtil.isSailing(client)) {
-            log.debug("Top-level world view unloaded while not sailing, clearing shoal state");
+        if (shouldClearStateOnWorldViewUnload()) {
             clearState();
         }
     }
 
-    /**
-     * Try to find the shoal WorldEntity if we lost track of it
-     */
+    private boolean shouldClearStateOnWorldViewUnload() {
+        if (isPlayerOrWorldViewInvalid()) {
+            log.debug("Top-level world view unloaded (player/worldview null), clearing shoal state");
+            return true;
+        }
+        
+        if (!SailingUtil.isSailing(client)) {
+            log.debug("Top-level world view unloaded while not sailing, clearing shoal state");
+            return true;
+        }
+        
+        return false;
+    }
+
+    private boolean isPlayerOrWorldViewInvalid() {
+        return client.getLocalPlayer() == null || client.getLocalPlayer().getWorldView() == null;
+    }
+
     public void findShoalEntity() {
-        if (client.getTopLevelWorldView() != null) {
-            for (WorldEntity entity : client.getTopLevelWorldView().worldEntities()) {
-                if (entity.getConfig() != null && entity.getConfig().getId() == SHOAL_WORLD_ENTITY_CONFIG_ID) {
-                    currentShoalEntity = entity;
-                    updateLocation();
-                    log.debug("Found shoal WorldEntity in scene");
-                    return;
-                }
+        WorldEntity foundEntity = searchForShoalEntity();
+        
+        if (foundEntity != null) {
+            handleFoundShoalEntity(foundEntity);
+        } else {
+            handleMissingShoalEntity();
+        }
+    }
+
+    private WorldEntity searchForShoalEntity() {
+        if (client.getTopLevelWorldView() == null) {
+            return null;
+        }
+        
+        for (WorldEntity entity : client.getTopLevelWorldView().worldEntities()) {
+            if (isShoalWorldEntity(entity)) {
+                return entity;
             }
         }
         
-        // If we can't find it, clear the entity reference
+        return null;
+    }
+
+    private void handleFoundShoalEntity(WorldEntity entity) {
+        currentShoalEntity = entity;
+        updateLocation();
+        log.debug("Found shoal WorldEntity in scene");
+    }
+
+    private void handleMissingShoalEntity() {
         if (currentShoalEntity != null) {
             log.debug("Shoal WorldEntity no longer exists");
-            currentShoalEntity = null;
-            currentLocation = null;
-            shoalDuration = 0;
+            clearShoalEntityState();
         }
+    }
+
+    private void clearShoalEntityState() {
+        currentShoalEntity = null;
+        currentLocation = null;
+        shoalDuration = 0;
     }
 
     /**

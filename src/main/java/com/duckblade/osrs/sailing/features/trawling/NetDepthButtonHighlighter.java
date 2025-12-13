@@ -18,7 +18,11 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 
 /**
  * Overlay component that highlights net depth adjustment buttons when shoal depth is known.
@@ -71,7 +75,7 @@ public class NetDepthButtonHighlighter extends Overlay
 
     @Override
     public boolean isEnabled(SailingConfig config) {
-        return config.trawlingShowNetDepthTimer();
+        return config.highlightNetButtons();
     }
 
     @Override
@@ -88,58 +92,59 @@ public class NetDepthButtonHighlighter extends Overlay
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        // Check basic prerequisites
+        if (!validatePrerequisites()) {
+            return null;
+        }
+
+        ensureHighlightingStateValid();
+
+        if (!hasHighlightsToRender()) {
+            return null;
+        }
+
+        Widget sailingWidget = getSailingWidget();
+        if (sailingWidget == null) {
+            return null;
+        }
+
+        renderCachedHighlights(graphics, sailingWidget);
+        return null;
+    }
+
+    private boolean validatePrerequisites() {
         if (!canHighlightButtons()) {
-            // If prerequisites changed, invalidate cache
             if (highlightingStateValid) {
                 log.debug("Prerequisites no longer met, invalidating highlighting state");
                 invalidateHighlightingState();
             }
-            return null;
+            return false;
         }
+        return true;
+    }
 
-        // Update highlighting state if needed (only when events occur)
+    private void ensureHighlightingStateValid() {
         if (!highlightingStateValid) {
             updateHighlightingState();
         }
-
-        // Only render if there's something to highlight
-        if (!shouldHighlightPort && !shouldHighlightStarboard) {
-            return null;
-        }
-
-        Widget widgetSailingRows = client.getWidget(InterfaceID.SailingSidepanel.FACILITIES_ROWS);
-        if (widgetSailingRows == null) {
-            return null;
-        }
-
-        // Render cached highlighting decisions
-        renderCachedHighlights(graphics, widgetSailingRows);
-
-        return null;
     }
 
-    /**
-     * Check if button highlighting is possible (basic prerequisites)
-     */
+    private boolean hasHighlightsToRender() {
+        return shouldHighlightPort || shouldHighlightStarboard;
+    }
+
+    private Widget getSailingWidget() {
+        return client.getWidget(InterfaceID.SailingSidepanel.FACILITIES_ROWS);
+    }
+
     private boolean canHighlightButtons() {
-        // Check if we have a boat with nets
         Boat boat = boatTracker.getBoat();
         if (boat == null || boat.getNetTiers().isEmpty()) {
             return false;
         }
 
-        // Check if shoal is active and we know its depth
-        if (!shoalTracker.hasShoal()) {
-            return false;
-        }
-
-        return shoalTracker.isShoalDepthKnown();
+        return shoalTracker.hasShoal() && shoalTracker.isShoalDepthKnown();
     }
 
-    /**
-     * Invalidate the cached highlighting state, forcing recalculation on next render
-     */
     private void invalidateHighlightingState() {
         highlightingStateValid = false;
         shouldHighlightPort = false;
@@ -149,156 +154,173 @@ public class NetDepthButtonHighlighter extends Overlay
         cachedStarboardDepth = null;
     }
 
-    /**
-     * Update the cached highlighting state based on current shoal and net depths
-     */
     private void updateHighlightingState() {
         log.debug("Updating highlighting state");
         
-        // Force refresh net depth cache to ensure we have latest values
         netDepthTracker.refreshCache();
+        cacheCurrentDepths();
+        calculateHighlightingDecisions();
+        highlightingStateValid = true;
         
-        // Get current depths
+        logHighlightingDecisions();
+    }
+
+    private void cacheCurrentDepths() {
         cachedRequiredDepth = determineRequiredDepth();
         cachedPortDepth = netDepthTracker.getPortNetDepth();
         cachedStarboardDepth = netDepthTracker.getStarboardNetDepth();
         
         log.debug("Current depths - Required: {}, Port: {}, Starboard: {}", 
                  cachedRequiredDepth, cachedPortDepth, cachedStarboardDepth);
-        
-        // Calculate highlighting decisions
-        shouldHighlightPort = cachedRequiredDepth != null && 
-                             cachedRequiredDepth != ShoalDepth.UNKNOWN &&
-                             cachedPortDepth != null && 
-                             cachedPortDepth != cachedRequiredDepth;
-                             
-        shouldHighlightStarboard = cachedRequiredDepth != null && 
-                                  cachedRequiredDepth != ShoalDepth.UNKNOWN &&
-                                  cachedStarboardDepth != null && 
-                                  cachedStarboardDepth != cachedRequiredDepth;
-        
-        highlightingStateValid = true;
-        
-        log.debug("Highlighting decisions - Port: {} ({}), Starboard: {} ({})",
-                 shouldHighlightPort, cachedPortDepth != cachedRequiredDepth ? "mismatch" : "match",
-                 shouldHighlightStarboard, cachedStarboardDepth != cachedRequiredDepth ? "mismatch" : "match");
     }
 
-    /**
-     * Render highlights based on cached state
-     */
+    private void calculateHighlightingDecisions() {
+        shouldHighlightPort = shouldHighlightNet(cachedPortDepth);
+        shouldHighlightStarboard = shouldHighlightNet(cachedStarboardDepth);
+    }
+
+    private boolean shouldHighlightNet(ShoalDepth netDepth) {
+        return cachedRequiredDepth != null && 
+               cachedRequiredDepth != ShoalDepth.UNKNOWN &&
+               netDepth != null && 
+               netDepth != cachedRequiredDepth;
+    }
+
+    private void logHighlightingDecisions() {
+        log.debug("Highlighting decisions - Port: {} ({}), Starboard: {} ({})",
+                 shouldHighlightPort, getDepthMatchStatus(cachedPortDepth),
+                 shouldHighlightStarboard, getDepthMatchStatus(cachedStarboardDepth));
+    }
+
+    private String getDepthMatchStatus(ShoalDepth netDepth) {
+        return netDepth != cachedRequiredDepth ? "mismatch" : "match";
+    }
+
     private void renderCachedHighlights(Graphics2D graphics, Widget parent) {
         Color highlightColor = config.trawlingShoalHighlightColour();
 
-        // Highlight starboard net if needed
         if (shouldHighlightStarboard) {
-            Widget starboardDepthWidget = parent.getChild(STARBOARD_DEPTH_WIDGET_INDEX);
-            if (starboardDepthWidget != null && starboardDepthWidget.getOpacity() == 0) {
-                highlightNetButton(graphics, parent, cachedStarboardDepth, cachedRequiredDepth, 
-                                  STARBOARD_UP, STARBOARD_DOWN, highlightColor);
-            }
+            renderStarboardHighlight(graphics, parent, highlightColor);
         }
 
-        // Highlight port net if needed
         if (shouldHighlightPort) {
-            Widget portDepthWidget = parent.getChild(PORT_DEPTH_WIDGET_INDEX);
-            if (portDepthWidget != null && portDepthWidget.getOpacity() == 0) {
-                highlightNetButton(graphics, parent, cachedPortDepth, cachedRequiredDepth,
-                                  PORT_UP, PORT_DOWN, highlightColor);
-            }
+            renderPortHighlight(graphics, parent, highlightColor);
         }
     }
 
-    /**
-     * Listen for any state changes that might affect highlighting
-     */
+    private void renderStarboardHighlight(Graphics2D graphics, Widget parent, Color highlightColor) {
+        Widget starboardDepthWidget = parent.getChild(STARBOARD_DEPTH_WIDGET_INDEX);
+        if (isWidgetInteractable(starboardDepthWidget)) {
+            highlightNetButton(graphics, parent, cachedStarboardDepth, cachedRequiredDepth, 
+                              STARBOARD_UP, STARBOARD_DOWN, highlightColor);
+        }
+    }
+
+    private void renderPortHighlight(Graphics2D graphics, Widget parent, Color highlightColor) {
+        Widget portDepthWidget = parent.getChild(PORT_DEPTH_WIDGET_INDEX);
+        if (isWidgetInteractable(portDepthWidget)) {
+            highlightNetButton(graphics, parent, cachedPortDepth, cachedRequiredDepth,
+                              PORT_UP, PORT_DOWN, highlightColor);
+        }
+    }
+
+    private boolean isWidgetInteractable(Widget widget) {
+        return widget != null && widget.getOpacity() == 0;
+    }
+
     @Subscribe
     public void onGameTick(GameTick e) {
-        // Always check if we need to invalidate the cache
-        if (highlightingStateValid) {
-            // Check if shoal depth changed
-            ShoalDepth currentRequiredDepth = determineRequiredDepth();
-            if (currentRequiredDepth != cachedRequiredDepth) {
-                log.debug("Shoal depth changed from {} to {}, invalidating highlighting state", 
-                         cachedRequiredDepth, currentRequiredDepth);
-                invalidateHighlightingState();
-                return;
-            }
-            
-            // Check if net depths changed (fallback in case varbit events are missed)
-            ShoalDepth currentPortDepth = netDepthTracker.getPortNetDepth();
-            ShoalDepth currentStarboardDepth = netDepthTracker.getStarboardNetDepth();
-            
-            if (currentPortDepth != cachedPortDepth || currentStarboardDepth != cachedStarboardDepth) {
-                log.debug("Net depths changed - Port: {} -> {}, Starboard: {} -> {}, invalidating highlighting state",
-                         cachedPortDepth, currentPortDepth, cachedStarboardDepth, currentStarboardDepth);
-                invalidateHighlightingState();
-                return;
-            }
+        if (!highlightingStateValid) {
+            return;
+        }
+
+        if (hasShoalDepthChanged()) {
+            invalidateHighlightingState();
+            return;
+        }
+
+        if (haveNetDepthsChanged()) {
+            invalidateHighlightingState();
         }
     }
 
-    /**
-     * Listen for net depth changes (varbit changes)
-     */
+    private boolean hasShoalDepthChanged() {
+        ShoalDepth currentRequiredDepth = determineRequiredDepth();
+        if (currentRequiredDepth != cachedRequiredDepth) {
+            log.debug("Shoal depth changed from {} to {}, invalidating highlighting state", 
+                     cachedRequiredDepth, currentRequiredDepth);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean haveNetDepthsChanged() {
+        ShoalDepth currentPortDepth = netDepthTracker.getPortNetDepth();
+        ShoalDepth currentStarboardDepth = netDepthTracker.getStarboardNetDepth();
+        
+        if (currentPortDepth != cachedPortDepth || currentStarboardDepth != cachedStarboardDepth) {
+            log.debug("Net depths changed - Port: {} -> {}, Starboard: {} -> {}, invalidating highlighting state",
+                     cachedPortDepth, currentPortDepth, cachedStarboardDepth, currentStarboardDepth);
+            return true;
+        }
+        return false;
+    }
+
     @Subscribe
     public void onVarbitChanged(VarbitChanged e) {
-        // Check if this is a net depth varbit change
         int varbitId = e.getVarbitId();
-        if (varbitId == 19206 || varbitId == 19208) { // Net depth varbits
+        if (isNetDepthVarbit(varbitId)) {
             log.debug("Net depth varbit changed ({}), invalidating highlighting state", varbitId);
             invalidateHighlightingState();
         }
     }
 
-    /**
-     * Determine which depth the nets should be set to
-     */
+    private boolean isNetDepthVarbit(int varbitId) {
+        return varbitId == 19206 || varbitId == 19208;
+    }
+
     private ShoalDepth determineRequiredDepth() {
         if (!shoalTracker.isShoalDepthKnown()) {
             return null;
         }
-
-        // Nets should match the current shoal depth
         return shoalTracker.getCurrentShoalDepth();
     }
 
-
-
-    /**
-     * Highlight the appropriate button for a specific net
-     */
     private void highlightNetButton(Graphics2D graphics, Widget parent, ShoalDepth current, 
                                     ShoalDepth required, int upIndex, int downIndex, Color color) {
-        // Determine which button to highlight
-        int buttonIndex;
-        if (required.ordinal() < current.ordinal()) {
-            // Need to go shallower (up)
-            buttonIndex = upIndex;
-        } else {
-            // Need to go deeper (down)
-            buttonIndex = downIndex;
-        }
-
+        int buttonIndex = getButtonIndex(current, required, upIndex, downIndex);
         Widget button = getNetWidget(parent, buttonIndex);
-        if (button != null && !button.isHidden()) {
-            Rectangle bounds = button.getBounds();
-            if (bounds.width > 0 && bounds.height > 0) {
-                // Check if button is actually visible in the viewport (not scrolled out of view)
-                if (isWidgetInViewport(button, parent)) {
-                    graphics.setColor(color);
-                    graphics.setStroke(new BasicStroke(3));
-                    graphics.drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
-                }
-            }
+        
+        if (isButtonHighlightable(button, parent)) {
+            drawButtonHighlight(graphics, button, color);
         }
+    }
+
+    private int getButtonIndex(ShoalDepth current, ShoalDepth required, int upIndex, int downIndex) {
+        return required.ordinal() < current.ordinal() ? upIndex : downIndex;
+    }
+
+    private boolean isButtonHighlightable(Widget button, Widget parent) {
+        return button != null && 
+               !button.isHidden() && 
+               hasValidBounds(button) && 
+               isWidgetInViewport(button, parent);
+    }
+
+    private boolean hasValidBounds(Widget button) {
+        Rectangle bounds = button.getBounds();
+        return bounds.width > 0 && bounds.height > 0;
+    }
+
+    private void drawButtonHighlight(Graphics2D graphics, Widget button, Color color) {
+        Rectangle bounds = button.getBounds();
+        graphics.setColor(color);
+        graphics.setStroke(new BasicStroke(3));
+        graphics.drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
     }
 
 
 
-    /**
-     * Safely access widget children
-     */
     private Widget getNetWidget(Widget parent, int index) {
         Widget parentWidget = parent.getChild(index);
         if (parentWidget == null) {
@@ -306,53 +328,39 @@ public class NetDepthButtonHighlighter extends Overlay
         }
 
         Rectangle bounds = parentWidget.getBounds();
-
-        // Parent widgets have invalid bounds, get their children
         if (bounds.x == -1 && bounds.y == -1) {
-            Widget[] children = parentWidget.getChildren();
-            if (children != null) {
-                for (Widget child : children) {
-                    if (child != null) {
-                        Rectangle childBounds = child.getBounds();
-                        if (childBounds.x != -1 && childBounds.y != -1) {
-                            return child;
-                        }
-                    }
+            return findChildWithValidBounds(parentWidget);
+        }
+        
+        return parentWidget;
+    }
+
+    private Widget findChildWithValidBounds(Widget parentWidget) {
+        Widget[] children = parentWidget.getChildren();
+        if (children != null) {
+            for (Widget child : children) {
+                if (child != null && hasValidBounds(child)) {
+                    return child;
                 }
             }
-        } else {
-            return parentWidget;
         }
-
         return null;
     }
 
-    /**
-     * Check if widget is visible in viewport
-     */
     private boolean isWidgetInViewport(Widget widget, Widget scrollContainer) {
         if (widget == null || scrollContainer == null) {
             return false;
         }
         
         Rectangle widgetBounds = widget.getBounds();
-        
-        // Find the actual scroll viewport by looking for the parent with scroll properties
-        Widget scrollViewport = scrollContainer;
-        while (scrollViewport != null && scrollViewport.getScrollHeight() == 0) {
-            scrollViewport = scrollViewport.getParent();
-        }
+        Widget scrollViewport = findScrollViewport(scrollContainer);
         
         if (scrollViewport == null) {
-            // No scroll container found, use the original container
             Rectangle containerBounds = scrollContainer.getBounds();
             return containerBounds.contains(widgetBounds);
         }
         
-        // Get the visible viewport bounds (accounting for scroll position)
         Rectangle viewportBounds = scrollViewport.getBounds();
-        
-        // Adjust the viewport to account for scroll position
         Rectangle visibleArea = new Rectangle(
             viewportBounds.x,
             viewportBounds.y,
@@ -360,7 +368,14 @@ public class NetDepthButtonHighlighter extends Overlay
             viewportBounds.height
         );
         
-        // Check if the widget is fully visible within the scrolled viewport
         return visibleArea.contains(widgetBounds);
+    }
+
+    private Widget findScrollViewport(Widget scrollContainer) {
+        Widget scrollViewport = scrollContainer;
+        while (scrollViewport != null && scrollViewport.getScrollHeight() == 0) {
+            scrollViewport = scrollViewport.getParent();
+        }
+        return scrollViewport;
     }
 }

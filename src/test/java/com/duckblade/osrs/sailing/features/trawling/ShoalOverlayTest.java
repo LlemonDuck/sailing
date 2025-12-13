@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.awt.*;
+import java.awt.Color;
 import java.lang.reflect.Method;
 
 import static org.junit.Assert.assertEquals;

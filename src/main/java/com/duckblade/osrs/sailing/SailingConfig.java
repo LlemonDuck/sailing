@@ -405,7 +405,7 @@ public interface SailingConfig extends Config
 		name = "Show Fish Caught",
 		description = "Display the number of each fish caught in the session.",
 		section = SECTION_TRAWLING,
-		position = 3
+		position = 4
 	)
 	default boolean trawlingShowFishCaught()
 	{
@@ -417,7 +417,7 @@ public interface SailingConfig extends Config
 		name = "Show Net Depth Timer",
 		description = "Display an overlay showing ticks until net depth change.",
 		section = SECTION_TRAWLING,
-		position = 4
+		position = 5
 	)
 	default boolean trawlingShowNetDepthTimer()
 	{
@@ -429,7 +429,7 @@ public interface SailingConfig extends Config
 		name = "Show Shoal Routes",
 		description = "Display the known routes for shoals.",
 		section = SECTION_TRAWLING,
-		position = 5
+		position = 6
 	)
 	default boolean trawlingShowShoalPaths()
 	{
@@ -441,7 +441,7 @@ public interface SailingConfig extends Config
 		name = "Hardcoded Route Colour",
 		description = "Colour for displaying hardcoded shoal routes.",
 		section = SECTION_TRAWLING,
-		position = 10
+		position = 7
 	)
 	@Alpha
 	default Color trawlingShoalPathColour()
@@ -450,13 +450,13 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "trawlingButtonsDummy",
-		name = "Highlight Buttons (Under Development)",
-		description = "This feature is still under development and will be released soon.",
+		keyName = "highlightNetButtons",
+		name = "Highlight Net Buttons ",
+		description = "Highlight the net button to move to the correct shoal depth.",
 		section = SECTION_TRAWLING,
-		position = -999
+		position = 8
 	)
-	default boolean trawlingButtonsDummy()
+	default boolean highlightNetButtons()
 	{
 		return true;
 	}
