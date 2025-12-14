@@ -61,8 +61,6 @@ public class ShoalOverlay extends Overlay
         log.debug("ShoalOverlay shutting down");
     }
 
-
-
     @Override
     public Dimension render(Graphics2D graphics) {
         if (!config.trawlingHighlightShoals()) {
@@ -161,10 +159,6 @@ public class ShoalOverlay extends Overlay
         }
         return config.trawlingShoalHighlightColour();
     }
-
-
-
-
 
     /**
      * Check if the shoal is a special type (VIBRANT, GLISTENING, SHIMMERING)
