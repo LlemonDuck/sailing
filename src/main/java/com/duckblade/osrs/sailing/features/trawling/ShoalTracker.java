@@ -70,7 +70,6 @@ public class ShoalTracker implements PluginLifecycleComponent {
 	private final Notifier notifier;
 	private final SailingConfig config;
 	private final BoatTracker boatTracker;
-    private NPC currentShoalNpc;
 
     /**
      * -- GETTER --
@@ -110,6 +109,13 @@ public class ShoalTracker implements PluginLifecycleComponent {
      */
     @Getter
     private ShoalDepth currentShoalDepth = ShoalDepth.UNKNOWN;
+
+    /**
+     * -- GETTER --
+     *  Get the current shoal NPC (for rendering/highlighting)
+     */
+    @Getter
+    private NPC currentShoalNpc;
 
     /**
      * Creates a new ShoalTracker with the specified client.

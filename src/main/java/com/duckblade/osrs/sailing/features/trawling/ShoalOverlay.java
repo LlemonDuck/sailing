@@ -1,10 +1,12 @@
 package com.duckblade.osrs.sailing.features.trawling;
 
 import com.duckblade.osrs.sailing.SailingConfig;
+import com.duckblade.osrs.sailing.model.ShoalDepth;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
+import net.runelite.api.NPC;
 import net.runelite.api.Perspective;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -67,15 +69,20 @@ public class ShoalOverlay extends Overlay
             return null;
         }
 
-        Set<GameObject> shoals = shoalTracker.getShoalObjects();
-        if (shoals.isEmpty()) {
+        // Use NPC for highlighting instead of GameObjects for more reliable rendering
+        NPC shoalNpc = shoalTracker.getCurrentShoalNpc();
+        if (shoalNpc != null) {
+            renderShoalNpcHighlight(graphics, shoalNpc);
             return null;
         }
 
-        // Only highlight one shoal at a time - choose the first available shoal
-        GameObject shoalToHighlight = selectShoalToHighlight(shoals);
-        if (shoalToHighlight != null) {
-            renderShoalHighlight(graphics, shoalToHighlight);
+        // Fallback to GameObject highlighting if NPC is not available
+        Set<GameObject> shoals = shoalTracker.getShoalObjects();
+        if (!shoals.isEmpty()) {
+            GameObject shoalToHighlight = selectShoalToHighlight(shoals);
+            if (shoalToHighlight != null) {
+                renderShoalHighlight(graphics, shoalToHighlight);
+            }
         }
 
         return null;
@@ -110,6 +117,18 @@ public class ShoalOverlay extends Overlay
         return firstSpecialShoal != null ? firstSpecialShoal : firstRegularShoal;
     }
 
+    private void renderShoalNpcHighlight(Graphics2D graphics, NPC shoalNpc) {
+        Polygon poly = Perspective.getCanvasTileAreaPoly(client, shoalNpc.getLocalLocation(), SHOAL_HIGHLIGHT_SIZE);
+        if (poly != null) {
+            // Use depth-based coloring for NPC highlighting
+            Color color = getShoalColorFromDepth();
+            Stroke originalStroke = graphics.getStroke();
+            graphics.setStroke(new BasicStroke(0.5f));
+            OverlayUtil.renderPolygon(graphics, poly, color);
+            graphics.setStroke(originalStroke);
+        }
+    }
+
     private void renderShoalHighlight(Graphics2D graphics, GameObject shoal) {
         Polygon poly = Perspective.getCanvasTileAreaPoly(client, shoal.getLocalLocation(), SHOAL_HIGHLIGHT_SIZE);
         if (poly != null) {
@@ -119,6 +138,21 @@ public class ShoalOverlay extends Overlay
             OverlayUtil.renderPolygon(graphics, poly, color);
             graphics.setStroke(originalStroke);
         }
+    }
+
+    private Color getShoalColorFromDepth() {
+        // Check if we have GameObjects to determine if it's a special shoal
+        Set<GameObject> shoals = shoalTracker.getShoalObjects();
+        for (GameObject shoal : shoals) {
+            if (isSpecialShoal(shoal.getId())) {
+                return Color.GREEN;
+            }
+        }
+        
+        // Could potentially use depth information for color coding in the future:
+        // ShoalDepth depth = shoalTracker.getCurrentShoalDepth();
+        // But for now, use config color for regular shoals
+        return config.trawlingShoalHighlightColour();
     }
 
     private Color getShoalColor(int objectId) {
