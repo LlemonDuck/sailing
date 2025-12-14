@@ -47,6 +47,8 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 	private static final int[] MISTY_SEA_STOP_INDICES = {0, 14, 28, 34, 52, 76, 105, 118, 125, 134};
 	private static final int[] ANGLERFISHS_LIGHT_STOP_INDICES = {0, 14, 33, 40, 52, 65, 74};
 	private static final int[] THE_ONYX_CREST_STOP_INDICES = {0, 18, 37, 53, 68, 91, 112, 124, 137, 141};
+	private static final int[] SEA_OF_SOULS_STOP_INDICES = {0, 15, 30, 35, 44, 73, 95, 113, 133, 138, 147, 177};
+	private static final int[] THE_CROWN_JEWEL_STOP_INDICES = {0, 18, 37, 58, 90, 116, 125, 144, 171, 207, 220};
 
 	// Color for stop point overlays (red)
 	private static final Color STOP_POINT_COLOR = Color.RED;
@@ -156,6 +158,16 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 		else if (TrawlingData.FishingAreas.THE_ONYX_CREST.contains(playerLocation)) {
 			renderPath(graphics, ShoalPaths.HADDOCK_THE_ONYX_CREST, pathColor);
 			renderStopPoints(graphics, ShoalPaths.HADDOCK_THE_ONYX_CREST, THE_ONYX_CREST_STOP_INDICES);
+		}
+
+		else if (TrawlingData.FishingAreas.SEA_OF_SOULS.contains(playerLocation)) {
+			renderPath(graphics, ShoalPaths.YELLOWFIN_SEA_OF_SOULS, pathColor);
+			renderStopPoints(graphics, ShoalPaths.YELLOWFIN_SEA_OF_SOULS, SEA_OF_SOULS_STOP_INDICES);
+		}
+
+		else if (TrawlingData.FishingAreas.THE_CROWN_JEWEL.contains(playerLocation)) {
+			renderPath(graphics, ShoalPaths.YELLOWFIN_THE_CROWN_JEWEL, pathColor);
+			renderStopPoints(graphics, ShoalPaths.YELLOWFIN_THE_CROWN_JEWEL, THE_CROWN_JEWEL_STOP_INDICES);
 		}
 
 		return null;

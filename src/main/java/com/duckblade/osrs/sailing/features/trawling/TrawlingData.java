@@ -43,7 +43,9 @@ public class TrawlingData {
         
         // Yellowfin areas (100 tick duration) - TWO_DEPTH
         protected static final ShoalFishingArea DEEPFIN_POINT = new ShoalFishingArea(1633, 1819, 2533, 2731, ShoalStopDuration.YELLOWFIN);
-        
+        protected static final ShoalFishingArea SEA_OF_SOULS = new ShoalFishingArea(2173, 2364, 2585, 2763, ShoalStopDuration.YELLOWFIN);
+        protected static final ShoalFishingArea THE_CROWN_JEWEL = new ShoalFishingArea(1740, 2024, 2665, 2880, ShoalStopDuration.YELLOWFIN);
+
         // Bluefin areas (66 tick duration) - THREE_DEPTH
         protected static final ShoalFishingArea RAINBOW_REEF = new ShoalFishingArea(2099, 2386, 2211, 2401, ShoalStopDuration.BLUEFIN);
         protected static final ShoalFishingArea BUCCANEERS_HAVEN = new ShoalFishingArea(1962, 2274, 3590, 3792, ShoalStopDuration.BLUEFIN);
@@ -85,6 +87,8 @@ public class TrawlingData {
             PORT_ROBERTS,
             SOUTHERN_EXPANSE,
             DEEPFIN_POINT,
+            SEA_OF_SOULS,
+            THE_CROWN_JEWEL,
             RAINBOW_REEF,
             BUCCANEERS_HAVEN,
             WEISSMERE,
