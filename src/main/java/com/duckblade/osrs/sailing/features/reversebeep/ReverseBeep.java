@@ -73,11 +73,12 @@ public class ReverseBeep implements PluginLifecycleComponent
 
     @Subscribe
     public void onGameStateChanged(GameStateChanged e) {
-        if (e.getGameState() == GameState.HOPPING
+        if ((e.getGameState() == GameState.HOPPING
                 || e.getGameState() == GameState.CONNECTION_LOST
                 || e.getGameState() == GameState.LOGIN_SCREEN
                 || e.getGameState() == GameState.LOGIN_SCREEN_AUTHENTICATOR
                 || e.getGameState() == GameState.UNKNOWN)
+                && beepTask != null)
         {
             beepTask.cancel(false);
             beepTask = null;
