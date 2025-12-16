@@ -7,13 +7,13 @@ import com.google.common.math.IntMath;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
+import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.BasicStroke;
@@ -26,35 +26,16 @@ import java.awt.Stroke;
 @Singleton
 public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponent {
 
-	@Nonnull
 	private final Client client;
 	private final SailingConfig config;
 
 	public static final int MAX_SPLITTABLE_DISTANCE = 10;
 
-	// Stop points that mark fishing spots on a given route
-	private static final int[] PORT_ROBERTS_STOP_INDICES = {0, 35, 55, 75, 98, 124, 144, 171, 188};
-	private static final int[] SOUTHERN_EXPANSE_STOP_INDICES = {0, 23, 46, 80, 128, 145, 176, 201, 229, 241};
-	private static final int[] DEEPFIN_POINT_STOP_INDICES = {0, 34, 52, 70, 79, 98, 122, 158};
-	private static final int[] RAINBOW_REEF_STOP_INDICES = {0, 13, 45, 75, 93, 119, 136, 160, 169, 192};
-	private static final int[] BUCCANEERS_HAVEN_STOP_INDICES = {0, 17, 27, 59, 79, 93, 111, 126, 145, 153, 173, 191};
-	private static final int[] WEISSMERE_STOP_INDICES = {0, 10, 40, 57, 65, 67, 118, 129};
-	private static final int[] BRITTLE_ISLE_STOP_INDICES = {0, 13, 29, 58, 80, 103, 134, 165, 200};
-	private static final int[] SIMIAN_SEA_STOP_INDICES = {0, 12, 22, 26, 32, 37, 42};
-	private static final int[] TURTLE_BELT_STOP_INDICES = {0, 11, 17, 23, 37, 44, 50, 73};
-	private static final int[] GREAT_SOUND_STOP_INDICES = {0, 10, 19, 29, 43, 48, 53};
-	private static final int[] SUNSET_BAY_STOP_INDICES = {0, 17, 29, 36, 46, 64, 73};
-	private static final int[] MISTY_SEA_STOP_INDICES = {0, 14, 28, 34, 52, 76, 105, 118, 125, 134};
-	private static final int[] ANGLERFISHS_LIGHT_STOP_INDICES = {0, 14, 33, 40, 52, 65, 74};
-	private static final int[] THE_ONYX_CREST_STOP_INDICES = {0, 18, 37, 53, 68, 91, 112, 124, 137, 141};
-	private static final int[] SEA_OF_SOULS_STOP_INDICES = {0, 15, 30, 35, 44, 73, 95, 113, 133, 138, 147, 177};
-	private static final int[] THE_CROWN_JEWEL_STOP_INDICES = {0, 18, 37, 58, 90, 116, 125, 144, 171, 207, 220};
-
 	// Color for stop point overlays (red)
 	private static final Color STOP_POINT_COLOR = Color.RED;
 
 	@Inject
-	public ShoalPathOverlay(@Nonnull Client client, SailingConfig config) {
+	public ShoalPathOverlay(Client client, SailingConfig config) {
 		this.client = client;
 		this.config = config;
 		setPosition(OverlayPosition.DYNAMIC);
@@ -79,95 +60,21 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 
 	@Override
 	public Dimension render(Graphics2D graphics) {
-		// Only render paths if player is sailing
 		if (!SailingUtil.isSailing(client)) {
 			return null;
 		}
-		
-		// Get top-level world coordinates (actual world position, not boat instance position)
+
 		WorldPoint playerLocation = SailingUtil.getTopLevelWorldPoint(client);
-		// log.debug("ShoalPathOverlay rendering at player location: {}", playerLocation);
 
-        Color pathColor = config.trawlingShoalPathColour();
+		Color pathColor = config.trawlingShoalPathColour();
 
-		if (TrawlingData.FishingAreas.PORT_ROBERTS.contains(playerLocation)) {
-			renderPath(graphics, ShoalPaths.HALIBUT_PORT_ROBERTS, pathColor);
-			renderStopPoints(graphics, ShoalPaths.HALIBUT_PORT_ROBERTS, PORT_ROBERTS_STOP_INDICES);
-		}
+		for (final var area : ShoalFishingArea.AREAS) {
+			if (!area.contains(playerLocation)) {
+				continue;
+			}
 
-		else if (TrawlingData.FishingAreas.SOUTHERN_EXPANSE.contains(playerLocation)) {
-			renderPath(graphics, ShoalPaths.HALIBUT_SOUTHERN_EXPANSE, pathColor);
-			renderStopPoints(graphics, ShoalPaths.HALIBUT_SOUTHERN_EXPANSE, SOUTHERN_EXPANSE_STOP_INDICES);
-		}
-
-		else if (TrawlingData.FishingAreas.DEEPFIN_POINT.contains(playerLocation)) {
-			renderPath(graphics, ShoalPaths.YELLOWFIN_DEEPFIN_POINT, pathColor);
-			renderStopPoints(graphics, ShoalPaths.YELLOWFIN_DEEPFIN_POINT, DEEPFIN_POINT_STOP_INDICES);
-		}
-
-		else if (TrawlingData.FishingAreas.RAINBOW_REEF.contains(playerLocation)) {
-			renderPath(graphics, ShoalPaths.BLUEFIN_RAINBOW_REEF, pathColor);
-			renderStopPoints(graphics, ShoalPaths.BLUEFIN_RAINBOW_REEF, RAINBOW_REEF_STOP_INDICES);
-		}
-
-		else if (TrawlingData.FishingAreas.BUCCANEERS_HAVEN.contains(playerLocation)) {
-			renderPath(graphics, ShoalPaths.BLUEFIN_BUCCANEERS_HAVEN, pathColor);
-			renderStopPoints(graphics, ShoalPaths.BLUEFIN_BUCCANEERS_HAVEN, BUCCANEERS_HAVEN_STOP_INDICES);
-		}
-
-		else if (TrawlingData.FishingAreas.WEISSMERE.contains(playerLocation)) {
-			renderPath(graphics, ShoalPaths.MARLIN_WEISSMERE, pathColor);
-			renderStopPoints(graphics, ShoalPaths.MARLIN_WEISSMERE, WEISSMERE_STOP_INDICES);
-		}
-
-		else if (TrawlingData.FishingAreas.BRITTLE_ISLE.contains(playerLocation)) {
-			renderPath(graphics, ShoalPaths.MARLIN_BRITTLE_ISLE, pathColor);
-			renderStopPoints(graphics, ShoalPaths.MARLIN_BRITTLE_ISLE, BRITTLE_ISLE_STOP_INDICES);
-		}
-
-		else if (TrawlingData.FishingAreas.SIMIAN_SEA.contains(playerLocation)) {
-			renderPath(graphics, ShoalPaths.GIANT_KRILL_SIMIAN_SEA, pathColor);
-			renderStopPoints(graphics, ShoalPaths.GIANT_KRILL_SIMIAN_SEA, SIMIAN_SEA_STOP_INDICES);
-		}
-
-		else if (TrawlingData.FishingAreas.TURTLE_BELT.contains(playerLocation)) {
-			renderPath(graphics, ShoalPaths.GIANT_KRILL_TURTLE_BELT, pathColor);
-			renderStopPoints(graphics, ShoalPaths.GIANT_KRILL_TURTLE_BELT, TURTLE_BELT_STOP_INDICES);
-		}
-
-		else if (TrawlingData.FishingAreas.GREAT_SOUND.contains(playerLocation)) {
-			renderPath(graphics, ShoalPaths.GIANT_KRILL_GREAT_SOUND, pathColor);
-			renderStopPoints(graphics, ShoalPaths.GIANT_KRILL_GREAT_SOUND, GREAT_SOUND_STOP_INDICES);
-		}
-
-		else if (TrawlingData.FishingAreas.SUNSET_BAY.contains(playerLocation)) {
-			renderPath(graphics, ShoalPaths.GIANT_KRILL_SUNSET_BAY, pathColor);
-			renderStopPoints(graphics, ShoalPaths.GIANT_KRILL_SUNSET_BAY, SUNSET_BAY_STOP_INDICES);
-		}
-
-		else if (TrawlingData.FishingAreas.MISTY_SEA.contains(playerLocation)) {
-			renderPath(graphics, ShoalPaths.HADDOCK_MISTY_SEA, pathColor);
-			renderStopPoints(graphics, ShoalPaths.HADDOCK_MISTY_SEA, MISTY_SEA_STOP_INDICES);
-		}
-
-		else if (TrawlingData.FishingAreas.ANGLERFISHS_LIGHT.contains(playerLocation)) {
-			renderPath(graphics, ShoalPaths.HADDOCK_ANGLERFISHS_LIGHT, pathColor);
-			renderStopPoints(graphics, ShoalPaths.HADDOCK_ANGLERFISHS_LIGHT, ANGLERFISHS_LIGHT_STOP_INDICES);
-		}
-
-		else if (TrawlingData.FishingAreas.THE_ONYX_CREST.contains(playerLocation)) {
-			renderPath(graphics, ShoalPaths.HADDOCK_THE_ONYX_CREST, pathColor);
-			renderStopPoints(graphics, ShoalPaths.HADDOCK_THE_ONYX_CREST, THE_ONYX_CREST_STOP_INDICES);
-		}
-
-		else if (TrawlingData.FishingAreas.SEA_OF_SOULS.contains(playerLocation)) {
-			renderPath(graphics, ShoalPaths.YELLOWFIN_SEA_OF_SOULS, pathColor);
-			renderStopPoints(graphics, ShoalPaths.YELLOWFIN_SEA_OF_SOULS, SEA_OF_SOULS_STOP_INDICES);
-		}
-
-		else if (TrawlingData.FishingAreas.THE_CROWN_JEWEL.contains(playerLocation)) {
-			renderPath(graphics, ShoalPaths.YELLOWFIN_THE_CROWN_JEWEL, pathColor);
-			renderStopPoints(graphics, ShoalPaths.YELLOWFIN_THE_CROWN_JEWEL, THE_CROWN_JEWEL_STOP_INDICES);
+			renderPath(graphics, area.getPath(), pathColor);
+			renderStopPoints(graphics, area.getPath(), area.getStopIndices());
 		}
 
 		return null;
@@ -206,8 +113,8 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 			return;
 		}
 
-		net.runelite.api.Point canvasPoint1 = Perspective.localToCanvas(client, localPoint1, worldPoint1.getPlane());
-		net.runelite.api.Point canvasPoint2 = Perspective.localToCanvas(client, localPoint2, worldPoint1.getPlane());
+		Point canvasPoint1 = Perspective.localToCanvas(client, localPoint1, worldPoint1.getPlane());
+		Point canvasPoint2 = Perspective.localToCanvas(client, localPoint2, worldPoint1.getPlane());
 		if (canvasPoint1 == null || canvasPoint2 == null) {
 			renderSplitSegments(graphics, worldPoint1, worldPoint2, pathColor);
 			return;
@@ -271,7 +178,7 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 		}
 
 		// Convert to canvas point
-		net.runelite.api.Point canvasPoint = Perspective.localToCanvas(client, localPoint, centerPoint.getPlane());
+		Point canvasPoint = Perspective.localToCanvas(client, localPoint, centerPoint.getPlane());
 		if (canvasPoint == null) {
 			return;
 		}

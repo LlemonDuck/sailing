@@ -1550,10 +1550,10 @@ public class ShoalPaths {
 		new WorldPoint(1574, 3338, 0),
 	};
 
-	// Yellowfin Shoal - Deepfin Point
+	// Yellowfin Shoal - The Crown Jewel
 	// Traced: 2025-12-12
 	// 179 waypoints, 8 stop points (complete loop)
-	public static final WorldPoint[] YELLOWFIN_DEEPFIN_POINT = {
+	public static final WorldPoint[] YELLOWFIN_THE_CROWN_JEWEL = {
 		new WorldPoint(1746, 2589, 0), // STOP POINT
 		new WorldPoint(1726, 2589, 0),
 		new WorldPoint(1723, 2591, 0),
@@ -2430,7 +2430,7 @@ public class ShoalPaths {
 		new WorldPoint(2224, 2611, 0),
 	};
 
-	public static final WorldPoint[] YELLOWFIN_THE_CROWN_JEWEL = {
+	public static final WorldPoint[] YELLOWFIN_DEEPFIN_POINT = {
 		new WorldPoint(1977, 2675, 0), // STOP POINT
 		new WorldPoint(1947, 2675, 0),
 		new WorldPoint(1919, 2675, 0),
