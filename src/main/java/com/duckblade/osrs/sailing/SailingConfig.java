@@ -796,13 +796,13 @@ public interface SailingConfig extends Config
 	}
 
     @ConfigItem(
-            keyName = "cargoHoldCustomizeTextColour",
-            name = "Customize Item Count Text Colour",
+            keyName = "cargoHoldCustomiseTextColour",
+            name = "Customise Item Count Text Colour",
             description = "Use a custom text colour for the cargo hold item count.",
             section = SECTION_CARGO_HOLD_TRACKING,
             position = 2
     )
-    default boolean cargoHoldCustomizeTextColour()
+    default boolean cargoHoldCustomiseTextColour()
     {
         return false;
     }

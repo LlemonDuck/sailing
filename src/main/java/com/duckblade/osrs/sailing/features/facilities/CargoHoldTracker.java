@@ -135,7 +135,7 @@ public class CargoHoldTracker
 	{
 		// always on for tracking events, conditionally display
 		overlayEnabled = config.cargoHoldShowCounts();
-        useCustomTextColour = config.cargoHoldCustomizeTextColour();
+        useCustomTextColour = config.cargoHoldCustomiseTextColour();
         customTextColour = config.cargoHoldCustomTextColour();
 		return true;
 	}
