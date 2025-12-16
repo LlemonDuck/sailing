@@ -28,6 +28,7 @@ import com.duckblade.osrs.sailing.features.mes.DeprioSailsOffHelm;
 import com.duckblade.osrs.sailing.features.mes.HideStopNavigatingDuringTrials;
 import com.duckblade.osrs.sailing.features.mes.PrioritizeCargoHold;
 import com.duckblade.osrs.sailing.features.navigation.LightningCloudsOverlay;
+import com.duckblade.osrs.sailing.features.navigation.LowHPNotification;
 import com.duckblade.osrs.sailing.features.navigation.NavigationOverlay;
 import com.duckblade.osrs.sailing.features.navigation.RapidsOverlay;
 import com.duckblade.osrs.sailing.features.navigation.TrueTileIndicator;
@@ -40,7 +41,6 @@ import com.duckblade.osrs.sailing.features.oceanencounters.MysteriousGlow;
 import com.duckblade.osrs.sailing.features.oceanencounters.OceanMan;
 import com.duckblade.osrs.sailing.features.reversebeep.ReverseBeep;
 import com.duckblade.osrs.sailing.features.salvaging.SalvagingHighlight;
-import com.duckblade.osrs.sailing.features.shipcombat.LowHPNotification;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -88,6 +88,7 @@ public class SailingModule extends AbstractModule
 		LightningCloudsOverlay lightningCloudsOverlay,
 		LostCargoHighlighter lostCargoHighlighter,
 		LostShipment lostShipment,
+		LowHPNotification lowHPNotification,
 		LuffOverlay luffOverlay,
 		CrystalExtractorHighlight crystalExtractorHighlight,
 		MermaidTaskSolver mermaidTaskSolver,
@@ -104,8 +105,7 @@ public class SailingModule extends AbstractModule
 		SpeedBoostInfoBox speedBoostInfoBox,
 		NavigationOverlay navigationOverlay,
 		TrueTileIndicator trueTileIndicator,
-		WeatherTaskTracker weatherTaskTracker,
-		LowHPNotification lowHPNotification
+		WeatherTaskTracker weatherTaskTracker
 	)
 	{
 		var builder = ImmutableSet.<PluginLifecycleComponent>builder()
@@ -132,6 +132,7 @@ public class SailingModule extends AbstractModule
 			.add(lightningCloudsOverlay)
 			.add(lostCargoHighlighter)
 			.add(lostShipment)
+			.add(lowHPNotification)
 			.add(luffOverlay)
 			.add(crystalExtractorHighlight)
 			.add(mermaidTaskSolver)
@@ -148,8 +149,7 @@ public class SailingModule extends AbstractModule
 			.add(seaChartTaskIndex)
 			.add(speedBoostInfoBox)
 			.add(trueTileIndicator)
-			.add(weatherTaskTracker)
-			.add(lowHPNotification);
+			.add(weatherTaskTracker);
 
 		// features still in development
 		//noinspection StatementWithEmptyBody

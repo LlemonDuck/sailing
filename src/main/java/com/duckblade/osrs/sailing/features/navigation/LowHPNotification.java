@@ -1,4 +1,4 @@
-package com.duckblade.osrs.sailing.features.shipcombat;
+package com.duckblade.osrs.sailing.features.navigation;
 
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
