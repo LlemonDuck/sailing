@@ -1,7 +1,6 @@
 package com.duckblade.osrs.sailing.features.shipcombat;
 
 import com.duckblade.osrs.sailing.SailingConfig;
-import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import javax.inject.Inject;
@@ -11,23 +10,28 @@ import net.runelite.api.Client;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.Notifier;
+import net.runelite.client.config.Notification;
 import net.runelite.client.eventbus.Subscribe;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class LowHPNotification implements PluginLifecycleComponent
 {
-	private final SailingConfig config;
+
 	private final Client client;
-	private final BoatTracker boatTracker;
 	private final Notifier notifier;
+
+	private Notification notification;
+	private int threshold;
 
 	private boolean hasNotified = false;
 
 	@Override
 	public boolean isEnabled(SailingConfig config)
 	{
-		return config.notifyLowBoatHP().isEnabled();
+		notification = config.lowBoatHPNotification();
+		threshold = config.lowBoatHPThreshold();
+		return notification.isEnabled();
 	}
 
 	@Override
@@ -39,7 +43,7 @@ public class LowHPNotification implements PluginLifecycleComponent
 	@Subscribe
 	public void onGameTick(GameTick e)
 	{
-		if (!SailingUtil.isSailing(client) || boatTracker.getBoat() == null)
+		if (!SailingUtil.isSailing(client))
 		{
 			hasNotified = false;
 			return;
@@ -53,13 +57,11 @@ public class LowHPNotification implements PluginLifecycleComponent
 			return;
 		}
 
-		int threshold = config.lowBoatHPThreshold();
-
 		if (currentHP < threshold)
 		{
 			if (!hasNotified)
 			{
-				notifier.notify(config.notifyLowBoatHP(), "Your boat's hitpoints are low!");
+				notifier.notify(notification, "Your boat's hitpoints are low!");
 				hasNotified = true;
 			}
 		}

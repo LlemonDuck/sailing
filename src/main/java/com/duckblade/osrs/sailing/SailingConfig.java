@@ -104,14 +104,6 @@ public interface SailingConfig extends Config
 		closedByDefault = true
 	)
 	String SECTION_SILLY = "silly";
-  
-	@ConfigSection(
-		name = "Ship Combat",
-		description = "Settings for ship combat and health monitoring.",
-		position = 1200,
-		closedByDefault = true
-	)
-	String SECTION_SHIP_COMBAT = "shipCombat";
 
 	@ConfigItem(
 		keyName = "highlightRapids",
@@ -275,6 +267,31 @@ public interface SailingConfig extends Config
 	default boolean navigationOverlaySpeed()
 	{
 		return true;
+	}
+
+	@ConfigItem(
+		keyName = "lowBoatHPNotify",
+		name = "Notify on Low Boat HP",
+		description = "Notify when your boat's hitpoints drop below the threshold.",
+		section = SECTION_NAVIGATION,
+		position = 13
+	)
+	default Notification lowBoatHPNotification()
+	{
+		return Notification.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "lowBoatHPThreshold",
+		name = "Low HP Threshold",
+		description = "The hitpoint threshold at which to notify you.",
+		section = SECTION_NAVIGATION,
+		position = 14
+	)
+	@Range(min = 1)
+	default int lowBoatHPThreshold()
+	{
+		return 50;
 	}
 
 	@ConfigItem(
@@ -956,29 +973,5 @@ public interface SailingConfig extends Config
 	default int reverseBeepVolume()
 	{
 		return 25;
-	}
-  
-  @ConfigItem(
-		keyName = "notifyLowBoatHP",
-		name = "Notify on Low Boat HP",
-		description = "Notify when your boat's hitpoints drop below the threshold.",
-		section = SECTION_SHIP_COMBAT,
-		position = 1
-	)
-	default Notification notifyLowBoatHP()
-	{
-		return Notification.OFF;
-	}
-
-	@ConfigItem(
-		keyName = "lowBoatHPThreshold",
-		name = "Low HP Threshold",
-		description = "The hitpoint threshold at which to notify you. Notification will trigger when boat HP drops below this value.",
-		section = SECTION_SHIP_COMBAT,
-		position = 2
-	)
-	default int lowBoatHPThreshold()
-	{
-		return 50;
 	}
 }
