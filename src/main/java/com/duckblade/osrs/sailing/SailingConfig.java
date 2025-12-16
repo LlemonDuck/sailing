@@ -270,6 +270,31 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "lowBoatHPNotify",
+		name = "Notify on Low Boat HP",
+		description = "Notify when your boat's hitpoints drop below the threshold.",
+		section = SECTION_NAVIGATION,
+		position = 13
+	)
+	default Notification lowBoatHPNotification()
+	{
+		return Notification.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "lowBoatHPThreshold",
+		name = "Low HP Threshold",
+		description = "The hitpoint threshold at which to notify you.",
+		section = SECTION_NAVIGATION,
+		position = 14
+	)
+	@Range(min = 1)
+	default int lowBoatHPThreshold()
+	{
+		return 50;
+	}
+
+	@ConfigItem(
 		keyName = "highlightTrimmableSails",
 		name = "Highlight Trimmable Sails",
 		description = "Highlight sails when they require trimming.",

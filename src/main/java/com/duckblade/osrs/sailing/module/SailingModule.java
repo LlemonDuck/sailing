@@ -28,6 +28,7 @@ import com.duckblade.osrs.sailing.features.mes.DeprioSailsOffHelm;
 import com.duckblade.osrs.sailing.features.mes.HideStopNavigatingDuringTrials;
 import com.duckblade.osrs.sailing.features.mes.PrioritizeCargoHold;
 import com.duckblade.osrs.sailing.features.navigation.LightningCloudsOverlay;
+import com.duckblade.osrs.sailing.features.navigation.LowHPNotification;
 import com.duckblade.osrs.sailing.features.navigation.NavigationOverlay;
 import com.duckblade.osrs.sailing.features.navigation.RapidsOverlay;
 import com.duckblade.osrs.sailing.features.navigation.TrueTileIndicator;
@@ -87,6 +88,7 @@ public class SailingModule extends AbstractModule
 		LightningCloudsOverlay lightningCloudsOverlay,
 		LostCargoHighlighter lostCargoHighlighter,
 		LostShipment lostShipment,
+		LowHPNotification lowHPNotification,
 		LuffOverlay luffOverlay,
 		CrystalExtractorHighlight crystalExtractorHighlight,
 		MermaidTaskSolver mermaidTaskSolver,
@@ -130,6 +132,7 @@ public class SailingModule extends AbstractModule
 			.add(lightningCloudsOverlay)
 			.add(lostCargoHighlighter)
 			.add(lostShipment)
+			.add(lowHPNotification)
 			.add(luffOverlay)
 			.add(crystalExtractorHighlight)
 			.add(mermaidTaskSolver)
