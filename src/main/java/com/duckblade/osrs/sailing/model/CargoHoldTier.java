@@ -117,10 +117,10 @@ public enum CargoHoldTier
 			ObjectID.SAILING_BOAT_CARGO_HOLD_ROSEWOOD_LARGE_OPEN,
 		},
 		new int[]{
-			-1,
-			-1,
-			-1,
-			-1,
+			120,
+			180,
+			240,
+			10,
 		}
 	),
 	;

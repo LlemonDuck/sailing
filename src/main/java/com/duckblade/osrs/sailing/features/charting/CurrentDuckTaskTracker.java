@@ -11,7 +11,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -26,12 +25,13 @@ import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayLayer;
+import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CurrentDuckTaskTracker
 	extends Overlay
 	implements PluginLifecycleComponent
@@ -48,6 +48,20 @@ public class CurrentDuckTaskTracker
 
 	private BufferedImage sprite;
 	private SeaChartTask activeTask;
+
+	@Inject
+	public CurrentDuckTaskTracker(Client client, ChatMessageManager chatMessageManager, ItemManager itemManager, WorldMapPointManager worldMapPointManager, SeaChartTaskIndex taskIndex, BoatTracker boatTracker)
+	{
+		this.client = client;
+		this.chatMessageManager = chatMessageManager;
+		this.itemManager = itemManager;
+		this.worldMapPointManager = worldMapPointManager;
+		this.taskIndex = taskIndex;
+		this.boatTracker = boatTracker;
+
+		setPosition(OverlayPosition.DYNAMIC);
+		setLayer(OverlayLayer.ABOVE_SCENE);
+	}
 
 	@Override
 	public boolean isEnabled(SailingConfig config)

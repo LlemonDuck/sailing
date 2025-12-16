@@ -14,11 +14,13 @@ import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
+import net.runelite.api.GameState;
 import net.runelite.api.NPC;
 import net.runelite.api.Perspective;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.events.WorldViewUnloaded;
@@ -197,6 +199,17 @@ public class SeaChartOverlay
 		if (e.getWorldView().isTopLevel())
 		{
 			chartObjects.clear();
+		}
+	}
+
+	@Subscribe
+	public void onGameStateChanged(GameStateChanged e)
+	{
+		if (e.getGameState() != GameState.LOADING &&
+			e.getGameState() != GameState.LOGGED_IN &&
+			e.getGameState() != GameState.CONNECTION_LOST)
+		{
+			chartNpcs.clear();
 		}
 	}
 

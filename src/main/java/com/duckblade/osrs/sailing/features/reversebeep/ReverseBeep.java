@@ -2,6 +2,7 @@ package com.duckblade.osrs.sailing.features.reversebeep;
 
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
+import java.util.EnumSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -9,10 +10,14 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
+import net.runelite.api.GameState;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.audio.AudioPlayer;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 
 @Slf4j
@@ -21,8 +26,16 @@ import net.runelite.client.eventbus.Subscribe;
 public class ReverseBeep implements PluginLifecycleComponent
 {
 
+	private static final EnumSet<GameState> CLEAR_GAME_STATES = EnumSet.of(
+		GameState.HOPPING,
+		GameState.CONNECTION_LOST,
+		GameState.LOGIN_SCREEN
+	);
+
 	private static final int VARB_VALUE_REVERSING = 3;
 
+	private final Client client;
+	private final ClientThread clientThread;
 	private final AudioPlayer audioPlayer;
 
 	private boolean reversing;
@@ -42,7 +55,7 @@ public class ReverseBeep implements PluginLifecycleComponent
 	@Override
 	public void startUp()
 	{
-		reversing = false;
+		clientThread.invoke(() -> reversing = client.getVarbitValue(VarbitID.SAILING_SIDEPANEL_BOAT_MOVE_MODE) == VARB_VALUE_REVERSING);
 		es = Executors.newScheduledThreadPool(1);
 	}
 
@@ -51,6 +64,17 @@ public class ReverseBeep implements PluginLifecycleComponent
 	{
 		es.shutdown();
 		beepTask = null;
+	}
+
+	@Subscribe
+	public void onGameStateChanged(GameStateChanged e)
+	{
+		if (beepTask != null &&
+			CLEAR_GAME_STATES.contains(e.getGameState()))
+		{
+			beepTask.cancel(false);
+			beepTask = null;
+		}
 	}
 
 	@Subscribe

@@ -289,12 +289,31 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
+	enum SailHighlightMode
+	{
+		AREA,
+		SAIL,
+		;
+	}
+
+	@ConfigItem(
+		keyName = "sailHighlightMode",
+		name = "Highlight Sails Mode",
+		description = "How to highlight trimmable sails. Area highlights the full clickable area, Sail highlights the sail outline.",
+		section = SECTION_FACILITIES,
+		position = 2
+	)
+	default SailHighlightMode sailHighlightMode()
+	{
+		return SailHighlightMode.AREA;
+	}
+
 	@ConfigItem(
 		keyName = "showSpeedBoostInfoBox",
 		name = "Show Speed Boost InfoBox",
 		description = "Show an InfoBox with the duration of your active speed boost.",
 		section = SECTION_FACILITIES,
-		position = 2
+		position = 3
 	)
 	default boolean showSpeedBoostInfoBox()
 	{
@@ -306,7 +325,7 @@ public interface SailingConfig extends Config
 		name = "Highlight Harvestable Extractor",
 		description = "Highlight the activated crystal extractor when it has a mote available.",
 		section = SECTION_FACILITIES,
-		position = 3
+		position = 4
 	)
 	default boolean highlightCrystalExtractorHarvestable()
 	{
@@ -318,7 +337,7 @@ public interface SailingConfig extends Config
 		name = "Harvestable Colour",
 		description = "Colour to highlight the crystal extractor while animating.",
 		section = SECTION_FACILITIES,
-		position = 4
+		position = 5
 	)
 	@Alpha
 	default Color highlightCrystalExtractorHarvestableColour()
@@ -331,7 +350,7 @@ public interface SailingConfig extends Config
 		name = "Notify Harvestable Extractor",
 		description = "Notify you when the crystal extractor has a mote available.",
 		section = SECTION_FACILITIES,
-		position = 5
+		position = 6
 	)
 	default Notification notifyCrystalExtractorHarvestable()
 	{
@@ -343,7 +362,7 @@ public interface SailingConfig extends Config
 		name = "Highlight Deactivated Extractor Deactivated",
 		description = "Highlight the activated crystal extractor when it is animating.",
 		section = SECTION_FACILITIES,
-		position = 6
+		position = 7
 	)
 	default boolean highlightCrystalExtractorInactive()
 	{
@@ -355,7 +374,7 @@ public interface SailingConfig extends Config
 		name = "Deactivated Colour",
 		description = "Colour to highlight the crystal extractor when it is deactivated.",
 		section = SECTION_FACILITIES,
-		position = 7
+		position = 8
 	)
 	@Alpha
 	default Color highlightCrystalExtractorInactiveColour()
@@ -792,28 +811,41 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "cargoHoldDummy",
-		name = "Under Development",
-		description = "This feature is still under development and will be released soon.",
+		keyName = "cargoHoldShowCounts",
+		name = "Item Count",
+		description = "Shows total item counts over the cargo hold.",
 		section = SECTION_CARGO_HOLD_TRACKING,
-		position = -999
+		position = 1
 	)
-	default boolean cargoHoldDummy()
+	default boolean cargoHoldShowCounts()
 	{
 		return true;
 	}
 
 	@ConfigItem(
-		keyName = "cargoHoldShowCounts",
-		name = "Show Item Count",
-		description = "Shows total item counts over the cargo hold.",
+		keyName = "cargoHoldColourEmpty",
+		name = "Item Count Empty Colour",
+		description = "Colour to use for item count when the tracker is empty.<br>" +
+			"Set this to the same colour as 'Item Count Empty Colour' to have a constant colour.",
 		section = SECTION_CARGO_HOLD_TRACKING,
-		position = 1,
-		hidden = true // todo
+		position = 1
 	)
-	default boolean cargoHoldShowCounts()
+	default Color cargoHoldColourEmpty()
 	{
-		return true;
+		return Color.GREEN;
+	}
+
+	@ConfigItem(
+		keyName = "cargoHoldColourFull",
+		name = "Item Count Full Colour",
+		description = "Colour to use for item count when the tracker is full.<br>" +
+			"Set this to the same colour as 'Item Count Empty Colour' to have a constant colour.",
+		section = SECTION_CARGO_HOLD_TRACKING,
+		position = 1
+	)
+	default Color cargoHoldColourFull()
+	{
+		return Color.RED;
 	}
 
 	@ConfigItem(

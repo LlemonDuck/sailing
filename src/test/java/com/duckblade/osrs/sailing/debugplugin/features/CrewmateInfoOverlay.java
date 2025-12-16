@@ -2,8 +2,8 @@ package com.duckblade.osrs.sailing.debugplugin.features;
 
 import com.duckblade.osrs.sailing.debugplugin.SailingDebugConfig;
 import com.duckblade.osrs.sailing.debugplugin.module.DebugLifecycleComponent;
+import com.duckblade.osrs.sailing.features.util.CrewmateAssignment;
 import com.duckblade.osrs.sailing.features.util.CrewmateIndex;
-import com.duckblade.osrs.sailing.features.util.CrewAssignment;
 import com.duckblade.osrs.sailing.model.Crewmate;
 import com.google.common.collect.ImmutableMap;
 import java.awt.Color;
@@ -68,7 +68,7 @@ public class CrewmateInfoOverlay
 			if (crewmate != null)
 			{
 				int facilityIx = client.getVarbitValue(positionVarb);
-				CrewAssignment facility = CrewAssignment.fromCrewAssignmentVarb(facilityIx);
+				CrewmateAssignment facility = CrewmateAssignment.fromCrewAssignmentVarb(facilityIx);
 
 				if (facility != null)
 				{
