@@ -73,10 +73,11 @@ public class FishCaughtTracker implements PluginLifecycleComponent {
             return;
         }
 
-        if (message.equals("Trawler's trust: You catch an additional fish.")) {
-            addFish(message, 1, lastFishCaught, "Trawler's trust");
-            return;
-        }
+		// Seems to be bugged in-game or the message indicates the previous catch benefited from the keg
+//        if (message.equals("Trawler's trust: You catch an additional fish.")) {
+//            addFish(message, 1, lastFishCaught, "Trawler's trust");
+//            return;
+//        }
 
         Matcher matcher = CATCH_FISH_REGEX.matcher(message);
         if (!matcher.find()) {
