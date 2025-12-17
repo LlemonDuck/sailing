@@ -8,6 +8,8 @@ import com.duckblade.osrs.sailing.model.HullTier;
 import com.duckblade.osrs.sailing.model.SailTier;
 import com.duckblade.osrs.sailing.model.SalvagingHookTier;
 import com.duckblade.osrs.sailing.model.FishingNetTier;
+import com.duckblade.osrs.sailing.model.CannonTier;
+import com.duckblade.osrs.sailing.model.WindCatcherTier;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import java.util.HashMap;
 import java.util.Map;
@@ -104,6 +106,16 @@ public class BoatTracker
             boat.getFishingNets().add(o);
             log.trace("found fishing net {}={} for boat in wv {}", o.getId(), FishingNetTier.fromGameObjectId(o.getId()), boat.getWorldViewId());
         }
+        if (CannonTier.fromGameObjectId(o.getId()) != null)
+        {
+            boat.getCannons().add(o);
+            log.trace("found cannon {}={} for boat in wv {}", o.getId(), CannonTier.fromGameObjectId(o.getId()), boat.getWorldViewId());
+        }
+        if (WindCatcherTier.fromGameObjectId(o.getId()) != null)
+        {
+            boat.getWindCatchers().add(o);
+            log.trace("found wind catcher {}={} for boat in wv {}", o.getId(), WindCatcherTier.fromGameObjectId(o.getId()), boat.getWorldViewId());
+        }
 	}
 
 	@Subscribe
@@ -148,6 +160,14 @@ public class BoatTracker
 		if (boat.getFishingNets().remove(o))
 		{
 			log.trace("unsetting fishing net for boat in wv {}", boat.getWorldViewId());
+		}
+		if (boat.getCannons().remove(o))
+		{
+			log.trace("unsetting cannon for boat in wv {}", boat.getWorldViewId());
+		}
+		if (boat.getWindCatchers().remove(o))
+		{
+			log.trace("unsetting wind catcher for boat in wv {}", boat.getWorldViewId());
 		}
 	}
 

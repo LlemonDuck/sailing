@@ -6,6 +6,8 @@ import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.model.Boat;
 import com.duckblade.osrs.sailing.model.FishingNetTier;
 import com.duckblade.osrs.sailing.model.SalvagingHookTier;
+import com.duckblade.osrs.sailing.model.CannonTier;
+import com.duckblade.osrs.sailing.model.WindCatcherTier;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.util.stream.Collectors;
@@ -107,6 +109,26 @@ public class LocalBoatInfoOverlayPanel
 					.getNetTiers()
 					.stream()
 					.map(FishingNetTier::toString)
+					.collect(Collectors.joining(", ", "[", "]")))
+				.build());
+
+		getPanelComponent().getChildren()
+			.add(LineComponent.builder()
+				.left("Cannons")
+				.right(boat
+					.getCannonTiers()
+					.stream()
+					.map(CannonTier::toString)
+					.collect(Collectors.joining(", ", "[", "]")))
+				.build());
+
+		getPanelComponent().getChildren()
+			.add(LineComponent.builder()
+				.left("WindCatchers")
+				.right(boat
+					.getWindCatcherTiers()
+					.stream()
+					.map(WindCatcherTier::toString)
 					.collect(Collectors.joining(", ", "[", "]")))
 				.build());
 

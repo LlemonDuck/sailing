@@ -30,6 +30,8 @@ public class Boat
 	@Setter(AccessLevel.NONE)
 	Set<GameObject> salvagingHooks = new HashSet<>();
     Set<GameObject> fishingNets = new HashSet<>();
+    Set<GameObject> cannons = new HashSet<>();
+    Set<GameObject> windCatchers = new HashSet<>();
 
 	// these are intentionally not cached in case the object is transformed without respawning
 	// e.g. helms have a different idle vs in-use id
@@ -64,6 +66,22 @@ public class Boat
                 .collect(Collectors.toList());
     }
 
+	public List<CannonTier> getCannonTiers()
+	{
+		return cannons.stream()
+			.mapToInt(GameObject::getId)
+			.mapToObj(CannonTier::fromGameObjectId)
+			.collect(Collectors.toList());
+	}
+
+	public List<WindCatcherTier> getWindCatcherTiers()
+	{
+		return windCatchers.stream()
+			.mapToInt(GameObject::getId)
+			.mapToObj(WindCatcherTier::fromGameObjectId)
+			.collect(Collectors.toList());
+	}
+
 	public CargoHoldTier getCargoHoldTier()
 	{
 		return cargoHold != null ? CargoHoldTier.fromGameObjectId(cargoHold.getId()) : null;
@@ -89,6 +107,8 @@ public class Boat
 		facilities.add(cargoHold);
 		facilities.add(chumStation);
         facilities.addAll(fishingNets);
+        facilities.addAll(cannons);
+        facilities.addAll(windCatchers);
 		return facilities;
 	}
 
@@ -137,7 +157,7 @@ public class Boat
 	public String getDebugString()
 	{
 		return String.format(
-			"Id: %d, Hull: %s, Sail: %s, Helm: %s, Hook: %s, Cargo: %s, Chum: %s, Nets: %s",
+			"Id: %d, Hull: %s, Sail: %s, Helm: %s, Hook: %s, Cargo: %s, Chum: %s, Nets: %s, Cannons: %s, WindCatchers: %s",
 			worldViewId,
 			getHullTier(),
 			getSailTier(),
@@ -151,6 +171,14 @@ public class Boat
 			getNetTiers()
 				.stream()
 				.map(FishingNetTier::toString)
+				.collect(Collectors.joining(", ", "[", "]")),
+			getCannonTiers()
+				.stream()
+				.map(CannonTier::toString)
+				.collect(Collectors.joining(", ", "[", "]")),
+			getWindCatcherTiers()
+				.stream()
+				.map(WindCatcherTier::toString)
 				.collect(Collectors.joining(", ", "[", "]"))
 		);
 	}
