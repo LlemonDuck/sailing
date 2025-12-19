@@ -63,6 +63,7 @@ public class FacilitiesOverlay
 		renderFacility(graphics, Color.CYAN, "sail", boat.getSail(), boat.getSailTier());
 		renderFacility(graphics, Color.ORANGE, "helm", boat.getHelm(), boat.getHelmTier());
 		renderFacility(graphics, Color.GREEN, "cargo", boat.getCargoHold(), boat.getCargoHoldTier());
+		renderFacility(graphics, Color.MAGENTA, "windcatcher", boat.getWindCatcher(), boat.getWindCatcherTier());
 		for (GameObject hook : boat.getSalvagingHooks())
 		{
 			renderFacility(graphics, Color.RED, "hook", hook, SalvagingHookTier.fromGameObjectId(hook.getId()));
@@ -70,10 +71,6 @@ public class FacilitiesOverlay
 		for (GameObject cannon : boat.getCannons())
 		{
 			renderFacility(graphics, Color.YELLOW, "cannon", cannon, CannonTier.fromGameObjectId(cannon.getId()));
-		}
-		for (GameObject windCatcher : boat.getWindCatchers())
-		{
-			renderFacility(graphics, Color.MAGENTA, "windcatcher", windCatcher, WindCatcherTier.fromGameObjectId(windCatcher.getId()));
 		}
 
 		return null;
