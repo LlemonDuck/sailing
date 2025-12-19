@@ -10,9 +10,9 @@ import net.runelite.api.coords.WorldPoint;
 public enum ShoalFishingArea
 {
 	GREAT_SOUND(
-		new WorldArea(1536, 3317, 113, 95, 0),
+		new WorldArea(1546, 3327, 93, 75, 0),
 		ShoalPaths.GIANT_KRILL_GREAT_SOUND,
-		new int[]{0, 10, 19, 29, 43, 48, 53},
+		new int[]{0, 18, 25, 31, 38, 50, 59},
 		Shoal.GIANT_KRILL
 	),
 	SIMIAN_SEA(

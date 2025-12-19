@@ -1465,6 +1465,44 @@ public class ShoalPaths {
 	};
 
 	public static final WorldPoint[] GIANT_KRILL_GREAT_SOUND = {
+		new WorldPoint(1580, 3365, 0), // STOP POINT
+		new WorldPoint(1583, 3362, 0),
+		new WorldPoint(1589, 3350, 0),
+		new WorldPoint(1589, 3347, 0),
+		new WorldPoint(1591, 3345, 0),
+		new WorldPoint(1595, 3343, 0),
+		new WorldPoint(1597, 3341, 0),
+		new WorldPoint(1598, 3341, 0),
+		new WorldPoint(1601, 3340, 0),
+		new WorldPoint(1602, 3339, 0),
+		new WorldPoint(1605, 3338, 0),
+		new WorldPoint(1606, 3337, 0),
+		new WorldPoint(1612, 3337, 0),
+		new WorldPoint(1614, 3338, 0),
+		new WorldPoint(1621, 3345, 0),
+		new WorldPoint(1628, 3359, 0),
+		new WorldPoint(1628, 3361, 0),
+		new WorldPoint(1622, 3373, 0),
+		new WorldPoint(1616, 3379, 0), // STOP POINT
+		new WorldPoint(1613, 3382, 0),
+		new WorldPoint(1595, 3391, 0),
+		new WorldPoint(1587, 3391, 0),
+		new WorldPoint(1586, 3390, 0),
+		new WorldPoint(1582, 3388, 0),
+		new WorldPoint(1581, 3387, 0),
+		new WorldPoint(1580, 3387, 0), // STOP POINT
+		new WorldPoint(1578, 3386, 0),
+		new WorldPoint(1577, 3385, 0),
+		new WorldPoint(1575, 3384, 0),
+		new WorldPoint(1563, 3372, 0),
+		new WorldPoint(1561, 3368, 0),
+		new WorldPoint(1561, 3364, 0), // STOP POINT
+		new WorldPoint(1561, 3347, 0),
+		new WorldPoint(1563, 3343, 0),
+		new WorldPoint(1565, 3342, 0),
+		new WorldPoint(1567, 3340, 0),
+		new WorldPoint(1567, 3339, 0),
+		new WorldPoint(1569, 3338, 0),
 		new WorldPoint(1574, 3338, 0), // STOP POINT
 		new WorldPoint(1575, 3338, 0),
 		new WorldPoint(1589, 3345, 0),
@@ -1475,6 +1513,8 @@ public class ShoalPaths {
 		new WorldPoint(1588, 3357, 0),
 		new WorldPoint(1586, 3361, 0),
 		new WorldPoint(1586, 3367, 0),
+		new WorldPoint(1582, 3375, 0),
+		new WorldPoint(1581, 3376, 0),
 		new WorldPoint(1580, 3379, 0), // STOP POINT
 		new WorldPoint(1579, 3380, 0),
 		new WorldPoint(1577, 3381, 0),
@@ -1494,39 +1534,7 @@ public class ShoalPaths {
 		new WorldPoint(1560, 3380, 0),
 		new WorldPoint(1562, 3380, 0),
 		new WorldPoint(1568, 3377, 0),
-		new WorldPoint(1580, 3365, 0), // STOP POINT
-		new WorldPoint(1583, 3362, 0),
-		new WorldPoint(1589, 3350, 0),
-		new WorldPoint(1589, 3347, 0),
-		new WorldPoint(1591, 3345, 0),
-		new WorldPoint(1607, 3337, 0),
-		new WorldPoint(1612, 3337, 0),
-		new WorldPoint(1614, 3338, 0),
-		new WorldPoint(1620, 3344, 0),
-		new WorldPoint(1621, 3346, 0),
-		new WorldPoint(1622, 3347, 0),
-		new WorldPoint(1628, 3359, 0),
-		new WorldPoint(1628, 3361, 0),
-		new WorldPoint(1622, 3373, 0),
-		new WorldPoint(1616, 3379, 0), // STOP POINT
-		new WorldPoint(1613, 3382, 0),
-		new WorldPoint(1595, 3391, 0),
-		new WorldPoint(1587, 3391, 0),
-		new WorldPoint(1586, 3390, 0),
-		new WorldPoint(1580, 3387, 0), // STOP POINT
-		new WorldPoint(1576, 3385, 0),
-		new WorldPoint(1563, 3372, 0),
-		new WorldPoint(1562, 3370, 0),
-		new WorldPoint(1561, 3367, 0),
-		new WorldPoint(1561, 3364, 0), // STOP POINT
-		new WorldPoint(1561, 3347, 0),
-		new WorldPoint(1562, 3345, 0),
-		new WorldPoint(1565, 3342, 0),
-		new WorldPoint(1566, 3340, 0),
-		new WorldPoint(1567, 3340, 0),
-		new WorldPoint(1567, 3339, 0),
-		new WorldPoint(1569, 3338, 0),
-		new WorldPoint(1574, 3338, 0),
+		new WorldPoint(1580, 3365, 0),
 	};
 
 	public static final WorldPoint[] YELLOWFIN_THE_CROWN_JEWEL = {
