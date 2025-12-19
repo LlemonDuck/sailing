@@ -71,11 +71,11 @@ public enum ShoalFishingArea
 		new int[]{0, 34, 52, 70, 79, 98, 122, 158},
 		Shoal.YELLOWFIN
 	),
-
+	// 
 	PORT_ROBERTS(
 		new WorldArea(1821, 3120, 212, 301, 0),
 		ShoalPaths.HALIBUT_PORT_ROBERTS,
-		new int[]{0, 35, 54, 74, 97, 123, 143, 170, 187},
+		new int[]{0, 35, 55, 75, 98, 124, 144, 171, 188},
 		Shoal.HALIBUT
 	),
 	SOUTHERN_EXPANSE(
@@ -101,7 +101,7 @@ public enum ShoalFishingArea
 	WEISSMERE(
 		new WorldArea(2590, 3945, 281, 202, 0),
 		ShoalPaths.MARLIN_WEISSMERE,
-		new int[]{0, 1, 54, 61, 75, 84, 108, 123},
+		new int[]{0, 10, 40, 57, 65, 67, 118, 129},
 		Shoal.MARLIN
 	),
 	BRITTLE_ISLE(

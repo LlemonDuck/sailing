@@ -465,7 +465,7 @@ public interface SailingConfig extends Config
 	)
 	default boolean trawlingShowNetDepthTimer()
 	{
-		return true;
+		return false;
 	}
 
 	@ConfigItem(
@@ -477,7 +477,7 @@ public interface SailingConfig extends Config
 	)
 	default boolean trawlingShowShoalPaths()
 	{
-		return false;
+		return true;
 	}
 
 	@ConfigItem(
@@ -507,12 +507,24 @@ public interface SailingConfig extends Config
 
 	@ConfigItem(
 		keyName = "notifyDepthChange",
-		name = "Notify Depth Change",
-		description = "Notify you when the depth of the shoal changes.",
+		name = "Notify Shoal Depth Changed",
+		description = "Notify you when the shoal changes depth.",
 		section = SECTION_TRAWLING,
 		position = 9
 	)
 	default Notification notifyDepthChange()
+	{
+		return Notification.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "notifyShoalMove",
+		name = "Notify Shoal Move",
+		description = "Notify you when the shoal moves.",
+		section = SECTION_TRAWLING,
+		position = 10
+	)
+	default Notification notifyShoalMove()
 	{
 		return Notification.OFF;
 	}

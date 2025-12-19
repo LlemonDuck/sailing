@@ -173,6 +173,10 @@ public class BoatTracker
 
 	public Boat getBoat()
 	{
+		if (client.getLocalPlayer() == null)
+		{
+			return null;
+		}
 		return getBoat(client.getLocalPlayer().getWorldView().getId());
 	}
 

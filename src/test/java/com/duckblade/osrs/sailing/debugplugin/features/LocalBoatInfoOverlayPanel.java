@@ -126,8 +126,6 @@ public class LocalBoatInfoOverlayPanel
 			.add(LineComponent.builder()
 				.left("WindCatcher")
 				.right(String.valueOf(boat.getWindCatcherTier()))
-					.collect(Collectors.joining(", ", "[", "]"))
-				)
 				.build());
 
 		return super.render(graphics);

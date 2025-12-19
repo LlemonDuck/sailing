@@ -34,7 +34,6 @@ import com.duckblade.osrs.sailing.features.oceanencounters.GiantClam;
 import com.duckblade.osrs.sailing.features.oceanencounters.LostShipment;
 import com.duckblade.osrs.sailing.features.oceanencounters.MysteriousGlow;
 import com.duckblade.osrs.sailing.features.oceanencounters.OceanMan;
-import com.duckblade.osrs.sailing.features.reversebeep.ReverseBeep;
 import com.duckblade.osrs.sailing.features.salvaging.SalvagingHighlight;
 import com.duckblade.osrs.sailing.features.trawling.FishCaughtTracker;
 import com.duckblade.osrs.sailing.features.trawling.NetDepthButtonHighlighter;
@@ -87,8 +86,7 @@ public class SailingModule extends AbstractModule
 		CrystalExtractorHighlight crystalExtractorHighlight,
 		CurrentDuckTaskTracker currentDuckTaskTracker,
 		DeprioSailsOffHelm deprioSailsOffHelm,
-    FishCaughtTracker fishCaughtTracker,
-		HideStopNavigatingDuringTrials hideStopNavigatingDuringTrials,
+        FishCaughtTracker fishCaughtTracker,
 		GiantClam giantClam,
 		HidePortalTransitions hidePortalTransitions,
 		HideStopNavigatingDuringTrials hideStopNavigatingDuringTrials,
@@ -100,29 +98,29 @@ public class SailingModule extends AbstractModule
 		LuffOverlay luffOverlay,
 		MermaidTaskSolver mermaidTaskSolver,
 		MysteriousGlow mysteriousGlow,
-    NetDepthButtonHighlighter netDepthButtonHighlighter,
-    NetDepthTimer netDepthTimer,
-    NetDepthTracker netDepthTracker,
+    	NetDepthButtonHighlighter netDepthButtonHighlighter,
+    	NetDepthTimer netDepthTimer,
+    	NetDepthTracker netDepthTracker,
 		NavigationOverlay navigationOverlay,
 		OceanMan oceanMan,
 		PrioritizeCargoHold prioritizeCargoHold,
 		RapidsOverlay rapidsOverlay,
 		ReverseBeep reverseBeep,
 		SalvagingHighlight salvagingHighlight,
-    SeaChartMapPointManager seaChartMapPointManager,
+    	SeaChartMapPointManager seaChartMapPointManager,
 		SeaChartOverlay seaChartOverlay,
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
-    ShoalOverlay shoalOverlay,
-    ShoalPathTrackerOverlay shoalPathTrackerOverlay,
-    ShoalPathTracker shoalPathTracker,
-    ShoalPathTrackerCommand shoalPathTrackerCommand,
-    ShoalPathOverlay shoalPathOverlay,
-    ShoalTracker shoalTracker,
+    	ShoalOverlay shoalOverlay,
+    	ShoalPathTrackerOverlay shoalPathTrackerOverlay,
+    	ShoalPathTracker shoalPathTracker,
+    	ShoalPathTrackerCommand shoalPathTrackerCommand,
+    	ShoalPathOverlay shoalPathOverlay,
+    	ShoalTracker shoalTracker,
 		SpeedBoostInfoBox speedBoostInfoBox,
 		TemporTantrumHelper temporTantrumHelper,
 		TrueTileIndicator trueTileIndicator,
-    TrawlingOverlay trawlingOverlay,
+    	TrawlingOverlay trawlingOverlay,
 		WeatherTaskTracker weatherTaskTracker
 	)
 	{
@@ -154,11 +152,11 @@ public class SailingModule extends AbstractModule
 			.add(luffOverlay)
 			.add(mermaidTaskSolver)
 			.add(mysteriousGlow)
-      .add(fishCaughtTracker)
-      .add(netDepthButtonHighlighter)
-      .add(netDepthTimer)
-      .add(netDepthTracker)
-      .add(trawlingOverlay)
+      		.add(fishCaughtTracker)
+      		.add(netDepthButtonHighlighter)
+      		.add(netDepthTimer)
+      		.add(netDepthTracker)
+      		.add(trawlingOverlay)
 			.add(navigationOverlay)
 			.add(oceanMan)
 			.add(prioritizeCargoHold)
@@ -166,14 +164,14 @@ public class SailingModule extends AbstractModule
 			.add(reverseBeep)
 			.add(salvagingHighlight)
 			.add(seaChartOverlay)
-      .add(seaChartMapPointManager)
+      		.add(seaChartMapPointManager)
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
 			.add(speedBoostInfoBox)
-      .add(shoalOverlay)
-      .add(shoalPathOverlay)
-      .add(shoalPathTracker)
-      .add(shoalTracker)
+      		.add(shoalOverlay)
+      		.add(shoalPathOverlay)
+      		.add(shoalPathTracker)
+      		.add(shoalTracker)
 			.add(temporTantrumHelper)
 			.add(trueTileIndicator)
 			.add(weatherTaskTracker);

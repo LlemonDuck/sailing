@@ -249,6 +249,15 @@ public class ShoalTracker implements PluginLifecycleComponent {
 		notifier.notify(config.notifyDepthChange(), "Shoal depth changed");
 	}
 
+	private void checkMovementNotification()
+	{
+		Boat boat = boatTracker.getBoat();
+		if (boat == null) {
+			return;
+		}
+		notifier.notify(config.notifyShoalMove(), "Shoal started moving");
+	}
+
 	private void resetDepthToUnknown() {
         if (currentShoalDepth != ShoalDepth.UNKNOWN) {
             currentShoalDepth = ShoalDepth.UNKNOWN;
@@ -269,7 +278,6 @@ public class ShoalTracker implements PluginLifecycleComponent {
      */
     public void updateLocation() {
         updateLocationFromEntity();
-        trackMovement();
     }
 
     private void updateLocationFromEntity() {
@@ -285,6 +293,10 @@ public class ShoalTracker implements PluginLifecycleComponent {
     }
 
     private void updateLocationIfChanged(WorldPoint newLocation) {
+        if (newLocation == null) {
+            return;
+        }
+        
         if (!newLocation.equals(currentLocation)) {
             previousLocation = currentLocation;
             currentLocation = newLocation;
@@ -303,6 +315,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
             return;
         }
         
+        updateLocation();
         updateShoalDepth();
         trackMovement();
     }
@@ -326,6 +339,9 @@ public class ShoalTracker implements PluginLifecycleComponent {
     }
 
     private void handleShoalMoving() {
+        if (!wasMoving) {
+            checkMovementNotification();
+        }
         wasMoving = true;
         stationaryTicks = 0;
     }
@@ -336,6 +352,8 @@ public class ShoalTracker implements PluginLifecycleComponent {
         } else {
             incrementStationaryCount();
         }
+        // Reset previousLocation when stationary so we can detect movement again
+        previousLocation = currentLocation;
     }
 
     private void startStationaryCount() {
@@ -406,10 +424,6 @@ public class ShoalTracker implements PluginLifecycleComponent {
         currentShoalEntity = entity;
         
         updateLocation();
-        
-        if (!hadExistingShoal) {
-            log.debug("Shoal WorldEntity spawned at {}", currentLocation);
-        }
     }
 
     @Subscribe

@@ -1,7 +1,10 @@
 package com.duckblade.osrs.sailing.features.trawling;
 
 import com.duckblade.osrs.sailing.SailingConfig;
+import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
+import com.duckblade.osrs.sailing.model.Boat;
+import com.duckblade.osrs.sailing.model.FishingNetTier;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import com.google.common.math.IntMath;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +24,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.util.List;
 
 @Slf4j
 @Singleton
@@ -28,6 +32,7 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 
 	private final Client client;
 	private final SailingConfig config;
+	private final BoatTracker boatTracker;
 
 	public static final int MAX_SPLITTABLE_DISTANCE = 10;
 
@@ -35,9 +40,15 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 	private static final Color STOP_POINT_COLOR = Color.RED;
 
 	@Inject
-	public ShoalPathOverlay(Client client, SailingConfig config) {
+	public ShoalPathOverlay(
+		Client client, 
+		SailingConfig config,
+		BoatTracker boatTracker
+	) 
+	{
 		this.client = client;
 		this.config = config;
+		this.boatTracker = boatTracker;
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.UNDER_WIDGETS);
 		setPriority(PRIORITY_MED);
@@ -60,7 +71,9 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 
 	@Override
 	public Dimension render(Graphics2D graphics) {
-		if (!SailingUtil.isSailing(client)) {
+		Boat boat = boatTracker.getBoat();
+		boolean hasNets = !boat.getNetTiers().isEmpty();
+		if (!SailingUtil.isSailing(client) || !hasNets) {
 			return null;
 		}
 
