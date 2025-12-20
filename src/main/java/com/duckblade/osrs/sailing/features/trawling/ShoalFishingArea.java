@@ -10,27 +10,27 @@ import net.runelite.api.coords.WorldPoint;
 public enum ShoalFishingArea
 {
 	GREAT_SOUND(
-		new WorldArea(1536, 3317, 113, 95, 0),
+		new WorldArea(1546, 3327, 93, 75, 0),
 		ShoalPaths.GIANT_KRILL_GREAT_SOUND,
-		new int[]{0, 10, 19, 29, 43, 48, 53},
+		new int[]{0, 18, 25, 31, 38, 50, 59},
 		Shoal.GIANT_KRILL
 	),
 	SIMIAN_SEA(
-		new WorldArea(2745, 2538, 122, 112, 0),
+		new WorldArea(2755, 2548, 103, 92, 0),
 		ShoalPaths.GIANT_KRILL_SIMIAN_SEA,
-		new int[]{0, 12, 22, 26, 32, 37, 42},
+		new int[]{0, 6, 12, 20, 27, 39, 49},
 		Shoal.GIANT_KRILL
 	),
 	SUNSET_BAY(
 		new WorldArea(1477, 2860, 128, 100, 0),
 		ShoalPaths.GIANT_KRILL_SUNSET_BAY,
-		new int[]{0, 17, 29, 36, 46, 64, 73},
+		new int[]{0, 9, 19, 37, 46, 52, 68},
 		Shoal.GIANT_KRILL
 	),
 	TURTLE_BELT(
-		new WorldArea(2912, 2455, 126, 132, 0),
+		new WorldArea(2922, 2465, 106, 112, 0),
 		ShoalPaths.GIANT_KRILL_TURTLE_BELT,
-		new int[]{0, 11, 17, 23, 37, 44, 50, 73},
+		new int[]{0, 6, 20, 27, 33, 56, 66, 77},
 		Shoal.GIANT_KRILL
 	),
 
