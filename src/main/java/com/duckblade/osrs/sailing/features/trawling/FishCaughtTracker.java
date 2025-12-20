@@ -4,17 +4,19 @@ import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.model.Boat;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.api.GameState;
 import net.runelite.api.events.ChatMessage;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.client.eventbus.Subscribe;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -26,13 +28,15 @@ public class FishCaughtTracker implements PluginLifecycleComponent {
     private final Client client;
     private final BoatTracker boatTracker;
 
-    @Getter
-    private final Map<String, Integer> fishCaught = new HashMap<>();
+    /**
+     * All the fish that was caught into the net since it was last emptied.
+     */
+    private final Map<String, Integer> fishInNet = new HashMap<>();
 
-    @Getter
-    private int fishInNet = 0;
-
-    private String lastFishCaught;
+    /**
+     * All the fish that was collected by emptying the nets.
+     */
+    private final Map<String, Integer> fishCollected = new HashMap<>();
 
     /**
      * Creates a new FishCaughtTracker with the specified dependencies.
@@ -59,6 +63,16 @@ public class FishCaughtTracker implements PluginLifecycleComponent {
     }
 
     @Subscribe
+    public void onGameStateChanged(GameStateChanged e) {
+        GameState state = e.getGameState();
+        if (state == GameState.HOPPING || state == GameState.LOGGING_IN) {
+            log.debug("{}; nets are forcibly emptied", state);
+            log.debug("lost fish: {}", fishInNet);
+            fishInNet.clear();
+        }
+    }
+
+    @Subscribe
     public void onChatMessage(ChatMessage e) {
         if (!SailingUtil.isSailing(client) ||
             (e.getType() != ChatMessageType.GAMEMESSAGE && e.getType() != ChatMessageType.SPAM)) {
@@ -67,17 +81,16 @@ public class FishCaughtTracker implements PluginLifecycleComponent {
 
         String message = e.getMessage();
         if (message.equals("You empty the nets into the cargo hold.")) {
-            // TODO: handle trying to empty net when already empty
-            log.debug("Nets emptied");
-            fishInNet = 0;
+            // TODO: handle trying to empty net when already empty (in case of desync)
+            log.debug("Nets manually emptied; collecting fish: {}", fishInNet);
+
+            for (var entry : fishInNet.entrySet()) {
+                fishCollected.merge(entry.getKey(), entry.getValue(), Integer::sum);
+            }
+
+            fishInNet.clear();
             return;
         }
-
-		// Seems to be bugged in-game or the message indicates the previous catch benefited from the keg
-//        if (message.equals("Trawler's trust: You catch an additional fish.")) {
-//            addFish(message, 1, lastFishCaught, "Trawler's trust");
-//            return;
-//        }
 
         Matcher matcher = CATCH_FISH_REGEX.matcher(message);
         if (!matcher.find()) {
@@ -94,16 +107,9 @@ public class FishCaughtTracker implements PluginLifecycleComponent {
             return;
         }
 
-        addFish(message, quantity, fish, catcher);
-    }
-
-    private void addFish(String message, int quantity, String fish, String catcher) {
         log.debug(message);
-        log.debug("Adding {} {} caught by {}; total: {}", quantity, fish, catcher, fishCaught.get(fish));
-
-        fishCaught.merge(fish, quantity, Integer::sum);
-        fishInNet += quantity;
-        lastFishCaught = fish;
+        log.debug("{} {} caught by {}; total: {}", quantity, fish, catcher, fishInNet.get(fish));
+        fishInNet.merge(fish, quantity, Integer::sum);
     }
 
     private int wordToNumber(String word) {
@@ -132,9 +138,27 @@ public class FishCaughtTracker implements PluginLifecycleComponent {
         return boat != null ? boat.getNetCapacity() : 0;
     }
 
+	public int getFishInNetCount() {
+		return fishInNet.values()
+			.stream()
+			.reduce(Integer::sum)
+			.orElse(0);
+	}
+
+    /**
+     * All fish caught, either currently in the net or previously collected.
+     */
+    public Map<String, Integer> getFishCaught() {
+        Map<String, Integer> fishCaught = new HashMap<>(fishCollected);
+        for (var entry : fishInNet.entrySet()) {
+            fishCaught.merge(entry.getKey(), entry.getValue(), Integer::sum);
+        }
+
+        return Collections.unmodifiableMap(fishCaught);
+    }
+
     private void reset() {
-        fishCaught.clear();
-        fishInNet = 0;
-        lastFishCaught = null;
+        fishInNet.clear();
+        fishCollected.clear();
     }
 }

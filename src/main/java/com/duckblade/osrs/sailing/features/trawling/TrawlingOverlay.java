@@ -98,11 +98,11 @@ public class TrawlingOverlay extends OverlayPanel
                     panelComponent.getChildren().add(LineComponent.builder().build());
                 }
 
-                int totalFishCount = fishCaughtTracker.getFishInNet();
+                int fishInNetTotal = fishCaughtTracker.getFishInNetCount();
 
                 // Choose color based on how full the nets are
                 Color textColor;
-                float fillPercent = (float) totalFishCount / maxCapacity;
+                float fillPercent = (float) fishInNetTotal / maxCapacity;
                 if (fillPercent >= 0.9f) {
                     textColor = Color.RED; // Nearly full
                 } else if (fillPercent >= 0.7f) {
@@ -113,7 +113,7 @@ public class TrawlingOverlay extends OverlayPanel
 
                 panelComponent.getChildren().add(LineComponent.builder()
                         .left("Net:")
-                        .right(totalFishCount + "/" + maxCapacity)
+                        .right(fishInNetTotal + "/" + maxCapacity)
                         .rightColor(textColor)
                         .build());
 
