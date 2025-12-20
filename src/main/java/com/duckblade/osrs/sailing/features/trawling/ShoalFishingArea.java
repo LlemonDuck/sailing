@@ -68,7 +68,7 @@ public enum ShoalFishingArea
 	THE_CROWN_JEWEL_TEMP(
 		new WorldArea(1633, 2533, 187, 199, 0),
 		ShoalPaths.YELLOWFIN_THE_CROWN_JEWEL,
-		new int[]{0, 34, 52, 70, 79, 98, 122, 158},
+		new int[]{0, 23, 60, 80, 100, 109, 128, 154, 193},
 		Shoal.YELLOWFIN
 	),
 	// 
