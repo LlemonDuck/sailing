@@ -49,7 +49,7 @@ public enum ShoalFishingArea
 	THE_ONYX_CREST(
 		new WorldArea(2929, 2157, 196, 219, 0),
 		ShoalPaths.HADDOCK_THE_ONYX_CREST,
-		new int[]{0, 18, 37, 53, 68, 91, 112, 124, 137, 141},
+		new int[]{0, 4, 15, 34, 52, 68, 83, 108, 129, 142},
 		Shoal.HADDOCK
 	),
 
