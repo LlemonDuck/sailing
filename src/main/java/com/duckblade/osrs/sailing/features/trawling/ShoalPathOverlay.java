@@ -71,9 +71,10 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 
 	@Override
 	public Dimension render(Graphics2D graphics) {
-		Boat boat = boatTracker.getBoat();
-		boolean hasNets = !boat.getNetTiers().isEmpty();
-		if (!SailingUtil.isSailing(client) || !hasNets) {
+		if (!SailingUtil.isSailing(client)) {
+			return null;
+		}
+		if (boatTracker.getBoat() == null || boatTracker.getBoat().getNetTiers().isEmpty()) {
 			return null;
 		}
 

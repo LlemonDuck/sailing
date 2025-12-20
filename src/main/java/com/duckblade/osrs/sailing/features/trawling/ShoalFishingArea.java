@@ -37,38 +37,38 @@ public enum ShoalFishingArea
 	ANGLERFISHS_LIGHT(
 		new WorldArea(2672, 2295, 162, 159, 0),
 		ShoalPaths.HADDOCK_ANGLERFISHS_LIGHT,
-		new int[]{0, 14, 33, 40, 52, 65, 74},
+		new int[]{0, 6, 22, 41, 48, 60, 74, 84},
 		Shoal.HADDOCK
 	),
 	MISTY_SEA(
 		new WorldArea(1377, 2607, 233, 182, 0),
 		ShoalPaths.HADDOCK_MISTY_SEA,
-		new int[]{0, 14, 28, 34, 52, 76, 105, 118, 125, 134},
+		new int[]{0, 20, 45, 60, 64, 70, 87, 99, 112, 118},
 		Shoal.HADDOCK
 	),
 	THE_ONYX_CREST(
 		new WorldArea(2929, 2157, 196, 219, 0),
 		ShoalPaths.HADDOCK_THE_ONYX_CREST,
-		new int[]{0, 18, 37, 53, 68, 91, 112, 124, 137, 141},
+		new int[]{0, 4, 15, 34, 52, 68, 83, 108, 129, 142},
 		Shoal.HADDOCK
 	),
 
 	DEEPFIN_POINT(
-		new WorldArea(1740, 2665, 285, 216, 0),
+		new WorldArea(1781, 2665, 244, 216, 0),
 		ShoalPaths.YELLOWFIN_DEEPFIN_POINT,
-		new int[]{0, 18, 37, 58, 90, 116, 125, 144, 171, 207, 220},
+		new int[]{0, 20, 42, 74, 100, 117, 136, 163, 197, 211, 237},
 		Shoal.YELLOWFIN
 	),
 	SEA_OF_SOULS(
 		new WorldArea(2173, 2585, 192, 179, 0),
 		ShoalPaths.YELLOWFIN_SEA_OF_SOULS,
-		new int[]{0, 15, 30, 35, 44, 73, 95, 113, 133, 138, 147, 177},
+		new int[]{0, 18, 38, 43, 53, 84, 107, 124, 140, 145, 155, 183},
 		Shoal.YELLOWFIN
 	),
 	THE_CROWN_JEWEL_TEMP(
 		new WorldArea(1633, 2533, 187, 199, 0),
 		ShoalPaths.YELLOWFIN_THE_CROWN_JEWEL,
-		new int[]{0, 34, 52, 70, 79, 98, 122, 158},
+		new int[]{0, 23, 60, 80, 100, 109, 128, 154, 193},
 		Shoal.YELLOWFIN
 	),
 	// 
@@ -81,7 +81,7 @@ public enum ShoalFishingArea
 	SOUTHERN_EXPANSE(
 		new WorldArea(1880, 2282, 217, 207, 0),
 		ShoalPaths.HALIBUT_SOUTHERN_EXPANSE,
-		new int[]{0, 23, 46, 80, 128, 145, 176, 201, 229, 241},
+		new int[]{0, 43, 59, 90, 121, 151, 161, 189, 214},
 		Shoal.HALIBUT
 	),
 
