@@ -93,7 +93,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
     private int shoalDuration = 0;
     
     // Movement tracking
-    private WorldPoint previousLocation = null;
+    private WorldPoint previousTickLocation = null;
     private boolean wasMoving = false;
     /**
      * -- GETTER --
@@ -165,7 +165,10 @@ public class ShoalTracker implements PluginLifecycleComponent {
      * @return true if a shoal entity or objects are present, false otherwise
      */
     public boolean hasShoal() {
-        return currentShoalEntity != null || !shoalObjects.isEmpty();
+        boolean hasEntity = currentShoalEntity != null;
+        boolean hasObjects = !shoalObjects.isEmpty();
+        boolean result = hasEntity || hasObjects;
+        return result;
     }
 
     /**
@@ -298,7 +301,6 @@ public class ShoalTracker implements PluginLifecycleComponent {
         }
         
         if (!newLocation.equals(currentLocation)) {
-            previousLocation = currentLocation;
             currentLocation = newLocation;
             updateShoalDuration();
         }
@@ -325,17 +327,15 @@ public class ShoalTracker implements PluginLifecycleComponent {
             return;
         }
         
-        boolean isMoving = hasShoalMoved();
+        boolean isMoving = previousTickLocation != null && !currentLocation.equals(previousTickLocation);
         
         if (isMoving) {
             handleShoalMoving();
         } else {
             handleShoalStationary();
         }
-    }
-
-    private boolean hasShoalMoved() {
-        return previousLocation != null && !currentLocation.equals(previousLocation);
+        
+        previousTickLocation = currentLocation;
     }
 
     private void handleShoalMoving() {
@@ -352,8 +352,6 @@ public class ShoalTracker implements PluginLifecycleComponent {
         } else {
             incrementStationaryCount();
         }
-        // Reset previousLocation when stationary so we can detect movement again
-        previousLocation = currentLocation;
     }
 
     private void startStationaryCount() {
@@ -369,7 +367,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
      * Reset movement tracking state
      */
     private void resetMovementTracking() {
-        previousLocation = null;
+        previousTickLocation = null;
         wasMoving = false;
         stationaryTicks = 0;
     }
