@@ -25,7 +25,6 @@ import net.runelite.api.coords.WorldPoint;
 public class BluefinRainbowReef implements ShoalAreaData {
 
 	public static final WorldArea AREA = new WorldArea(2099, 2211, 287, 190, 0);
-	public static final int STOP_DURATION = 70;
 	public static final Shoal SHOAL_TYPE = Shoal.BLUEFIN;
 
 	public static final ShoalWaypoint[] WAYPOINTS = {
@@ -247,8 +246,5 @@ public class BluefinRainbowReef implements ShoalAreaData {
 	
 	@Override
 	public Shoal getShoalType() { return SHOAL_TYPE; }
-	
-	@Override
-	public int getStopDuration() { return STOP_DURATION; }
 
 }

@@ -40,7 +40,9 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 	// Arrow spacing - draw an arrow every N points along the path
 	private static final int ARROW_SPACING = 5;
 	// Arrow size in pixels
-	private static final int ARROW_SIZE = 8;
+	private static final int ARROW_SIZE = 12;
+	// Arrow width (how wide the arrowhead is)
+	private static final int ARROW_WIDTH = 8;
 
 	// Color for stop point overlays (red)
 	private static final Color STOP_POINT_COLOR = Color.RED;
@@ -183,7 +185,7 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 			return;
 		}
 
-		graphics.setStroke(new BasicStroke(1));
+		graphics.setStroke(new BasicStroke(2));
 		graphics.setColor(pathColor);
 
 		// Draw arrows at regular intervals along the path
@@ -239,9 +241,13 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 	private void drawArrowhead(Graphics2D graphics, int x, int y, double dirX, double dirY, Color color) {
 		graphics.setColor(color);
 		
-		// Calculate arrowhead points
-		double arrowAngle = Math.PI / 6; // 30 degrees
+		// Create a filled triangular arrowhead for better visibility
+		double arrowAngle = Math.PI / 4; // 45 degrees for wider arrowhead
 		double arrowLength = ARROW_SIZE;
+		
+		// Arrow tip point (ahead of the center point)
+		int tipX = (int) (x + arrowLength * 0.3 * dirX);
+		int tipY = (int) (y + arrowLength * 0.3 * dirY);
 		
 		// Left wing of arrow
 		double leftX = x - arrowLength * (dirX * Math.cos(arrowAngle) - dirY * Math.sin(arrowAngle));
@@ -251,9 +257,17 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 		double rightX = x - arrowLength * (dirX * Math.cos(-arrowAngle) - dirY * Math.sin(-arrowAngle));
 		double rightY = y - arrowLength * (dirY * Math.cos(-arrowAngle) + dirX * Math.sin(-arrowAngle));
 		
-		// Draw the arrowhead lines
-		graphics.drawLine(x, y, (int)leftX, (int)leftY);
-		graphics.drawLine(x, y, (int)rightX, (int)rightY);
+		// Create triangle points for filled arrowhead
+		int[] xPoints = {tipX, (int)leftX, (int)rightX};
+		int[] yPoints = {tipY, (int)leftY, (int)rightY};
+		
+		// Fill the arrowhead triangle
+		graphics.fillPolygon(xPoints, yPoints, 3);
+		
+		// Add a darker outline for better visibility
+		graphics.setColor(color.darker());
+		graphics.setStroke(new BasicStroke(1));
+		graphics.drawPolygon(xPoints, yPoints, 3);
 	}
 
 	private void renderStopPoints(Graphics2D graphics, WorldPoint[] path, int[] stopIndices) {

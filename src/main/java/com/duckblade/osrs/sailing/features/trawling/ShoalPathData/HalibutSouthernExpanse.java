@@ -25,7 +25,6 @@ import net.runelite.api.coords.WorldPoint;
 public class HalibutSouthernExpanse implements ShoalAreaData {
 
 	public static final WorldArea AREA = new WorldArea(1880, 2282, 216, 206, 0);
-	public static final int STOP_DURATION = 78;
 	public static final Shoal SHOAL_TYPE = Shoal.HALIBUT;
 
 	public static final ShoalWaypoint[] WAYPOINTS = {
@@ -318,9 +317,6 @@ public class HalibutSouthernExpanse implements ShoalAreaData {
 	
 	@Override
 	public Shoal getShoalType() { return SHOAL_TYPE; }
-	
-	@Override
-	public int getStopDuration() { return STOP_DURATION; }
 
 }
 

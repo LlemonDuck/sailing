@@ -1,7 +1,6 @@
 package com.duckblade.osrs.sailing.features.trawling;
 
-import com.duckblade.osrs.sailing.features.trawling.ShoalPathData.BluefinRainbowReef;
-import com.duckblade.osrs.sailing.features.trawling.ShoalPathData.HalibutSouthernExpanse;
+import com.duckblade.osrs.sailing.features.trawling.ShoalPathData.*;
 import lombok.Getter;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
@@ -79,27 +78,10 @@ public enum ShoalFishingArea
 		Shoal.HALIBUT
 	),
 	SOUTHERN_EXPANSE(HalibutSouthernExpanse.INSTANCE),
-
-	BUCCANEERS_HAVEN(
-		new WorldArea(1962, 3590, 313, 203, 0),
-		ShoalPaths.BLUEFIN_BUCCANEERS_HAVEN,
-		new int[]{0, 17, 27, 59, 79, 93, 111, 126, 145, 153, 173, 191},
-		Shoal.BLUEFIN
-	),
+	BUCCANEERS_HAVEN(BluefinBuccaneersHaven.INSTANCE),
 	RAINBOW_REEF(BluefinRainbowReef.INSTANCE),
-	WEISSMERE(
-		new WorldArea(2590, 3945, 281, 202, 0),
-		ShoalPaths.MARLIN_WEISSMERE,
-		new int[]{0, 16, 25, 57, 73, 81, 83, 128},
-		Shoal.MARLIN
-	),
-	BRITTLE_ISLE(
-		new WorldArea(1856, 3963, 223, 159, 0),
-		ShoalPaths.MARLIN_BRITTLE_ISLE,
-		new int[]{0, 13, 29, 58, 80, 103, 134, 165, 200},
-		Shoal.MARLIN
-	),
-	;
+	WEISSMERE(MarlinWeissmere.INSTANCE),
+	BRITTLE_ISLE(MarlinBrittleIsle.INSTANCE);
 
 	static final ShoalFishingArea[] AREAS = values();
 
@@ -107,7 +89,11 @@ public enum ShoalFishingArea
 	private final WorldPoint[] path;
 	private final int[] stopIndices;
 	private final Shoal shoal;
-	private final ShoalAreaData areaData; // For interface-based entries
+    /**
+     * -- GETTER --
+     *  Get the ShoalAreaData interface if this area uses the new interface-based approach.
+     */
+    private final ShoalAreaData areaData; // For interface-based entries
 
 	// Constructor for legacy entries (4 parameters)
 	ShoalFishingArea(WorldArea area, WorldPoint[] path, int[] stopIndices, Shoal shoal) {
@@ -132,15 +118,7 @@ public enum ShoalFishingArea
 		return area.contains(wp);
 	}
 
-	/**
-	 * Get the ShoalAreaData interface if this area uses the new interface-based approach.
-	 * @return ShoalAreaData instance, or null for legacy areas
-	 */
-	public ShoalAreaData getAreaData() {
-		return areaData;
-	}
-
-	/**
+    /**
 	 * Check if this area uses the new interface-based approach.
 	 * @return true if this area has ShoalAreaData, false for legacy areas
 	 */

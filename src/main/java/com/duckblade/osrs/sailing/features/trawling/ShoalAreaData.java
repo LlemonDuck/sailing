@@ -27,7 +27,7 @@ public interface ShoalAreaData {
     /**
      * Get the duration in ticks that shoals stop at each stop point in this area.
      */
-    int getStopDuration();
+    default int getStopDuration() { return getShoalType().getStopDuration(); }
     
     // Default implementations for common operations
     
