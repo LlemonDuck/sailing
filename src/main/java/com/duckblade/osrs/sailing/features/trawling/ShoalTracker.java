@@ -277,6 +277,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
         shoalDuration = TrawlingData.FishingAreas.getStopDurationForLocation(currentLocation);
     }
 
+    @SuppressWarnings("unused")
     @Subscribe
     public void onGameTick(GameTick e) {
         if (!hasShoal()) {
@@ -315,6 +316,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
 
     // Event handlers
 
+    @SuppressWarnings("unused")
     @Subscribe
     public void onNpcSpawned(NpcSpawned e) {
         NPC npc = e.getNpc();
@@ -323,6 +325,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
         }
     }
 
+    @SuppressWarnings("unused")
     @Subscribe
     public void onNpcDespawned(NpcDespawned e) {
         NPC npc = e.getNpc();
@@ -347,6 +350,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
         updateShoalDepth();
     }
 
+    @SuppressWarnings("unused")
     @Subscribe
     public void onWorldEntitySpawned(WorldEntitySpawned e) {
         WorldEntity entity = e.getWorldEntity();
@@ -365,6 +369,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
         updateLocation();
     }
 
+    @SuppressWarnings("unused")
     @Subscribe
     public void onGameObjectSpawned(GameObjectSpawned e) {
         GameObject obj = e.getGameObject();
@@ -383,6 +388,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
         shoalObjects.put(objectId, obj);
     }
 
+    @SuppressWarnings("unused")
     @Subscribe
     public void onWorldViewUnloaded(WorldViewUnloaded e) {
         if (!e.getWorldView().isTopLevel()) {
