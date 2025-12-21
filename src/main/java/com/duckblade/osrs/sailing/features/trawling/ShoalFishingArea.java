@@ -71,12 +71,7 @@ public enum ShoalFishingArea
 		Shoal.YELLOWFIN
 	),
 	// 
-	PORT_ROBERTS(
-		new WorldArea(1821, 3120, 212, 301, 0),
-		ShoalPaths.HALIBUT_PORT_ROBERTS,
-		new int[]{0, 35, 55, 75, 98, 124, 144, 171, 188},
-		Shoal.HALIBUT
-	),
+	PORT_ROBERTS(HalibutPortRoberts.INSTANCE),
 	SOUTHERN_EXPANSE(HalibutSouthernExpanse.INSTANCE),
 	BUCCANEERS_HAVEN(BluefinBuccaneersHaven.INSTANCE),
 	RAINBOW_REEF(BluefinRainbowReef.INSTANCE),
@@ -116,13 +111,5 @@ public enum ShoalFishingArea
 	public boolean contains(final WorldPoint wp)
 	{
 		return area.contains(wp);
-	}
-
-    /**
-	 * Check if this area uses the new interface-based approach.
-	 * @return true if this area has ShoalAreaData, false for legacy areas
-	 */
-	public boolean hasAreaData() {
-		return areaData != null;
 	}
 }

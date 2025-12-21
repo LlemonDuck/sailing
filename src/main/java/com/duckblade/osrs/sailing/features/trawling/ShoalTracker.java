@@ -9,16 +9,12 @@ import com.duckblade.osrs.sailing.model.ShoalDepth;
 import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Actor;
 import net.runelite.api.Client;
-import net.runelite.api.DynamicObject;
 import net.runelite.api.GameObject;
 import net.runelite.api.NPC;
-import net.runelite.api.Renderable;
 import net.runelite.api.WorldEntity;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.NpcDespawned;
@@ -91,10 +87,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
      */
     @Getter
     private int shoalDuration = 0;
-    
-    // Movement tracking
-    private WorldPoint previousTickLocation = null;
-    private boolean wasMoving = false;
+
     /**
      * -- GETTER --
      *  Get the number of ticks the shoal has been stationary
@@ -170,8 +163,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
     public boolean hasShoal() {
         boolean hasEntity = currentShoalEntity != null;
         boolean hasObjects = !shoalObjects.isEmpty();
-        boolean result = hasEntity || hasObjects;
-        return result;
+        return hasEntity || hasObjects;
     }
 
     /**
@@ -179,36 +171,8 @@ public class ShoalTracker implements PluginLifecycleComponent {
      *
      * @return true if the shoal entity exists and has a valid camera focus, false otherwise
      */
-    public boolean isShoalEntityValid() {
-        return currentShoalEntity != null && currentShoalEntity.getCameraFocus() != null;
-    }
-
-    /**
-     * Get animation ID from any Renderable object (supports multiple types)
-     * @param renderable The renderable object to check
-     * @return Animation ID, or -1 if no animation or unsupported type
-     */
-    public int getAnimationIdFromRenderable(Renderable renderable) {
-        if (renderable == null) {
-            return -1;
-        }
-
-        // DynamicObject (GameObjects with animations)
-        if (renderable instanceof DynamicObject) {
-            DynamicObject dynamicObject = (DynamicObject) renderable;
-            if (dynamicObject.getAnimation() != null) {
-                return dynamicObject.getAnimation().getId();
-            }
-        }
-        // Actor types (NPCs, Players) - they have direct getAnimation() method
-        else if (renderable instanceof Actor) {
-            Actor actor = (Actor) renderable;
-            return actor.getAnimation(); // Returns int directly, -1 if no animation
-        }
-        // Note: Other Renderable types like Model, GraphicsObject may exist but are less common
-        // Add more types here as needed
-
-        return -1;
+    public boolean isShoalEntityInvalid() {
+        return currentShoalEntity == null || currentShoalEntity.getCameraFocus() == null;
     }
 
     /**
@@ -323,14 +287,6 @@ public class ShoalTracker implements PluginLifecycleComponent {
         updateLocation();
         updateShoalDepth();
         trackMovementByHealth();
-        
-        // Log NPC health if shoal NPC exists
-        if (currentShoalNpc != null) {
-            int healthRatio = currentShoalNpc.getHealthRatio();
-            int healthScale = currentShoalNpc.getHealthScale();
-            log.debug("Shoal NPC health: {}/{} (ratio: {})", healthRatio, healthScale, 
-                     healthScale > 0 ? (double) healthRatio / healthScale : 0.0);
-        }
     }
     
     private void trackMovementByHealth() {
@@ -348,53 +304,11 @@ public class ShoalTracker implements PluginLifecycleComponent {
         previousHealthRatio = currentHealthRatio;
     }
     
-    private void trackMovement() {
-        if (currentLocation == null) {
-            return;
-        }
-        
-        boolean isMoving = previousTickLocation != null && !currentLocation.equals(previousTickLocation);
-        
-        if (isMoving) {
-            handleShoalMoving();
-        } else {
-            handleShoalStationary();
-        }
-        
-        previousTickLocation = currentLocation;
-    }
-
-    private void handleShoalMoving() {
-        if (!wasMoving) {
-            checkMovementNotification();
-        }
-        wasMoving = true;
-        stationaryTicks = 0;
-    }
-
-    private void handleShoalStationary() {
-        if (wasMoving) {
-            startStationaryCount();
-        } else {
-            incrementStationaryCount();
-        }
-    }
-
-    private void startStationaryCount() {
-        wasMoving = false;
-        stationaryTicks = 1;
-    }
-
-    private void incrementStationaryCount() {
-        stationaryTicks++;
-    }
-    
     /**
      * Reset movement tracking state
      */
     private void resetMovementTracking() {
-        previousTickLocation = null;
-        wasMoving = false;
+        // Movement tracking
         stationaryTicks = 0;
         previousHealthRatio = -1;
     }
@@ -413,7 +327,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
     public void onNpcDespawned(NpcDespawned e) {
         NPC npc = e.getNpc();
         if (npc == currentShoalNpc) {
-            handleShoalNpcDespawned(npc);
+            handleShoalNpcDespawned();
         }
     }
 
@@ -427,7 +341,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
         updateShoalDepth();
     }
 
-    private void handleShoalNpcDespawned(NPC npc) {
+    private void handleShoalNpcDespawned() {
         currentShoalNpc = null;
         previousHealthRatio = -1; // Reset health tracking
         updateShoalDepth();
@@ -447,9 +361,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
     }
 
     private void handleShoalWorldEntitySpawned(WorldEntity entity) {
-        boolean hadExistingShoal = currentShoalEntity != null;
         currentShoalEntity = entity;
-        
         updateLocation();
     }
 
@@ -462,16 +374,6 @@ public class ShoalTracker implements PluginLifecycleComponent {
         }
     }
 
-    @Subscribe
-    public void onGameObjectDespawned(GameObjectDespawned e) {
-        GameObject obj = e.getGameObject();
-        
-        GameObject removedObject = shoalObjects.remove(obj.getId());
-        if (removedObject != null && removedObject == obj) {
-            handleShoalGameObjectDespawned(obj);
-        }
-    }
-
     private boolean isShoalGameObject(GameObject obj) {
         return SHOAL_OBJECT_IDS.contains(obj.getId());
     }
@@ -480,12 +382,6 @@ public class ShoalTracker implements PluginLifecycleComponent {
         int objectId = obj.getId();
         shoalObjects.put(objectId, obj);
     }
-
-    private void handleShoalGameObjectDespawned(GameObject obj) {
-        // GameObject removed from map in onGameObjectDespawned
-    }
-
-
 
     @Subscribe
     public void onWorldViewUnloaded(WorldViewUnloaded e) {

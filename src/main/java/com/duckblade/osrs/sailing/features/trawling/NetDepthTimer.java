@@ -141,9 +141,9 @@ public class NetDepthTimer extends Overlay implements PluginLifecycleComponent {
         }
         
         // Check if WorldEntity is valid, try to find it if not
-        if (!shoalTracker.isShoalEntityValid()) {
+        if (shoalTracker.isShoalEntityInvalid()) {
             shoalTracker.findShoalEntity();
-            if (!shoalTracker.isShoalEntityValid()) {
+            if (shoalTracker.isShoalEntityInvalid()) {
                 // WorldEntity is truly gone - reset state
                 log.debug("WorldEntity no longer exists - resetting timer state");
                 resetState();

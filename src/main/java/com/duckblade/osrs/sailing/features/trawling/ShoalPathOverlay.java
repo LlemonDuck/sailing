@@ -3,8 +3,6 @@ package com.duckblade.osrs.sailing.features.trawling;
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
-import com.duckblade.osrs.sailing.model.Boat;
-import com.duckblade.osrs.sailing.model.FishingNetTier;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import com.google.common.math.IntMath;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +22,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
-import java.awt.geom.AffineTransform;
-import java.util.List;
 
 @Slf4j
 @Singleton
@@ -38,11 +34,10 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 	public static final int MAX_SPLITTABLE_DISTANCE = 10;
 	
 	// Arrow spacing - draw an arrow every N points along the path
-	private static final int ARROW_SPACING = 5;
+	private static final int ARROW_SPACING = 10;
 	// Arrow size in pixels
-	private static final int ARROW_SIZE = 12;
+	private static final int ARROW_SIZE = 10;
 	// Arrow width (how wide the arrowhead is)
-	private static final int ARROW_WIDTH = 8;
 
 	// Color for stop point overlays (red)
 	private static final Color STOP_POINT_COLOR = Color.RED;
