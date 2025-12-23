@@ -200,7 +200,7 @@ public class NetDepthButtonHighlighter extends Overlay
 
     private boolean canHighlightButtons() {
         Boat boat = boatTracker.getBoat();
-        if (boat == null || boat.getNetTiers().isEmpty()) {
+        if (boat == null || boat.getFishingNets().isEmpty()) {
             return false;
         }
 

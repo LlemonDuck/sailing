@@ -213,7 +213,7 @@ public class ShoalTracker implements PluginLifecycleComponent {
 	private void checkDepthNotification()
 	{
 		Boat boat = boatTracker.getBoat();
-		if (boat == null || boat.getNetTiers().isEmpty()) {
+		if (boat == null || boat.getFishingNets().isEmpty()) {
 			return;
 		}
 		notifier.notify(config.notifyDepthChange(), "Shoal depth changed");

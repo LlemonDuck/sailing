@@ -128,17 +128,7 @@ public class Boat
 
     public int getNetCapacity()
     {
-        int totalCapacity = 0;
-        List<FishingNetTier> netTiers = getNetTiers();
-        SizeClass sizeClass = getSizeClass();
-        for (FishingNetTier netTier : netTiers)
-        {
-            if (netTier != null)
-            {
-                totalCapacity += netTier.getCapacity();
-            }
-        }
-        return totalCapacity;
+        return fishingNets.size() * 125;
     }
 
 	public int getSpeedBoostDuration()

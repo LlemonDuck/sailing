@@ -77,7 +77,7 @@ public class ShoalPathOverlay extends Overlay implements PluginLifecycleComponen
 		if (!SailingUtil.isSailing(client)) {
 			return null;
 		}
-		if (boatTracker.getBoat() == null || boatTracker.getBoat().getNetTiers().isEmpty()) {
+		if (boatTracker.getBoat() == null || boatTracker.getBoat().getFishingNets().isEmpty()) {
 			return null;
 		}
 
