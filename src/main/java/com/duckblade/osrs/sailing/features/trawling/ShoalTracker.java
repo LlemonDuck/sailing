@@ -15,6 +15,7 @@ import net.runelite.api.NPC;
 import net.runelite.api.WorldEntity;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.NpcDespawned;
@@ -153,6 +154,21 @@ public class ShoalTracker implements PluginLifecycleComponent {
      */
     public Set<GameObject> getShoalObjects() {
         return new HashSet<>(shoalObjects.values());
+    }
+
+    /**
+     * Gets debug information about current shoal objects.
+     *
+     * @return a string describing current shoal objects and their IDs
+     */
+    public String getShoalObjectsDebugInfo() {
+        if (shoalObjects.isEmpty()) {
+            return "No shoal objects";
+        }
+        
+        StringBuilder sb = new StringBuilder("Shoal objects: ");
+        shoalObjects.forEach((id, obj) -> sb.append(String.format("ID=%d ", id)));
+        return sb.toString().trim();
     }
 
     /**
@@ -379,6 +395,16 @@ public class ShoalTracker implements PluginLifecycleComponent {
         }
     }
 
+    @SuppressWarnings("unused")
+    @Subscribe
+    public void onGameObjectDespawned(GameObjectDespawned e) {
+        GameObject obj = e.getGameObject();
+        
+        if (isShoalGameObject(obj)) {
+            handleShoalGameObjectDespawned(obj);
+        }
+    }
+
     private boolean isShoalGameObject(GameObject obj) {
         return SHOAL_OBJECT_IDS.contains(obj.getId());
     }
@@ -386,6 +412,15 @@ public class ShoalTracker implements PluginLifecycleComponent {
     private void handleShoalGameObjectSpawned(GameObject obj) {
         int objectId = obj.getId();
         shoalObjects.put(objectId, obj);
+        log.debug("Shoal GameObject spawned: ID={}", objectId);
+    }
+
+    private void handleShoalGameObjectDespawned(GameObject obj) {
+        int objectId = obj.getId();
+        GameObject removed = shoalObjects.remove(objectId);
+        if (removed != null) {
+            log.debug("Shoal GameObject despawned: ID={}", objectId);
+        }
     }
 
     @SuppressWarnings("unused")

@@ -215,12 +215,9 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 			if (!lastWaypoint.isStopPoint() && waypoints.size() >= 2) {
 				Waypoint penultimateWaypoint = waypoints.get(waypoints.size() - 2);
 				WorldPoint penultimatePosition = penultimateWaypoint.getPosition();
-				double previousSlope = getSlope(penultimatePosition, lastPosition);
-				double currentSlope = getSlope(lastPosition, position);
-
-				boolean isSameSlope = DoubleMath.fuzzyEquals(previousSlope, currentSlope, 0.01);
-				boolean isSegmentTooLong = !isNearPosition(lastPosition, penultimatePosition, MAX_WAYPOINT_DISTANCE);
-				if (isSameSlope && !isSegmentTooLong) {
+				
+				// Use more sophisticated path smoothing to eliminate small zigzags
+				if (shouldSmoothPath(penultimatePosition, lastPosition, position)) {
 					waypoints.removeLast();
 				}
 			}
@@ -244,6 +241,87 @@ public class ShoalPathTracker implements PluginLifecycleComponent {
 			double dx = p1.getX() - p2.getX();
 			double dy = p1.getY() - p2.getY();
 			return dx / dy;
+		}
+
+		/**
+		 * Determines if a path segment should be smoothed out to eliminate small zigzags.
+		 * Uses multiple criteria to detect unnecessary waypoints that don't meaningfully
+		 * contribute to following the shoal path.
+		 */
+		private boolean shouldSmoothPath(WorldPoint p1, WorldPoint p2, WorldPoint p3) {
+			// Don't smooth if segment is too long (might be important waypoint)
+			boolean isSegmentTooLong = !isNearPosition(p2, p1, MAX_WAYPOINT_DISTANCE);
+			if (isSegmentTooLong) {
+				return false;
+			}
+
+			// Check if the three points are nearly collinear (small zigzag)
+			if (arePointsNearlyCollinear(p1, p2, p3)) {
+				return true;
+			}
+
+			// Check if the deviation from direct path is small
+			if (isSmallDeviation(p1, p2, p3)) {
+				return true;
+			}
+
+			// Check if slopes are similar (more conservative than exact match)
+			double previousSlope = getSlope(p1, p2);
+			double currentSlope = getSlope(p2, p3);
+			return DoubleMath.fuzzyEquals(previousSlope, currentSlope, 0.05); // More conservative tolerance
+		}
+
+		/**
+		 * Checks if three points are nearly collinear using the cross product method.
+		 * Small cross products indicate the points are nearly in a straight line.
+		 */
+		private boolean arePointsNearlyCollinear(WorldPoint p1, WorldPoint p2, WorldPoint p3) {
+			// Calculate cross product of vectors (p1->p2) and (p2->p3)
+			double dx1 = p2.getX() - p1.getX();
+			double dy1 = p2.getY() - p1.getY();
+			double dx2 = p3.getX() - p2.getX();
+			double dy2 = p3.getY() - p2.getY();
+			
+			double crossProduct = Math.abs(dx1 * dy2 - dy1 * dx2);
+			
+			// More conservative threshold - only remove very straight lines
+			// Reduced from 2.0 to 1.0 for more conservative smoothing
+			return crossProduct < 1.0;
+		}
+
+		/**
+		 * Checks if the middle point deviates only slightly from the direct path
+		 * between the first and third points. Small deviations indicate unnecessary waypoints.
+		 */
+		private boolean isSmallDeviation(WorldPoint p1, WorldPoint p2, WorldPoint p3) {
+			// Calculate distance from p2 to the line segment p1-p3
+			double distanceToLine = distanceFromPointToLine(p2, p1, p3);
+			
+			// More conservative threshold - only remove points very close to the line
+			// Reduced from 3.0 to 1.5 tiles for more conservative smoothing
+			return distanceToLine < 1.5;
+		}
+
+		/**
+		 * Calculates the perpendicular distance from a point to a line segment.
+		 */
+		private double distanceFromPointToLine(WorldPoint point, WorldPoint lineStart, WorldPoint lineEnd) {
+			double dx = lineEnd.getX() - lineStart.getX();
+			double dy = lineEnd.getY() - lineStart.getY();
+			
+			// If line segment has zero length, return distance to start point
+			if (dx == 0 && dy == 0) {
+				return Math.hypot(point.getX() - lineStart.getX(), point.getY() - lineStart.getY());
+			}
+			
+			// Calculate the perpendicular distance using the formula:
+			// distance = |ax + by + c| / sqrt(a² + b²)
+			// where the line is ax + by + c = 0
+			double a = dy;
+			double b = -dx;
+			double c = dx * lineStart.getY() - dy * lineStart.getX();
+			
+			return Math.abs(a * point.getX() + b * point.getY() + c) / Math.sqrt(a * a + b * b);
 		}
 
 		public boolean hasValidPath() {

@@ -144,17 +144,18 @@ public class ShoalOverlay extends Overlay
     }
 
     private Color getShoalColorFromDepth() {
-        // Check if we have GameObjects to determine if it's a special shoal
+        // Check if we have any special shoal GameObjects
         Set<GameObject> shoals = shoalTracker.getShoalObjects();
-        for (GameObject shoal : shoals) {
-            if (isSpecialShoal(shoal.getId())) {
-                return Color.GREEN;
-            }
+        boolean hasSpecialShoal = shoals.stream()
+            .anyMatch(shoal -> isSpecialShoal(shoal.getId()));
+        
+        if (hasSpecialShoal) {
+            log.debug("Special shoal detected, using green highlight");
+            return Color.GREEN;
         }
         
-        // Could potentially use depth information for color coding in the future:
-        // ShoalDepth depth = shoalTracker.getCurrentShoalDepth();
-        // But for now, use config color for regular shoals
+        // Use config color for regular shoals
+        log.debug("Regular shoal detected, using config color");
         return config.trawlingShoalHighlightColour();
     }
 
