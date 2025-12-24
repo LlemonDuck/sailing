@@ -98,9 +98,17 @@ public interface SailingConfig extends Config
 	String SECTION_OCEAN_ENCOUNTERS = "oceanEncounters";
 
 	@ConfigSection(
+		name = "Side Panel",
+		description = "Settings for the sailing side panel.",
+		position = 1100,
+		closedByDefault = true
+	)
+	String SECTION_SIDE_PANEL = "sidePanel";
+
+	@ConfigSection(
 		name = "Silly Things",
 		description = "Fun options for the lighthearted sailor.",
-		position = 1100,
+		position = 1200,
 		closedByDefault = true
 	)
 	String SECTION_SILLY = "silly";
@@ -947,6 +955,21 @@ public interface SailingConfig extends Config
 	default Notification notifyOceanManSpawn()
 	{
 		return Notification.OFF;
+	}
+
+	String CONFIG_KEY_PREFIX_SIDE_PANEL_HOTSPOT = "sidePanelHotspot_";
+	String CONFIG_KEY_DEFAULT_STEERING_ASSIGN_BUTTON = "defaultSteeringAssignButton";
+
+	@ConfigItem(
+		keyName = CONFIG_KEY_DEFAULT_STEERING_ASSIGN_BUTTON,
+		name = "Default Steering Assign Button",
+		description = "Use the default location of the steering wheel npc assign button.",
+		section = SECTION_SIDE_PANEL,
+		position = 1
+	)
+	default boolean defaultSteeringAssignButton()
+	{
+		return true;
 	}
 
 	@ConfigItem(

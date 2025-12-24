@@ -43,3 +43,8 @@ Sailing quality-of-life for charting, navigation, facilities, and more.
 
 ## Courier Tasks
 - Destination on Items: Shows the destination port directly on cargo crates in your inventory and cargo hold.
+
+## Side Panel
+- Reorder facilities in the sailing side panel.
+
+![Reorder Side Panel](docs/reorder-sidepanel.png)
