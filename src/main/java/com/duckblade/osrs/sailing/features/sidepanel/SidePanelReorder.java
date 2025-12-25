@@ -40,6 +40,7 @@ import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.api.FontID;
 import net.runelite.api.GameState;
 import net.runelite.api.MenuAction;
 import net.runelite.api.events.MenuOptionClicked;
@@ -51,6 +52,7 @@ import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetSizeMode;
+import net.runelite.api.widgets.WidgetTextAlignment;
 import net.runelite.api.widgets.WidgetType;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatMessageManager;
@@ -379,6 +381,13 @@ public class SidePanelReorder implements PluginLifecycleComponent
 
 		clickLayer.deleteAllChildren();
 
+		if (rows.getChildren() != null)
+		{
+			Arrays.stream(rows.getChildren())
+				.filter(w -> w != null && w.isFilled())
+				.forEach(w -> w.setHidden(true));
+		}
+
 		for (var visualIdx = 0; visualIdx < customRowOrder.length; visualIdx++)
 		{
 			final var logicalIdx = customRowOrder[visualIdx];
@@ -418,7 +427,7 @@ public class SidePanelReorder implements PluginLifecycleComponent
 		background.setOriginalY(originalY);
 		background.setOriginalHeight(ROW_HEIGHT);
 		background.setWidthMode(WidgetSizeMode.MINUS);
-		background.setTextColor(Color.HSBtoRGB(logicalIdx / 10f, 0.7f, 0.7f) & 0xFFFFFF);
+		background.setTextColor(Color.HSBtoRGB(logicalIdx / 10f, 0.8f, 0.8f) & 0xFFFFFF);
 		background.setOpacity(160);
 		background.setFilled(true);
 		background.revalidate();
@@ -451,6 +460,19 @@ public class SidePanelReorder implements PluginLifecycleComponent
 		upButton.setOnMouseLeaveListener((JavaScriptCallback) e -> upButton.setBorderType(1));
 		upButton.setHasListener(true);
 		upButton.revalidate();
+
+		final var rowNumber = rows.createChild(WidgetType.TEXT);
+		rowNumber.setOriginalX(134);
+		rowNumber.setOriginalY(originalY + 6);
+		rowNumber.setOriginalWidth(20);
+		rowNumber.setOriginalHeight(20);
+		rowNumber.setXTextAlignment(WidgetTextAlignment.CENTER);
+		rowNumber.setYTextAlignment(WidgetTextAlignment.CENTER);
+		rowNumber.setFontId(FontID.VERDANA_15);
+		rowNumber.setText(Integer.toString(logicalIdx + 1));
+		rowNumber.setTextColor(0xffffff);
+		rowNumber.setTextShadowed(true);
+		rowNumber.revalidate();
 	}
 
 	private boolean isSailingSidePanelOpen()
@@ -554,7 +576,6 @@ public class SidePanelReorder implements PluginLifecycleComponent
 	private void reset()
 	{
 		customRowOrder = null;
-		disableReordering();
 		redrawSidePanel();
 	}
 
