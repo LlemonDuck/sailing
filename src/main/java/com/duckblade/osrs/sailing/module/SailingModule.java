@@ -39,6 +39,7 @@ import com.duckblade.osrs.sailing.features.oceanencounters.GiantClam;
 import com.duckblade.osrs.sailing.features.oceanencounters.LostShipment;
 import com.duckblade.osrs.sailing.features.oceanencounters.MysteriousGlow;
 import com.duckblade.osrs.sailing.features.oceanencounters.OceanMan;
+import com.duckblade.osrs.sailing.features.sidepanel.SidePanelReorder;
 import com.duckblade.osrs.sailing.features.reversebeep.ReverseBeep;
 import com.duckblade.osrs.sailing.features.salvaging.SalvagingHighlight;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
@@ -102,6 +103,7 @@ public class SailingModule extends AbstractModule
 		SeaChartOverlay seaChartOverlay,
 		SeaChartPanelOverlay seaChartPanelOverlay,
 		SeaChartTaskIndex seaChartTaskIndex,
+		SidePanelReorder sidePanelReorder,
 		SpeedBoostInfoBox speedBoostInfoBox,
 		TemporTantrumHelper temporTantrumHelper,
 		TrueTileIndicator trueTileIndicator,
@@ -146,6 +148,7 @@ public class SailingModule extends AbstractModule
 			.add(seaChartMapPointManager)
 			.add(seaChartPanelOverlay)
 			.add(seaChartTaskIndex)
+			.add(sidePanelReorder)
 			.add(speedBoostInfoBox)
 			.add(temporTantrumHelper)
 			.add(trueTileIndicator)
