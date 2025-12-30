@@ -43,3 +43,8 @@ Sailing quality-of-life for charting, navigation, facilities, and more.
 
 ## Courier Tasks
 - Destination on Items: Shows the destination port directly on cargo crates in your inventory and cargo hold.
+
+## Sailing UI
+- Expand the UI to show more facilities without scrolling
+
+![Sailing UI](docs/ui.png)

@@ -98,9 +98,17 @@ public interface SailingConfig extends Config
 	String SECTION_OCEAN_ENCOUNTERS = "oceanEncounters";
 
 	@ConfigSection(
+		name = "User Interface",
+		description = "Settings for the user interface.",
+		position = 1100,
+		closedByDefault = true
+	)
+	String SECTION_USER_INTERFACE = "userInterface";
+
+	@ConfigSection(
 		name = "Silly Things",
 		description = "Fun options for the lighthearted sailor.",
-		position = 1100,
+		position = 1200,
 		closedByDefault = true
 	)
 	String SECTION_SILLY = "silly";
@@ -947,6 +955,18 @@ public interface SailingConfig extends Config
 	default Notification notifyOceanManSpawn()
 	{
 		return Notification.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "expandSailingUI",
+		name = "Expand Sailing Panel",
+		description = "Expand the sailing settings UI.",
+		section = SECTION_USER_INTERFACE,
+		position = 1
+	)
+	default boolean expandSailingUI()
+	{
+		return false;
 	}
 
 	@ConfigItem(

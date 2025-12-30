@@ -41,6 +41,7 @@ import com.duckblade.osrs.sailing.features.oceanencounters.MysteriousGlow;
 import com.duckblade.osrs.sailing.features.oceanencounters.OceanMan;
 import com.duckblade.osrs.sailing.features.reversebeep.ReverseBeep;
 import com.duckblade.osrs.sailing.features.salvaging.SalvagingHighlight;
+import com.duckblade.osrs.sailing.features.ui.SettingsRedesign;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -105,7 +106,8 @@ public class SailingModule extends AbstractModule
 		SpeedBoostInfoBox speedBoostInfoBox,
 		TemporTantrumHelper temporTantrumHelper,
 		TrueTileIndicator trueTileIndicator,
-		WeatherTaskTracker weatherTaskTracker
+		WeatherTaskTracker weatherTaskTracker,
+		SettingsRedesign settingsRedesign
 	)
 	{
 		var builder = ImmutableSet.<PluginLifecycleComponent>builder()
@@ -149,7 +151,8 @@ public class SailingModule extends AbstractModule
 			.add(speedBoostInfoBox)
 			.add(temporTantrumHelper)
 			.add(trueTileIndicator)
-			.add(weatherTaskTracker);
+			.add(weatherTaskTracker)
+			.add(settingsRedesign);
 
 		// features still in development
 		//noinspection StatementWithEmptyBody
