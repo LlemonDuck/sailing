@@ -444,13 +444,13 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "hideStopNavigatingDuringTrials",
-		name = "Deprio Stop-navigating During BT",
-		description = "Deprioritizes the 'Stop-navigating' and 'Escape' option while you are in a Barracuda Trial.",
+		keyName = "LockToHelmDuringTrials",
+		name = "Lock Player to Helm During Trials",
+		description = "Deprioritizes non-navigational options while in a Barracuda Trial and at helm.",
 		section = SECTION_MES,
 		position = 3
 	)
-	default boolean hideStopNavigatingDuringTrials()
+	default boolean lockToHelmDuringTrials()
 	{
 		return true;
 	}
