@@ -6,6 +6,8 @@ import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.model.Boat;
 import com.duckblade.osrs.sailing.model.SalvagingHookTier;
+import com.duckblade.osrs.sailing.model.CannonTier;
+import com.duckblade.osrs.sailing.model.WindCatcherTier;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -61,9 +63,14 @@ public class FacilitiesOverlay
 		renderFacility(graphics, Color.CYAN, "sail", boat.getSail(), boat.getSailTier());
 		renderFacility(graphics, Color.ORANGE, "helm", boat.getHelm(), boat.getHelmTier());
 		renderFacility(graphics, Color.GREEN, "cargo", boat.getCargoHold(), boat.getCargoHoldTier());
+		renderFacility(graphics, Color.MAGENTA, "windcatcher", boat.getWindCatcher(), boat.getWindCatcherTier());
 		for (GameObject hook : boat.getSalvagingHooks())
 		{
 			renderFacility(graphics, Color.RED, "hook", hook, SalvagingHookTier.fromGameObjectId(hook.getId()));
+		}
+		for (GameObject cannon : boat.getCannons())
+		{
+			renderFacility(graphics, Color.YELLOW, "cannon", cannon, CannonTier.fromGameObjectId(cannon.getId()));
 		}
 
 		return null;

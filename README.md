@@ -17,6 +17,11 @@ Sailing quality-of-life for charting, navigation, facilities, and more.
 
 ![Trimmable Sails](docs/trimmable-sails.png)
 
+## Trawling
+- Highlight Net Buttons: Automatically highlights fishing net depth adjustment buttons when they need to be changed to match the current shoal depth.
+  - Calibration: Shows "Calibrating Nets..." message until the plugin observes a complete shoal movement cycle to sync timing.
+- Show Net Capacity: Displays the current fish count in your nets (max 250 for two nets, 125 for one net).
+
 ## Crewmates
 - Mute Overhead Text: Mute crewmate overhead messages.
   - Modes: `None` (default), `Other boats`, `All`.

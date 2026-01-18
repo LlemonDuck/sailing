@@ -1,11 +1,14 @@
 package com.duckblade.osrs.sailing.features.util;
-
 import com.duckblade.osrs.sailing.model.Boat;
 import com.duckblade.osrs.sailing.model.CargoHoldTier;
+import com.duckblade.osrs.sailing.model.ChumStationTier;
 import com.duckblade.osrs.sailing.model.HelmTier;
 import com.duckblade.osrs.sailing.model.HullTier;
 import com.duckblade.osrs.sailing.model.SailTier;
 import com.duckblade.osrs.sailing.model.SalvagingHookTier;
+import com.duckblade.osrs.sailing.model.FishingNetTier;
+import com.duckblade.osrs.sailing.model.CannonTier;
+import com.duckblade.osrs.sailing.model.WindCatcherTier;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import java.util.HashMap;
 import java.util.Map;
@@ -92,6 +95,26 @@ public class BoatTracker
 			boat.setCargoHold(o);
 			log.trace("found cargo hold {}={} for boat in wv {}", o.getId(), boat.getCargoHoldTier(), boat.getWorldViewId());
 		}
+		if (ChumStationTier.fromGameObjectId(o.getId()) != null)
+		{
+			boat.setChumStation(o);
+			log.trace("found chum station {}={} for boat in wv {}", o.getId(), boat.getChumStationTier(), boat.getWorldViewId());
+		}
+        if (FishingNetTier.fromGameObjectId(o.getId()) != null)
+        {
+            boat.getFishingNets().add(o);
+            log.trace("found fishing net {}={} for boat in wv {}", o.getId(), FishingNetTier.fromGameObjectId(o.getId()), boat.getWorldViewId());
+        }
+        if (CannonTier.fromGameObjectId(o.getId()) != null)
+        {
+            boat.getCannons().add(o);
+            log.trace("found cannon {}={} for boat in wv {}", o.getId(), CannonTier.fromGameObjectId(o.getId()), boat.getWorldViewId());
+        }
+        if (WindCatcherTier.fromGameObjectId(o.getId()) != null)
+        {
+            boat.setWindCatcher(o);
+            log.trace("found wind catcher {}={} for boat in wv {}", o.getId(), boat.getWindCatcherTier(), boat.getWorldViewId());
+        }
 	}
 
 	@Subscribe
@@ -128,10 +151,32 @@ public class BoatTracker
 			boat.setCargoHold(null);
 			log.trace("unsetting cargo hold for boat in wv {}", boat.getWorldViewId());
 		}
+		if (boat.getChumStation() == o)
+		{
+			boat.setChumStation(null);
+			log.trace("unsetting chum station for boat in wv {}", boat.getWorldViewId());
+		}
+		if (boat.getFishingNets().remove(o))
+		{
+			log.trace("unsetting fishing net for boat in wv {}", boat.getWorldViewId());
+		}
+		if (boat.getCannons().remove(o))
+		{
+			log.trace("unsetting cannon for boat in wv {}", boat.getWorldViewId());
+		}
+		if (boat.getWindCatcher() == o)
+		{
+			boat.setWindCatcher(null);
+			log.trace("unsetting wind catcher for boat in wv {}", boat.getWorldViewId());
+		}
 	}
 
 	public Boat getBoat()
 	{
+		if (client.getLocalPlayer() == null)
+		{
+			return null;
+		}
 		return getBoat(client.getLocalPlayer().getWorldView().getId());
 	}
 
