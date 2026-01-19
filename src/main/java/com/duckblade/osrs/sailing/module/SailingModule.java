@@ -41,6 +41,8 @@ import com.duckblade.osrs.sailing.features.oceanencounters.MysteriousGlow;
 import com.duckblade.osrs.sailing.features.oceanencounters.OceanMan;
 import com.duckblade.osrs.sailing.features.reversebeep.ReverseBeep;
 import com.duckblade.osrs.sailing.features.salvaging.SalvagingHighlight;
+import com.duckblade.osrs.sailing.features.salvaging.SalvagingNotification;
+import com.duckblade.osrs.sailing.features.salvaging.SalvagingOverlay;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -98,6 +100,8 @@ public class SailingModule extends AbstractModule
 		RapidsOverlay rapidsOverlay,
 		ReverseBeep reverseBeep,
 		SalvagingHighlight salvagingHighlight,
+        SalvagingOverlay salvagingOverlay,
+        SalvagingNotification salvagingNotification,
 		SeaChartMapPointManager seaChartMapPointManager,
 		SeaChartOverlay seaChartOverlay,
 		SeaChartPanelOverlay seaChartPanelOverlay,
@@ -142,6 +146,8 @@ public class SailingModule extends AbstractModule
 			.add(rapidsOverlay)
 			.add(reverseBeep)
 			.add(salvagingHighlight)
+            .add(salvagingOverlay)
+            .add(salvagingNotification)
 			.add(seaChartOverlay)
 			.add(seaChartMapPointManager)
 			.add(seaChartPanelOverlay)
