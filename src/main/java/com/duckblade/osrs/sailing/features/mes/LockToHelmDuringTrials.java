@@ -2,12 +2,16 @@ package com.duckblade.osrs.sailing.features.mes;
 
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
+import java.util.Arrays;
+import java.util.Comparator;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.events.MenuEntryAdded;
+import net.runelite.api.Menu;
+import net.runelite.api.MenuEntry;
+import net.runelite.api.events.PostMenuSort;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.eventbus.Subscribe;
 
@@ -17,8 +21,16 @@ import net.runelite.client.eventbus.Subscribe;
 public class LockToHelmDuringTrials implements PluginLifecycleComponent
 {
 
-	private static final String OPTION_STOP_NAVIGATING = "Stop-navigating";
-	private static final String OPTION_ESCAPE = "Escape";
+	private static final int LOCKED_TO_HELM = 3;
+
+	private static final String[] FACILITY_SUBSTRINGS = new String[] {"Anchor", "Helm", "Keg", "Range", "cargo hold", "cannon",
+		"focus", "net", "pearl", "salvaging hook", "station", "spreader", "stone"};
+
+	private static final Comparator<MenuEntry> MENU_ENTRY_COMPARATOR =
+		Comparator.comparing((MenuEntry me) ->
+				me.getTarget().startsWith("<col=ffff>") &&
+					Arrays.stream(FACILITY_SUBSTRINGS).anyMatch(facilitySubstring -> me.getTarget().contains(facilitySubstring)))
+			.reversed();
 
 	private final Client client;
 
@@ -29,18 +41,19 @@ public class LockToHelmDuringTrials implements PluginLifecycleComponent
 	}
 
 	@Subscribe
-	public void onMenuEntryAdded(MenuEntryAdded e)
+	public void onPostMenuSort(PostMenuSort e)
 	{
-		if (client.getVarbitValue(VarbitID.SAILING_BT_IN_TRIAL) == 0)
+		if (client.getVarbitValue(VarbitID.SAILING_BOAT_FACILITY_LOCKEDIN) != LOCKED_TO_HELM ||
+			client.getVarbitValue(VarbitID.SAILING_BT_IN_TRIAL) == 0)
 		{
 			return;
 		}
 
-		if (OPTION_STOP_NAVIGATING.equals(e.getOption()) ||
-			OPTION_ESCAPE.equals(e.getOption()))
-		{
-			// Push the Stop-navigating option down instead of removing it
-			e.getMenuEntry().setDeprioritized(true);
-		}
+		Menu menu = client.getMenu();
+		menu.setMenuEntries(
+			Arrays.stream(menu.getMenuEntries())
+				.sorted(MENU_ENTRY_COMPARATOR)
+				.toArray(MenuEntry[]::new)
+		);
 	}
 }
