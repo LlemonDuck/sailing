@@ -14,7 +14,7 @@ import net.runelite.client.eventbus.Subscribe;
 @Slf4j
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
-public class HideStopNavigatingDuringTrials implements PluginLifecycleComponent
+public class LockToHelmDuringTrials implements PluginLifecycleComponent
 {
 
 	private static final String OPTION_STOP_NAVIGATING = "Stop-navigating";
@@ -25,7 +25,7 @@ public class HideStopNavigatingDuringTrials implements PluginLifecycleComponent
 	@Override
 	public boolean isEnabled(SailingConfig config)
 	{
-		return config.hideStopNavigatingDuringTrials();
+		return config.lockToHelmDuringTrials();
 	}
 
 	@Subscribe
