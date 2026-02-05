@@ -8,7 +8,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.Client;
@@ -80,7 +83,7 @@ public class ChartingPathOverlay extends Overlay implements PluginLifecycleCompo
 		boolean needsRecalc = cachedPath.isEmpty()
 			|| lastCalcPosition == null
 			|| playerPos.distanceTo(lastCalcPosition) > RECALC_DISTANCE_THRESHOLD
-			|| (!cachedPath.isEmpty() && cachedPath.get(0).isComplete(client));
+			|| cachedPath.get(0).isComplete(client);
 
 		if (needsRecalc)
 		{
@@ -159,26 +162,18 @@ public class ChartingPathOverlay extends Overlay implements PluginLifecycleCompo
 
 	private void recalculatePath(WorldPoint startPos)
 	{
-		List<SeaChartTask> uncompleted = new ArrayList<>();
-		for (SeaChartTask task : SeaChartTask.values())
-		{
-			if (!task.isComplete(client))
-			{
-				uncompleted.add(task);
-			}
-		}
+		List<SeaChartTask> uncompleted = Arrays.stream(SeaChartTask.values())
+			.filter(task -> !task.isComplete(client))
+			.collect(Collectors.toList());
 
 		if (uncompleted.isEmpty())
 		{
 			cachedPath.clear();
-			lastCalcPosition = startPos;
-			return;
 		}
-
-		List<SeaChartTask> path = nearestNeighbor(uncompleted, startPos);
-		path = twoOpt(path);
-
-		cachedPath = path;
+		else
+		{
+			cachedPath = twoOpt(nearestNeighbor(uncompleted, startPos));
+		}
 		lastCalcPosition = startPos;
 	}
 
@@ -261,14 +256,7 @@ public class ChartingPathOverlay extends Overlay implements PluginLifecycleCompo
 
 	private void reverse(List<SeaChartTask> path, int start, int end)
 	{
-		while (start < end)
-		{
-			SeaChartTask temp = path.get(start);
-			path.set(start, path.get(end));
-			path.set(end, temp);
-			start++;
-			end--;
-		}
+		Collections.reverse(path.subList(start, end + 1));
 	}
 
 	private int distance(WorldPoint a, WorldPoint b)
