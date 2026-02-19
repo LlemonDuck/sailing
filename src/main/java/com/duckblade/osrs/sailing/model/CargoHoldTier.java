@@ -27,7 +27,6 @@ public enum CargoHoldTier
 			20,
 			30,
 			40,
-			4,
 		}
 	),
 	OAK(
@@ -46,7 +45,6 @@ public enum CargoHoldTier
 			30,
 			45,
 			60,
-			5,
 		}
 	),
 	TEAK(
@@ -65,7 +63,6 @@ public enum CargoHoldTier
 			45,
 			60,
 			75,
-			6,
 		}
 	),
 	MAHOGANY(
@@ -84,7 +81,6 @@ public enum CargoHoldTier
 			60,
 			90,
 			120,
-			7,
 		}
 	),
 	CAMPHOR(
@@ -103,7 +99,6 @@ public enum CargoHoldTier
 			80,
 			120,
 			160,
-			8,
 		}
 	),
 	IRONWOOD(
@@ -122,7 +117,6 @@ public enum CargoHoldTier
 			105,
 			150,
 			210,
-			9,
 		}
 	),
 	ROSEWOOD(
@@ -141,13 +135,12 @@ public enum CargoHoldTier
 			120,
 			180,
 			240,
-			10,
 		}
 	),
 	;
 
 	private final int[] gameObjectIds;
-	private final int[] capacities; // raft, skiff, sloop, uim
+	private final int[] capacities; // raft, skiff, sloop
 
 	public static CargoHoldTier fromGameObjectId(int id)
 	{
@@ -165,13 +158,8 @@ public enum CargoHoldTier
 		return null;
 	}
 
-	public int getCapacity(SizeClass sizeClass, boolean uim)
+	public int getCapacity(SizeClass sizeClass)
 	{
-		if (uim)
-		{
-			return capacities[3];
-		}
-
 		switch (sizeClass)
 		{
 			case RAFT:

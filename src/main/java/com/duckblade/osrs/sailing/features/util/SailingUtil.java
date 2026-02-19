@@ -12,7 +12,6 @@ import net.runelite.api.Player;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.gameval.VarbitID;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = @Inject)
@@ -31,11 +30,6 @@ public class SailingUtil
 	{
 		return client.getLocalPlayer() != null &&
 			!client.getLocalPlayer().getWorldView().isTopLevel();
-	}
-
-	public static boolean isUim(Client client)
-	{
-		return client.getVarbitValue(VarbitID.IRONMAN) == ACCOUNT_TYPE_UIM;
 	}
 
 	// on boats, InteractingChanged fires for the local player but the target is null
