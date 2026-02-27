@@ -3,12 +3,15 @@ package com.duckblade.osrs.sailing.features.salvaging;
 import com.duckblade.osrs.sailing.SailingConfig;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
+import com.duckblade.osrs.sailing.features.salvaging.Wreck.WreckType;
 import com.google.common.collect.ImmutableMap;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
+import java.awt.BasicStroke;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
@@ -37,39 +40,38 @@ public class SalvagingHighlight
 
 	private static final int SIZE_SALVAGEABLE_AREA = 15;
 
-	private static final Map<Integer, Integer> SALVAGE_LEVEL_REQ = ImmutableMap.<Integer, Integer>builder()
-		.put(ObjectID.SAILING_SMALL_SHIPWRECK, 15)
-		.put(ObjectID.SAILING_FISHERMAN_SHIPWRECK, 26)
-		.put(ObjectID.SAILING_BARRACUDA_SHIPWRECK, 35)
-		.put(ObjectID.SAILING_LARGE_SHIPWRECK, 53)
-		.put(ObjectID.SAILING_PIRATE_SHIPWRECK, 64)
-		.put(ObjectID.SAILING_MERCENARY_SHIPWRECK, 73)
-		.put(ObjectID.SAILING_FREMENNIK_SHIPWRECK, 80)
-		.put(ObjectID.SAILING_MERCHANT_SHIPWRECK, 87)
-		.build();
-
-	private static final Map<Integer, Integer> STUMP_LEVEL_REQ = ImmutableMap.<Integer, Integer>builder()
-		.put(ObjectID.SAILING_SMALL_SHIPWRECK_STUMP, 15)
-		.put(ObjectID.SAILING_FISHERMAN_SHIPWRECK_STUMP, 26)
-		.put(ObjectID.SAILING_BARRACUDA_SHIPWRECK_STUMP, 35)
-		.put(ObjectID.SAILING_LARGE_SHIPWRECK_STUMP, 53)
-		.put(ObjectID.SAILING_PIRATE_SHIPWRECK_STUMP, 64)
-		.put(ObjectID.SAILING_MERCENARY_SHIPWRECK_STUMP, 73)
-		.put(ObjectID.SAILING_FREMENNIK_SHIPWRECK_STUMP, 80)
-		.put(ObjectID.SAILING_MERCHANT_SHIPWRECK_STUMP, 87)
-		.build();
+	private static final Map<Integer, Wreck> WRECK_DEF_BY_ID =
+			ImmutableMap.<Integer, Wreck>builder()
+					.put(ObjectID.SAILING_SMALL_SHIPWRECK, new Wreck(WreckType.SALVAGE, 15))
+					.put(ObjectID.SAILING_SMALL_SHIPWRECK_STUMP, new Wreck(WreckType.STUMP, 15))
+					.put(ObjectID.SAILING_FISHERMAN_SHIPWRECK, new Wreck(WreckType.SALVAGE, 26))
+					.put(ObjectID.SAILING_FISHERMAN_SHIPWRECK_STUMP, new Wreck(WreckType.STUMP, 26))
+					.put(ObjectID.SAILING_BARRACUDA_SHIPWRECK, new Wreck(WreckType.SALVAGE, 35))
+					.put(ObjectID.SAILING_BARRACUDA_SHIPWRECK_STUMP, new Wreck(WreckType.STUMP, 35))
+					.put(ObjectID.SAILING_LARGE_SHIPWRECK, new Wreck(WreckType.SALVAGE, 53))
+					.put(ObjectID.SAILING_LARGE_SHIPWRECK_STUMP, new Wreck(WreckType.STUMP, 53))
+					.put(ObjectID.SAILING_PIRATE_SHIPWRECK, new Wreck(WreckType.SALVAGE, 64))
+					.put(ObjectID.SAILING_PIRATE_SHIPWRECK_STUMP, new Wreck(WreckType.STUMP, 64))
+					.put(ObjectID.SAILING_MERCENARY_SHIPWRECK, new Wreck(WreckType.SALVAGE, 73))
+					.put(ObjectID.SAILING_MERCENARY_SHIPWRECK_STUMP, new Wreck(WreckType.STUMP, 73))
+					.put(ObjectID.SAILING_FREMENNIK_SHIPWRECK, new Wreck(WreckType.SALVAGE, 80))
+					.put(ObjectID.SAILING_FREMENNIK_SHIPWRECK_STUMP, new Wreck(WreckType.STUMP, 80))
+					.put(ObjectID.SAILING_MERCHANT_SHIPWRECK, new Wreck(WreckType.SALVAGE, 87))
+					.put(ObjectID.SAILING_MERCHANT_SHIPWRECK_STUMP, new Wreck(WreckType.STUMP, 87))
+					.build();
 
 	private final Client client;
 
-	private final Set<GameObject> wrecks = new HashSet<>();
-	private final Set<GameObject> stumps = new HashSet<>();
-
-	private boolean activeWrecks;
+	private final Map<GameObject, WreckType> wreckObjects = new HashMap<>();
+	private boolean showActiveWrecks;
 	private Color activeColour;
-	private boolean inactiveWrecks;
+	private int activeOpacity;
+	private boolean showInctiveWrecks;
 	private Color inactiveColour;
-	private boolean highLevelWrecks;
+	private int inactiveOpacity;
+	private boolean showHighLevelWrecks;
 	private Color highLevelColour;
+	private int highLevelOpacity;
 
 	@Inject
 	public SalvagingHighlight(Client client)
@@ -83,21 +85,23 @@ public class SalvagingHighlight
 	@Override
 	public boolean isEnabled(SailingConfig config)
 	{
-		activeWrecks = config.salvagingHighlightActiveWrecks();
+		showActiveWrecks = config.salvagingHighlightActiveWrecks();
 		activeColour = config.salvagingHighlightActiveWrecksColour();
-		inactiveWrecks = config.salvagingHighlightInactiveWrecks();
+		activeOpacity = config.salvagingHighlightActiveWrecksOpacity();
+		showInctiveWrecks = config.salvagingHighlightInactiveWrecks();
 		inactiveColour = config.salvagingHighlightInactiveWrecksColour();
-		highLevelWrecks = config.salvagingHighlightHighLevelWrecks();
+		inactiveOpacity = config.salvagingHighlightInactiveWrecksOpacity();
+		showHighLevelWrecks = config.salvagingHighlightHighLevelWrecks();
 		highLevelColour = config.salvagingHighLevelWrecksColour();
+		highLevelOpacity = config.salvagingHighlightHighLevelWrecksOpacity();
 
-		return activeWrecks || inactiveWrecks || highLevelWrecks;
+		return showActiveWrecks || showInctiveWrecks || showHighLevelWrecks;
 	}
 
 	@Override
 	public void shutDown()
 	{
-		wrecks.clear();
-		stumps.clear();
+		wreckObjects.clear();
 	}
 
 	@Override
@@ -110,53 +114,53 @@ public class SalvagingHighlight
 
 		int sailingLevel = client.getBoostedSkillLevel(Skill.SAILING);
 
-		for (GameObject wreck : wrecks)
+		for (Map.Entry<GameObject, WreckType> wreck : wreckObjects.entrySet())
 		{
-			boolean hasReq = sailingLevel >= SALVAGE_LEVEL_REQ.get(wreck.getId());
-			if ((hasReq && activeWrecks) || (!hasReq && highLevelWrecks))
+			GameObject wreckObj = wreck.getKey();
+			WreckType type = wreck.getValue();
+			int levelReq = WRECK_DEF_BY_ID.get(wreckObj.getId()).getLevelReq();
+			boolean hasReq = sailingLevel >= levelReq;
+			if (hasReq && showActiveWrecks && type == WreckType.SALVAGE)
 			{
-				renderWreck(graphics, wreck, hasReq ? activeColour : highLevelColour);
+				renderWreck(graphics, wreckObj, activeColour, activeOpacity);
 			}
-		}
-		for (GameObject wreck : stumps)
-		{
-			boolean hasReq = sailingLevel >= STUMP_LEVEL_REQ.get(wreck.getId());
-			if ((hasReq && inactiveWrecks) || (!hasReq && highLevelWrecks))
+			else if(hasReq && showInctiveWrecks && type == WreckType.STUMP)
 			{
-				renderWreck(graphics, wreck, hasReq ? inactiveColour : highLevelColour);
+				renderWreck(graphics, wreckObj, inactiveColour, inactiveOpacity);
+			}
+			else if(!hasReq && showHighLevelWrecks)
+			{
+				renderWreck(graphics, wreckObj, highLevelColour, highLevelOpacity);
 			}
 		}
 
 		return null;
 	}
 
-	private void renderWreck(Graphics2D graphics, GameObject wreck, Color colour)
+	private void renderWreck(Graphics2D graphics, GameObject wreck, Color colour, int opacity)
 	{
 		Polygon poly = Perspective.getCanvasTileAreaPoly(client, wreck.getLocalLocation(), SIZE_SALVAGEABLE_AREA);
 		if (poly != null)
 		{
-			OverlayUtil.renderPolygon(graphics, poly, colour);
+			OverlayUtil.renderPolygon(graphics, poly, colour, new Color(0, 0, 0, opacity), new BasicStroke((float) 1));
 		}
 	}
 
 	@Subscribe
 	public void onGameObjectSpawned(GameObjectSpawned e)
 	{
-		if (SALVAGE_LEVEL_REQ.containsKey(e.getGameObject().getId()))
+		if (WRECK_DEF_BY_ID.containsKey(e.getGameObject().getId()))
 		{
-			wrecks.add(e.getGameObject());
-		}
-		else if (STUMP_LEVEL_REQ.containsKey(e.getGameObject().getId()))
-		{
-			stumps.add(e.getGameObject());
+			WreckType type = WRECK_DEF_BY_ID.get(e.getGameObject().getId()).getType();
+			wreckObjects.put(e.getGameObject(), type);
 		}
 	}
 
 	@Subscribe
 	public void onGameObjectDespawned(GameObjectDespawned e)
 	{
-		wrecks.remove(e.getGameObject());
-		stumps.remove(e.getGameObject());
+		wreckObjects.remove(e.getGameObject(), WreckType.SALVAGE);
+		wreckObjects.remove(e.getGameObject(), WreckType.STUMP);
 	}
 
 	@Subscribe
@@ -164,8 +168,7 @@ public class SalvagingHighlight
 	{
 		if (e.getWorldView().isTopLevel())
 		{
-			wrecks.clear();
-			stumps.clear();
+			wreckObjects.clear();
 		}
 	}
 }
