@@ -66,7 +66,7 @@ public class SalvagingHighlight
 	private boolean showActiveWrecks;
 	private Color activeColour;
 	private int activeOpacity;
-	private boolean showInctiveWrecks;
+	private boolean showInactiveWrecks;
 	private Color inactiveColour;
 	private int inactiveOpacity;
 	private boolean showHighLevelWrecks;
@@ -88,14 +88,14 @@ public class SalvagingHighlight
 		showActiveWrecks = config.salvagingHighlightActiveWrecks();
 		activeColour = config.salvagingHighlightActiveWrecksColour();
 		activeOpacity = config.salvagingHighlightActiveWrecksOpacity();
-		showInctiveWrecks = config.salvagingHighlightInactiveWrecks();
+		showInactiveWrecks = config.salvagingHighlightInactiveWrecks();
 		inactiveColour = config.salvagingHighlightInactiveWrecksColour();
 		inactiveOpacity = config.salvagingHighlightInactiveWrecksOpacity();
 		showHighLevelWrecks = config.salvagingHighlightHighLevelWrecks();
 		highLevelColour = config.salvagingHighLevelWrecksColour();
 		highLevelOpacity = config.salvagingHighlightHighLevelWrecksOpacity();
 
-		return showActiveWrecks || showInctiveWrecks || showHighLevelWrecks;
+		return showActiveWrecks || showInactiveWrecks || showHighLevelWrecks;
 	}
 
 	@Override
@@ -124,7 +124,7 @@ public class SalvagingHighlight
 			{
 				renderWreck(graphics, wreckObj, activeColour, activeOpacity);
 			}
-			else if(hasReq && showInctiveWrecks && type == WreckType.STUMP)
+			else if(hasReq && showInactiveWrecks && type == WreckType.STUMP)
 			{
 				renderWreck(graphics, wreckObj, inactiveColour, inactiveOpacity);
 			}
