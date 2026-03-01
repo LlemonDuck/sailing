@@ -24,6 +24,7 @@ Sailing quality-of-life for charting, navigation, facilities, and more.
 ## Menu Entry Swaps
 - Sails At Helm Only: Deprioritizes sail interaction options when you’re not at the helm.
 - Prioritize Cargo Hold: Prioritizes clicking the Cargo Hold over nearby objects to make it easier to open.
+- Lock to Helm During Trials: Deprioritizes non-movement facilities while sailing through Barracuda Trials.
 
 ## Sea Charting
 - Highlight Sea Charting Locations: Highlights nearby chartable locations.

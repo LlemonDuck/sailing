@@ -5,6 +5,7 @@ import com.duckblade.osrs.sailing.features.barracudatrials.HidePortalTransitions
 import com.duckblade.osrs.sailing.features.barracudatrials.JubblyJiveHelper;
 import com.duckblade.osrs.sailing.features.barracudatrials.LostCargoHighlighter;
 import com.duckblade.osrs.sailing.features.barracudatrials.TemporTantrumHelper;
+import com.duckblade.osrs.sailing.features.barracudatrials.locktohelm.LockToHelmDuringTrials;
 import com.duckblade.osrs.sailing.features.barracudatrials.splits.BarracudaSplitsChatMessage;
 import com.duckblade.osrs.sailing.features.barracudatrials.splits.BarracudaSplitsFileWriter;
 import com.duckblade.osrs.sailing.features.barracudatrials.splits.BarracudaSplitsOverlayPanel;
@@ -25,7 +26,6 @@ import com.duckblade.osrs.sailing.features.facilities.CrystalExtractorHighlight;
 import com.duckblade.osrs.sailing.features.facilities.LuffOverlay;
 import com.duckblade.osrs.sailing.features.facilities.SpeedBoostInfoBox;
 import com.duckblade.osrs.sailing.features.mes.DeprioSailsOffHelm;
-import com.duckblade.osrs.sailing.features.mes.HideStopNavigatingDuringTrials;
 import com.duckblade.osrs.sailing.features.mes.PrioritizeCargoHold;
 import com.duckblade.osrs.sailing.features.navigation.LightningCloudsOverlay;
 import com.duckblade.osrs.sailing.features.navigation.LowHPNotification;
@@ -83,9 +83,9 @@ public class SailingModule extends AbstractModule
 		DeprioSailsOffHelm deprioSailsOffHelm,
 		GiantClam giantClam,
 		HidePortalTransitions hidePortalTransitions,
-		HideStopNavigatingDuringTrials hideStopNavigatingDuringTrials,
 		JubblyJiveHelper jubblyJiveHelper,
 		LightningCloudsOverlay lightningCloudsOverlay,
+		LockToHelmDuringTrials lockToHelmDuringTrials,
 		LostCargoHighlighter lostCargoHighlighter,
 		LostShipment lostShipment,
 		LowHPNotification lowHPNotification,
@@ -127,9 +127,9 @@ public class SailingModule extends AbstractModule
 			.add(deprioSailsOffHelm)
 			.add(giantClam)
 			.add(hidePortalTransitions)
-			.add(hideStopNavigatingDuringTrials)
 			.add(jubblyJiveHelper)
 			.add(lightningCloudsOverlay)
+			.add(lockToHelmDuringTrials)
 			.add(lostCargoHighlighter)
 			.add(lostShipment)
 			.add(lowHPNotification)
