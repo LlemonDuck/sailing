@@ -5,6 +5,7 @@ import com.duckblade.osrs.sailing.features.barracudatrials.HidePortalTransitions
 import com.duckblade.osrs.sailing.features.barracudatrials.JubblyJiveHelper;
 import com.duckblade.osrs.sailing.features.barracudatrials.LostCargoHighlighter;
 import com.duckblade.osrs.sailing.features.barracudatrials.TemporTantrumHelper;
+import com.duckblade.osrs.sailing.features.barracudatrials.locktohelm.LockToHelmDuringTrials;
 import com.duckblade.osrs.sailing.features.barracudatrials.splits.BarracudaSplitsChatMessage;
 import com.duckblade.osrs.sailing.features.barracudatrials.splits.BarracudaSplitsFileWriter;
 import com.duckblade.osrs.sailing.features.barracudatrials.splits.BarracudaSplitsOverlayPanel;
@@ -25,7 +26,6 @@ import com.duckblade.osrs.sailing.features.facilities.CrystalExtractorHighlight;
 import com.duckblade.osrs.sailing.features.facilities.LuffOverlay;
 import com.duckblade.osrs.sailing.features.facilities.SpeedBoostInfoBox;
 import com.duckblade.osrs.sailing.features.mes.DeprioSailsOffHelm;
-import com.duckblade.osrs.sailing.features.mes.LockToHelmDuringTrials;
 import com.duckblade.osrs.sailing.features.mes.PrioritizeCargoHold;
 import com.duckblade.osrs.sailing.features.navigation.LightningCloudsOverlay;
 import com.duckblade.osrs.sailing.features.navigation.LowHPNotification;
@@ -84,8 +84,8 @@ public class SailingModule extends AbstractModule
 		GiantClam giantClam,
 		HidePortalTransitions hidePortalTransitions,
 		JubblyJiveHelper jubblyJiveHelper,
-		LockToHelmDuringTrials lockToHelmDuringTrials,
 		LightningCloudsOverlay lightningCloudsOverlay,
+		LockToHelmDuringTrials lockToHelmDuringTrials,
 		LostCargoHighlighter lostCargoHighlighter,
 		LostShipment lostShipment,
 		LowHPNotification lowHPNotification,
@@ -128,8 +128,8 @@ public class SailingModule extends AbstractModule
 			.add(giantClam)
 			.add(hidePortalTransitions)
 			.add(jubblyJiveHelper)
-			.add(lockToHelmDuringTrials)
 			.add(lightningCloudsOverlay)
+			.add(lockToHelmDuringTrials)
 			.add(lostCargoHighlighter)
 			.add(lostShipment)
 			.add(lowHPNotification)

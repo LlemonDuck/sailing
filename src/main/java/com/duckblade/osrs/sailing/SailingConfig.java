@@ -1,6 +1,9 @@
 package com.duckblade.osrs.sailing;
 
 import java.awt.Color;
+import java.util.Set;
+
+import com.duckblade.osrs.sailing.features.barracudatrials.locktohelm.LockToHelmFilter;
 import net.runelite.client.config.Alpha;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
@@ -443,18 +446,6 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(
-		keyName = "lockToHelmDuringTrials",
-		name = "Lock to Helm During Trials",
-		description = "Deprioritizes non-movement facilities while sailing through Barracuda Trials.",
-		section = SECTION_MES,
-		position = 3
-	)
-	default boolean lockToHelmDuringTrials()
-	{
-		return true;
-	}
-
 	enum ShowChartsMode
 	{
 		NONE,
@@ -587,12 +578,26 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
+	String LOCK_PLAYER_TO_HELM = "lockToHelmDuringTrials";
+	@ConfigItem(
+		keyName = LOCK_PLAYER_TO_HELM,
+		name = "Lock to Helm",
+		description = "Hides actions unrelated to the trial or selected movement facilities. " +
+			"Selecting \"Disabled\" turns this feature off.",
+		section = SECTION_BARRACUDA_TRIALS,
+		position = 1
+	)
+	default Set<LockToHelmFilter> lockToHelmFilter()
+	{
+		return Set.of(LockToHelmFilter.WIND_GALE_CATCHER, LockToHelmFilter.CRYSTAL_EXTRACTOR);
+	}
+
 	@ConfigItem(
 		keyName = "barracudaHighlightLostCrates",
 		name = "Highlight Crates",
 		description = "Highlight lost crates that need to be collected during Barracuda Trials.",
 		section = SECTION_BARRACUDA_TRIALS,
-		position = 1
+		position = 2
 	)
 	default boolean barracudaHighlightLostCrates()
 	{
@@ -604,7 +609,7 @@ public interface SailingConfig extends Config
 		name = "Crate Colour",
 		description = "The colour to highlight lost crates.",
 		section = SECTION_BARRACUDA_TRIALS,
-		position = 2
+		position = 3
 	)
 	@Alpha
 	default Color barracudaHighlightLostCratesColour()
@@ -617,7 +622,7 @@ public interface SailingConfig extends Config
 		name = "Hide Portal Transitions",
 		description = "Hide the transition animation when taking a portal in The Gwenith Glide.",
 		section = SECTION_BARRACUDA_TRIALS,
-		position = 3
+		position = 4
 	)
 	default boolean barracudaHidePortalTransitions()
 	{
@@ -629,7 +634,7 @@ public interface SailingConfig extends Config
 		name = "TT: Show Rum Target",
 		description = "Show whether you have rum/need to drop-off rum in the Tempor Tantrum course.",
 		section = SECTION_BARRACUDA_TRIALS,
-		position = 4
+		position = 5
 	)
 	default boolean barracudaTemporTantrumShowRumTarget()
 	{
@@ -641,7 +646,7 @@ public interface SailingConfig extends Config
 		name = "JJ: Show Toady Targets",
 		description = "Show which outcrops need toadies thrown at them in the Jubbly Jive course.",
 		section = SECTION_BARRACUDA_TRIALS,
-		position = 5
+		position = 6
 	)
 	default boolean barracudaJubblyJiveShowToadyTargets()
 	{
@@ -653,7 +658,7 @@ public interface SailingConfig extends Config
 		name = "Splits Chat Message",
 		description = "Post Barracuda Trials split times to chat.",
 		section = SECTION_BARRACUDA_TRIALS,
-		position = 6
+		position = 7
 	)
 	default boolean barracudaSplitsChatMessage()
 	{
@@ -665,7 +670,7 @@ public interface SailingConfig extends Config
 		name = "Splits Overlay Panel",
 		description = "Show an overlay panel with Barracuda Trials split times.",
 		section = SECTION_BARRACUDA_TRIALS,
-		position = 7
+		position = 8
 	)
 	default boolean barracudaSplitsOverlayPanel()
 	{
