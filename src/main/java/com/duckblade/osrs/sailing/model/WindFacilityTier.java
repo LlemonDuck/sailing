@@ -3,8 +3,6 @@ package com.duckblade.osrs.sailing.model;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.gameval.ObjectID;
-import org.apache.commons.lang3.ArrayUtils;
-
 import java.util.Arrays;
 
 @RequiredArgsConstructor
