@@ -81,13 +81,13 @@ public class CargoHoldTracker
 		"Woooo wooo wooooo woooo."
 	);
 
-	private static final Map<Integer, Integer> CARGOHOLD_ID_TO_BOAT_SLOT = ImmutableMap.of(
-		InventoryID.SAILING_BOAT_1_CARGOHOLD, 1,
-		InventoryID.SAILING_BOAT_2_CARGOHOLD, 2,
-		InventoryID.SAILING_BOAT_3_CARGOHOLD, 3,
-		InventoryID.SAILING_BOAT_4_CARGOHOLD, 4,
-		InventoryID.SAILING_BOAT_5_CARGOHOLD, 5
-	);
+	private static final Map<Integer, Integer> CARGOHOLD_ID_TO_BOAT_SLOT = ImmutableMap.<Integer, Integer>builder()
+			.put(InventoryID.SAILING_BOAT_1_CARGOHOLD, 1)
+			.put(InventoryID.SAILING_BOAT_2_CARGOHOLD, 2)
+			.put(InventoryID.SAILING_BOAT_3_CARGOHOLD, 3)
+			.put(InventoryID.SAILING_BOAT_4_CARGOHOLD, 4)
+			.put(InventoryID.SAILING_BOAT_5_CARGOHOLD, 5)
+			.build();
 
 	private static final char CONFIG_DELIMITER_PAIRS = ';';
 	private static final char CONFIG_DELIMITER_KV = ':';
