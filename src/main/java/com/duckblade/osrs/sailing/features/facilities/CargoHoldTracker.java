@@ -11,6 +11,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 import java.awt.Color;
@@ -80,12 +81,12 @@ public class CargoHoldTracker
 		"Woooo wooo wooooo woooo."
 	);
 
-	private static final Set<Integer> CARGO_INVENTORY_IDS = ImmutableSet.of(
-		InventoryID.SAILING_BOAT_1_CARGOHOLD,
-		InventoryID.SAILING_BOAT_2_CARGOHOLD,
-		InventoryID.SAILING_BOAT_3_CARGOHOLD,
-		InventoryID.SAILING_BOAT_4_CARGOHOLD,
-		InventoryID.SAILING_BOAT_5_CARGOHOLD
+	private static final Map<Integer, Integer> CARGOHOLD_ID_TO_BOAT_SLOT = ImmutableMap.of(
+		InventoryID.SAILING_BOAT_1_CARGOHOLD, 1,
+		InventoryID.SAILING_BOAT_2_CARGOHOLD, 2,
+		InventoryID.SAILING_BOAT_3_CARGOHOLD, 3,
+		InventoryID.SAILING_BOAT_4_CARGOHOLD, 4,
+		InventoryID.SAILING_BOAT_5_CARGOHOLD, 5
 	);
 
 	private static final char CONFIG_DELIMITER_PAIRS = ';';
@@ -243,13 +244,24 @@ public class CargoHoldTracker
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged e)
 	{
+		//looks like here we
+		// 1. check if it is player inventory
+		// 2. assert it is a boat inventory
+		// 3. once asserted, replace our tracked inventory with the inventory associated
+		// 4. output new tracked inventory
+		//
+		// Lets also do this when selecting a boat
+		// However when selecting a boat we have access to multiple inventories at once so this event fires multiple times once per boat inventory
+		// so we can just update any inventory `seen` by the boat selection screen, no need for a new varbit
 		if (e.getContainerId() == InventoryID.INV)
 		{
 			sawInventoryContainerUpdate = true;
 			return;
 		}
 
-		if (!CARGO_INVENTORY_IDS.contains(e.getContainerId() & 0x4FFF))
+		log.debug("Current Logic: {}", e.getContainerId() & 0x4FFF);
+		log.debug("Raw ID Logic: {}", e.getContainerId());
+		if (!CARGOHOLD_ID_TO_BOAT_SLOT.containsKey(e.getContainerId() & 0x4FFF)) //& 0x4FFF converts the `tradable` inventoryID into a true inventory ID
 		{
 			return;
 		}
@@ -257,7 +269,9 @@ public class CargoHoldTracker
 		sawItemContainerUpdate = true;
 
 		ItemContainer containerInv = e.getItemContainer();
-		Multiset<Integer> trackedInv = cargoHold();
+		int boatSlot = CARGOHOLD_ID_TO_BOAT_SLOT.get(e.getContainerId() & 0x4FFF);
+		Multiset<Integer> trackedInv = cargoHold(boatSlot);
+		log.debug("read cargo hold inventory for boat {} from event PRE CHANGE {}",boatSlot, trackedInv);
 		trackedInv.clear();
 		for (Item item : containerInv.getItems())
 		{
@@ -271,11 +285,23 @@ public class CargoHoldTracker
 				continue;
 			}
 
-			add(item.getId(), item.getQuantity());
+			add(item.getId(), item.getQuantity(), boatSlot);
+			//i think the above line is causing the bug with cargoholds. this line implicitly adds the items to the current boat slot
+			//the current boat slot is defined as the last boat boarded. The last boat boarded is always the top listed boat in the UI
+			//this means we ALWAYS set the inventory container of the last boat boarded to equal the inventory of the most recently read boat's inventory
+			//since these events appear to fire at the same time this is not guaranteed to be in-order
+
+			//to fix this we can change this function to also pass the boat inventory container ID
+
+			//TODO: check downstream usages of the above LOC to determine impact
+			// Subtract 0x8000 from a TRADEABLE inventory to get the original inventory
+			// We can assume it is NOT the tradable variant IF the varbit SAILING_BOAT_SELECTION_TYPE > 0
+			// if needed we can assert we are at a dock location using SAILING_BOAT_SELECTION_CURRENT_DOCK varplayer
+			// need to find a way to associate an inventory ID to a cargohold ID
 		}
 
 		log.debug("read cargo hold inventory from event {}", trackedInv);
-		writeToConfig();
+		writeToConfig(boatSlot);
 	}
 
 	@Subscribe
@@ -376,7 +402,7 @@ public class CargoHoldTracker
 
 	private int currentBoatSlot()
 	{
-		return client.getVarbitValue(VarbitID.SAILING_LAST_PERSONAL_BOAT_BOARDED) - 1;
+		return client.getVarbitValue(VarbitID.SAILING_LAST_PERSONAL_BOAT_BOARDED);
 	}
 
 	private int usedCapacity()
@@ -427,6 +453,18 @@ public class CargoHoldTracker
 		else
 		{
 			cargoHold().add(item, count);
+		}
+	}
+
+	private void add(int item, int count, int boatSlot)
+	{
+		if (isStackable(item))
+		{
+			cargoHold(boatSlot).setCount(item, 1);
+		}
+		else
+		{
+			cargoHold(boatSlot).add(item, count);
 		}
 	}
 
