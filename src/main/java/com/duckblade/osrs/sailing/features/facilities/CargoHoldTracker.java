@@ -259,8 +259,6 @@ public class CargoHoldTracker
 			return;
 		}
 
-		log.debug("Current Logic: {}", e.getContainerId() & 0x4FFF);
-		log.debug("Raw ID Logic: {}", e.getContainerId());
 		if (!CARGOHOLD_ID_TO_BOAT_SLOT.containsKey(e.getContainerId() & 0x4FFF)) //& 0x4FFF converts the `tradable` inventoryID into a true inventory ID
 		{
 			return;
@@ -286,21 +284,9 @@ public class CargoHoldTracker
 			}
 
 			add(item.getId(), item.getQuantity(), boatSlot);
-			//i think the above line is causing the bug with cargoholds. this line implicitly adds the items to the current boat slot
-			//the current boat slot is defined as the last boat boarded. The last boat boarded is always the top listed boat in the UI
-			//this means we ALWAYS set the inventory container of the last boat boarded to equal the inventory of the most recently read boat's inventory
-			//since these events appear to fire at the same time this is not guaranteed to be in-order
-
-			//to fix this we can change this function to also pass the boat inventory container ID
-
-			//TODO: check downstream usages of the above LOC to determine impact
-			// Subtract 0x8000 from a TRADEABLE inventory to get the original inventory
-			// We can assume it is NOT the tradable variant IF the varbit SAILING_BOAT_SELECTION_TYPE > 0
-			// if needed we can assert we are at a dock location using SAILING_BOAT_SELECTION_CURRENT_DOCK varplayer
-			// need to find a way to associate an inventory ID to a cargohold ID
 		}
 
-		log.debug("read cargo hold inventory from event {}", trackedInv);
+		log.debug("written cargo hold to boat {} from event {}", boatSlot, trackedInv);
 		writeToConfig(boatSlot);
 	}
 
