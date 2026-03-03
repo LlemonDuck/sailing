@@ -244,15 +244,6 @@ public class CargoHoldTracker
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged e)
 	{
-		//looks like here we
-		// 1. check if it is player inventory
-		// 2. assert it is a boat inventory
-		// 3. once asserted, replace our tracked inventory with the inventory associated
-		// 4. output new tracked inventory
-		//
-		// Lets also do this when selecting a boat
-		// However when selecting a boat we have access to multiple inventories at once so this event fires multiple times once per boat inventory
-		// so we can just update any inventory `seen` by the boat selection screen, no need for a new varbit
 		if (e.getContainerId() == InventoryID.INV)
 		{
 			sawInventoryContainerUpdate = true;
