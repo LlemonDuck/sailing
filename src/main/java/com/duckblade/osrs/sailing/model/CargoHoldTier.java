@@ -167,10 +167,10 @@ public enum CargoHoldTier
 
 	public int getCapacity(SizeClass sizeClass, boolean uim)
 	{
-		if (uim)
+		/*if (uim)
 		{
 			return capacities[3];
-		}
+		}*/
 
 		switch (sizeClass)
 		{
