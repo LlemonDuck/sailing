@@ -24,18 +24,12 @@ public class SailingUtil
 		2,
 		3 // 3? confirm sloop?
 	);
-	public static final int ACCOUNT_TYPE_UIM = 2;
 
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public static boolean isSailing(Client client)
 	{
 		return client.getLocalPlayer() != null &&
 			!client.getLocalPlayer().getWorldView().isTopLevel();
-	}
-
-	public static boolean isUim(Client client)
-	{
-		return client.getVarbitValue(VarbitID.IRONMAN) == ACCOUNT_TYPE_UIM;
 	}
 
 	// on boats, InteractingChanged fires for the local player but the target is null

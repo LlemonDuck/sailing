@@ -75,7 +75,7 @@ public class Boat
 		return facilities;
 	}
 
-	public int getCargoCapacity(boolean uim)
+	public int getCargoCapacity()
 	{
 		CargoHoldTier cargoHoldTier = getCargoHoldTier();
 		if (cargoHoldTier == null)
@@ -83,12 +83,12 @@ public class Boat
 			return 0;
 		}
 
-		return cargoHoldTier.getCapacity(getSizeClass(), uim);
+		return cargoHoldTier.getCapacity(getSizeClass());
 	}
 
-	public int getCargoCapacity(Client client)
+	public int getCargoCapacity()
 	{
-		return getCargoCapacity(SailingUtil.isUim(client));
+		return getCargoCapacity();
 	}
 
 	public int getSpeedBoostDuration()
