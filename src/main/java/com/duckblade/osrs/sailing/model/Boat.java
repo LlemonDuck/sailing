@@ -86,11 +86,6 @@ public class Boat
 		return cargoHoldTier.getCapacity(getSizeClass());
 	}
 
-	public int getCargoCapacity()
-	{
-		return getCargoCapacity();
-	}
-
 	public int getSpeedBoostDuration()
 	{
 		SailTier sailTier = getSailTier();
