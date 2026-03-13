@@ -12,7 +12,6 @@ import net.runelite.api.Player;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.gameval.VarbitID;
 
 @Slf4j
 @RequiredArgsConstructor(onConstructor_ = @Inject)
@@ -24,8 +23,6 @@ public class SailingUtil
 		2,
 		3 // 3? confirm sloop?
 	);
-	public static final int ACCOUNT_TYPE_UIM = 2;
-
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public static boolean isSailing(Client client)
 	{
@@ -33,13 +30,9 @@ public class SailingUtil
 			!client.getLocalPlayer().getWorldView().isTopLevel();
 	}
 
-	public static boolean isUim(Client client)
-	{
-		return client.getVarbitValue(VarbitID.IRONMAN) == ACCOUNT_TYPE_UIM;
-	}
-
 	// on boats, InteractingChanged fires for the local player but the target is null
 	// it DOES fire an event with the expected target for a separate instance of Player with the same ID
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public static boolean isLocalPlayer(Client client, Actor actor)
 	{
 		return client.getLocalPlayer() != null &&

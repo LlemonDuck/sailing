@@ -165,13 +165,8 @@ public enum CargoHoldTier
 		return null;
 	}
 
-	public int getCapacity(SizeClass sizeClass, boolean uim)
+	public int getCapacity(SizeClass sizeClass)
 	{
-		if (uim)
-		{
-			return capacities[3];
-		}
-
 		switch (sizeClass)
 		{
 			case RAFT:
