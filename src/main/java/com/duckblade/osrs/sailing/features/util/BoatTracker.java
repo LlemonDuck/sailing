@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.WorldEntity;
+import net.runelite.api.WorldView;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.WorldEntityDespawned;
@@ -137,7 +138,7 @@ public class BoatTracker
 
 	public Boat getBoat(int wvId)
 	{
-		if (wvId == -1)
+		if (wvId == WorldView.TOPLEVEL)
 		{
 			return null;
 		}
