@@ -475,10 +475,6 @@ public class CargoHoldTracker
 				loadFromConfig(boatSlot);
 			}
 		}
-
-		int max = maxCapacity();
-		wasFull = max > 0 && usedCapacity() >= max;
-		lastCheckedBoatSlot = currentBoatSlot();
 	}
 
 	private void loadFromConfig(int boatSlot)
