@@ -11,6 +11,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multisets;
 import java.awt.Color;
@@ -80,13 +81,13 @@ public class CargoHoldTracker
 		"Woooo wooo wooooo woooo."
 	);
 
-	private static final Set<Integer> CARGO_INVENTORY_IDS = ImmutableSet.of(
-		InventoryID.SAILING_BOAT_1_CARGOHOLD,
-		InventoryID.SAILING_BOAT_2_CARGOHOLD,
-		InventoryID.SAILING_BOAT_3_CARGOHOLD,
-		InventoryID.SAILING_BOAT_4_CARGOHOLD,
-		InventoryID.SAILING_BOAT_5_CARGOHOLD
-	);
+	private static final Map<Integer, Integer> CARGOHOLD_ID_TO_BOAT_SLOT = ImmutableMap.<Integer, Integer>builder()
+			.put(InventoryID.SAILING_BOAT_1_CARGOHOLD, 1)
+			.put(InventoryID.SAILING_BOAT_2_CARGOHOLD, 2)
+			.put(InventoryID.SAILING_BOAT_3_CARGOHOLD, 3)
+			.put(InventoryID.SAILING_BOAT_4_CARGOHOLD, 4)
+			.put(InventoryID.SAILING_BOAT_5_CARGOHOLD, 5)
+			.build();
 
 	private static final char CONFIG_DELIMITER_PAIRS = ';';
 	private static final char CONFIG_DELIMITER_KV = ':';
@@ -249,7 +250,7 @@ public class CargoHoldTracker
 			return;
 		}
 
-		if (!CARGO_INVENTORY_IDS.contains(e.getContainerId() & 0x4FFF))
+		if (!CARGOHOLD_ID_TO_BOAT_SLOT.containsKey(e.getContainerId() & 0x4FFF)) //& 0x4FFF converts the `tradable` inventoryID into a true inventory ID
 		{
 			return;
 		}
@@ -257,7 +258,9 @@ public class CargoHoldTracker
 		sawItemContainerUpdate = true;
 
 		ItemContainer containerInv = e.getItemContainer();
-		Multiset<Integer> trackedInv = cargoHold();
+		int boatSlot = CARGOHOLD_ID_TO_BOAT_SLOT.get(e.getContainerId() & 0x4FFF);
+		Multiset<Integer> trackedInv = cargoHold(boatSlot);
+		log.debug("read cargo hold inventory for boat {} from event PRE CHANGE {}",boatSlot, trackedInv);
 		trackedInv.clear();
 		for (Item item : containerInv.getItems())
 		{
@@ -271,11 +274,11 @@ public class CargoHoldTracker
 				continue;
 			}
 
-			add(item.getId(), item.getQuantity());
+			add(item.getId(), item.getQuantity(), boatSlot);
 		}
 
-		log.debug("read cargo hold inventory from event {}", trackedInv);
-		writeToConfig();
+		log.debug("written cargo hold to boat {} from event {}", boatSlot, trackedInv);
+		writeToConfig(boatSlot);
 	}
 
 	@Subscribe
@@ -376,7 +379,7 @@ public class CargoHoldTracker
 
 	private int currentBoatSlot()
 	{
-		return client.getVarbitValue(VarbitID.SAILING_LAST_PERSONAL_BOAT_BOARDED) - 1;
+		return client.getVarbitValue(VarbitID.SAILING_LAST_PERSONAL_BOAT_BOARDED);
 	}
 
 	private int usedCapacity()
@@ -427,6 +430,18 @@ public class CargoHoldTracker
 		else
 		{
 			cargoHold().add(item, count);
+		}
+	}
+
+	private void add(int item, int count, int boatSlot)
+	{
+		if (isStackable(item))
+		{
+			cargoHold(boatSlot).setCount(item, 1);
+		}
+		else
+		{
+			cargoHold(boatSlot).add(item, count);
 		}
 	}
 
