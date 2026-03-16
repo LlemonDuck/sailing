@@ -80,6 +80,15 @@ public class CargoHoldTracker
 		"Woooo wooo wooooo woooo."
 	);
 
+	private static final Set<Integer> SAILING_CARGO_TOOLS = ImmutableSet.of(
+			ItemID.SAILING_LOG,
+			ItemID.SAILING_CHARTING_SPYGLASS,
+			ItemID.HUNDRED_PIRATE_DIVING_HELMET,
+			ItemID.HUNDRED_PIRATE_DIVING_BACKPACK,
+			ItemID.SAILING_CHARTING_CROWBAR,
+			ItemID.SAILING_CHARTING_CURRENT_DUCK
+	);
+
 	private static final Set<Integer> CARGO_INVENTORY_IDS = ImmutableSet.of(
 		InventoryID.SAILING_BOAT_1_CARGOHOLD,
 		InventoryID.SAILING_BOAT_2_CARGOHOLD,
@@ -317,8 +326,8 @@ public class CargoHoldTracker
 		log.trace("deposited: {}", deposited);
 
 		Multisets.removeOccurrences(cargoHoldToUpdate, withdrawn);
-		deposited.entrySet().forEach(entry -> cargoHoldToUpdate.add(entry.getElement(), entry.getCount()));
-
+		Multisets.filter(deposited, id -> !SAILING_CARGO_TOOLS.contains(id))
+				.forEachEntry(cargoHoldToUpdate::add);									// cargo tools do not count towards total
 		log.debug("updated cargo hold from inventory delta {}", cargoHoldToUpdate);
 		writeToConfig();
 	}
