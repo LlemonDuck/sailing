@@ -1,6 +1,5 @@
 package com.duckblade.osrs.sailing.model;
 
-import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -9,7 +8,6 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.WorldEntity;
 
@@ -110,7 +108,7 @@ public class Boat
 		return facilities;
 	}
 
-	public int getCargoCapacity(boolean uim)
+	public int getCargoCapacity()
 	{
 		CargoHoldTier cargoHoldTier = getCargoHoldTier();
 		if (cargoHoldTier == null)
@@ -118,12 +116,7 @@ public class Boat
 			return 0;
 		}
 
-		return cargoHoldTier.getCapacity(getSizeClass(), uim);
-	}
-
-	public int getCargoCapacity(Client client)
-	{
-		return getCargoCapacity(SailingUtil.isUim(client));
+		return cargoHoldTier.getCapacity(getSizeClass());
 	}
 
     public int getNetCapacity()

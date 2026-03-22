@@ -392,7 +392,7 @@ public class CargoHoldTracker
 			return -1;
 		}
 
-		return boat.getCargoCapacity(client);
+		return boat.getCargoCapacity();
 	}
 
 	private Multiset<Integer> getInventoryMap()
