@@ -34,6 +34,14 @@ public interface SailingConfig extends Config
 	String SECTION_FACILITIES = "facilities";
 
 	@ConfigSection(
+		name = "Trawling",
+		description = "Settings for fishing net trawling.",
+		position = 250,
+		closedByDefault = true
+	)
+	String SECTION_TRAWLING = "trawling";
+
+	@ConfigSection(
 		name = "Crewmates",
 		description = "Settings for your crewmates.",
 		position = 300,
@@ -397,6 +405,140 @@ public interface SailingConfig extends Config
 	default Color highlightCrystalExtractorInactiveColour()
 	{
 		return Color.YELLOW;
+	}
+
+    @ConfigItem(
+		keyName = "trawlingHighlightShoals",
+		name = "Highlight Shoals",
+		description = "Highlight fish shoals with a 10x10 tile area.",
+		section = SECTION_TRAWLING,
+		position = 1
+	)
+	default boolean trawlingHighlightShoals()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingShoalHighlightColour",
+		name = "Shoal Highlight Colour",
+		description = "Colour to highlight fish shoals.",
+		section = SECTION_TRAWLING,
+		position = 2
+	)
+	@Alpha
+	default Color trawlingShoalHighlightColour()
+	{
+		return Color.CYAN;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingShowNetCapacity",
+		name = "Show Net Capacity",
+		description = "Display the current fish count in your nets.",
+		section = SECTION_TRAWLING,
+		position = 3
+	)
+	default boolean trawlingShowNetCapacity()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingShowFishCaught",
+		name = "Show Fish Caught",
+		description = "Display the number of each fish caught in the session.",
+		section = SECTION_TRAWLING,
+		position = 4
+	)
+	default boolean trawlingShowFishCaught()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingShowNetDepthTimer",
+		name = "Show Net Depth Timer",
+		description = "Display an overlay showing ticks until net depth change.",
+		section = SECTION_TRAWLING,
+		position = 5
+	)
+	default boolean trawlingShowNetDepthTimer()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingShowShoalPaths",
+		name = "Show Shoal Routes",
+		description = "Display the known routes for shoals.",
+		section = SECTION_TRAWLING,
+		position = 6
+	)
+	default boolean trawlingShowShoalPaths()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingShoalPathColour",
+		name = "Route Colour",
+		description = "Colour for displaying shoal routes.",
+		section = SECTION_TRAWLING,
+		position = 7
+	)
+	@Alpha
+	default Color trawlingShoalPathColour()
+	{
+		return Color.WHITE;
+	}
+
+	@ConfigItem(
+		keyName = "trawlingShowShoalDirectionArrows",
+		name = "Show Direction Arrows",
+		description = "Display directional arrows along shoal routes to indicate movement direction.",
+		section = SECTION_TRAWLING,
+		position = 8
+	)
+	default boolean trawlingShowShoalDirectionArrows()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "highlightNetButtons",
+		name = "Highlight Net Buttons ",
+		description = "Highlight the net button to move to the correct shoal depth.",
+		section = SECTION_TRAWLING,
+		position = 9
+	)
+	default boolean highlightNetButtons()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "notifyDepthChange",
+		name = "Notify Shoal Depth Changed",
+		description = "Notify you when the shoal changes depth.",
+		section = SECTION_TRAWLING,
+		position = 9
+	)
+	default Notification notifyDepthChange()
+	{
+		return Notification.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "notifyShoalMove",
+		name = "Notify Shoal Move",
+		description = "Notify you when the shoal moves.",
+		section = SECTION_TRAWLING,
+		position = 10
+	)
+	default Notification notifyShoalMove()
+	{
+		return Notification.OFF;
 	}
 
 	enum CrewmateMuteMode
