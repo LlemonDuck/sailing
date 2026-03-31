@@ -342,22 +342,24 @@ public class CargoHoldTracker
 	@Subscribe
 	public void onMenuOptionClicked(MenuOptionClicked e)
 	{
-		if (e.getMenuOption().contains("Withdraw") || e.getMenuOption().contains("Deposit"))
+		if (!e.getMenuOption().contains("Withdraw") && !e.getMenuOption().contains("Deposit"))
 		{
-			Widget cargoHoldWidget = client.getWidget(InterfaceID.SailingBoatCargohold.UNIVERSE); // todo confirm
-			if (cargoHoldWidget != null && !cargoHoldWidget.isHidden())
-			{
-				pendingInventoryAction = INVENTORY_DELTA_MAX_DELAY;
-				memoizedInventory = getInventoryMap();
-				log.debug("queued pendingInventoryAction with inventory {}", memoizedInventory);
-			}
+			return;
 		}
-		else if(e.getMenuOption().equals("Deposit-all"))
+		if (e.getMenuOption().equals("Deposit-all"))
 		{
 			beginSfxOverrideIfMuted();
 			depositAllTicksRemaining = DEPOSIT_ALL_MAX_TICKS_TIMEOUT;
 			initialDepositAllInventory = getInventoryMap();
 			log.debug("Initial deposit-all player inventory {}", initialDepositAllInventory);
+		}
+
+		Widget cargoHoldWidget = client.getWidget(InterfaceID.SailingBoatCargohold.UNIVERSE); // todo confirm
+		if (cargoHoldWidget != null && !cargoHoldWidget.isHidden())
+		{
+			pendingInventoryAction = INVENTORY_DELTA_MAX_DELAY;
+			memoizedInventory = getInventoryMap();
+			log.debug("queued pendingInventoryAction with inventory {}", memoizedInventory);
 		}
 	}
 
