@@ -14,6 +14,7 @@ import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -70,8 +71,7 @@ public class LuffOverlay
 			return null;
 		}
 
-		// Core behaviour: only show when the luff action is actually available
-		if (!sail.isOpShown(0))
+		if (client.getVarbitValue(VarbitID.SAILING_BOAT_TIME_TRIM_WINDOW) == 0)
 		{
 			return null;
 		}
