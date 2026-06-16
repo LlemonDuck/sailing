@@ -58,7 +58,8 @@ public class FacilitiesOverlay
 		}
 
 		Boat boat = boatTracker.getBoat();
-		renderFacility(graphics, Color.CYAN, "sail", boat.getSail(), boat.getSailTier());
+		renderFacility(graphics, Color.BLUE, "sail", boat.getSail(), boat.getSailObject());
+		renderFacility(graphics, Color.CYAN, "sailTier", boat.getSailTier(), boat.getSailTierObject());
 		renderFacility(graphics, Color.ORANGE, "helm", boat.getHelm(), boat.getHelmTier());
 		renderFacility(graphics, Color.GREEN, "cargo", boat.getCargoHold(), boat.getCargoHoldTier());
 		for (GameObject hook : boat.getSalvagingHooks())

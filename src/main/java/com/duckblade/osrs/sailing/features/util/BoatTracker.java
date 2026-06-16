@@ -1,11 +1,6 @@
 package com.duckblade.osrs.sailing.features.util;
 
-import com.duckblade.osrs.sailing.model.Boat;
-import com.duckblade.osrs.sailing.model.CargoHoldTier;
-import com.duckblade.osrs.sailing.model.HelmTier;
-import com.duckblade.osrs.sailing.model.HullTier;
-import com.duckblade.osrs.sailing.model.SailTier;
-import com.duckblade.osrs.sailing.model.SalvagingHookTier;
+import com.duckblade.osrs.sailing.model.*;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,10 +69,15 @@ public class BoatTracker
 			boat.setHull(o);
 			log.trace("found hull {}={}+{} for boat in wv {}", o.getId(), boat.getHullTier(), boat.getSizeClass(), boat.getWorldViewId());
 		}
-		if (SailTier.fromGameObjectId(o.getId()) != null)
+		if (Sail.fromGameObjectId(o.getId()) != null)
 		{
 			boat.setSail(o);
-			log.trace("found sail {}={} for boat in wv {}", o.getId(), boat.getSailTier(), boat.getWorldViewId());
+			log.trace("found sail {}={} for boat in wv {}", o.getId(), boat.getSailObject(), boat.getWorldViewId());
+		}
+		if (SailTier.fromGameObjectId(o.getId()) != null)
+		{
+			boat.setSailTier(o);
+			log.trace("found sail tier {}={} for boat in wv {}", o.getId(), boat.getSailTierObject(), boat.getWorldViewId());
 		}
 		if (HelmTier.fromGameObjectId(o.getId()) != null)
 		{
@@ -114,6 +114,11 @@ public class BoatTracker
 		{
 			boat.setSail(null);
 			log.trace("unsetting sail for boat in wv {}", boat.getWorldViewId());
+		}
+		if (boat.getSailTier() == o)
+		{
+			boat.setSailTier(null);
+			log.trace("unsetting sail tier for boat in wv {}", boat.getWorldViewId());
 		}
 		if (boat.getHelm() == o)
 		{

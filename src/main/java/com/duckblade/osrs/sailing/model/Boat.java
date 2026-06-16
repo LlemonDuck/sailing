@@ -21,6 +21,7 @@ public class Boat
 
 	GameObject hull;
 	GameObject sail;
+	GameObject sailTier;
 	GameObject helm;
 	GameObject cargoHold;
 
@@ -34,9 +35,10 @@ public class Boat
 		return hull != null ? HullTier.fromGameObjectId(hull.getId()) : null;
 	}
 
-	public SailTier getSailTier()
+	public Sail getSailObject() { return sail != null ? Sail.fromGameObjectId(sail.getId()) : null; }
+	public SailTier getSailTierObject()
 	{
-		return sail != null ? SailTier.fromGameObjectId(sail.getId()) : null;
+		return sailTier != null ? SailTier.fromGameObjectId(sailTier.getId()) : null;
 	}
 
 	public HelmTier getHelmTier()
@@ -67,6 +69,7 @@ public class Boat
 		Set<GameObject> facilities = new HashSet<>();
 		facilities.add(hull);
 		facilities.add(sail);
+		facilities.add(sailTier);
 		facilities.add(helm);
 		facilities.addAll(salvagingHooks);
 		facilities.add(cargoHold);
@@ -86,7 +89,7 @@ public class Boat
 
 	public int getSpeedBoostDuration()
 	{
-		SailTier sailTier = getSailTier();
+		SailTier sailTier = getSailTierObject();
 		if (sailTier == null)
 		{
 			return -1;
@@ -98,10 +101,11 @@ public class Boat
 	public String getDebugString()
 	{
 		return String.format(
-			"Id: %d, Hull: %s, Sail: %s, Helm: %s, Hook: %s, Cargo: %s",
+			"Id: %d, Hull: %s, Sail: %s, Sail Tier: %s, Helm: %s, Hook: %s, Cargo: %s",
 			worldViewId,
 			getHullTier(),
-			getSailTier(),
+			getSailObject(),
+			getSailTierObject(),
 			getHelmTier(),
 			getSalvagingHookTiers()
 				.stream()
