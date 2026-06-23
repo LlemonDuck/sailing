@@ -81,6 +81,12 @@ public class NavigationOverlay
 		checkSceneBase();
 
 		Boat boat = boatTracker.getBoat();
+		if (boat == null)
+		{
+			lastPoint = null;
+			return;
+		}
+
 		WorldEntity we = boat.getWorldEntity();
 		LocalPoint lp = we.getTargetLocation();
 
