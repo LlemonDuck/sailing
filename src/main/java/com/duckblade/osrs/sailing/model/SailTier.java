@@ -8,7 +8,7 @@ import net.runelite.api.gameval.ObjectID;
 @Slf4j
 @RequiredArgsConstructor
 @Getter
-public enum SailMast
+public enum SailTier
 {
 
 	WOOD(
@@ -100,9 +100,9 @@ public enum SailMast
 	private final int[] gameObjectIds;
 	private final int[] speedBoostDurations;
 
-	public static SailMast fromGameObjectId(int id)
+	public static SailTier fromGameObjectId(int id)
 	{
-		for (SailMast tier : values())
+		for (SailTier tier : values())
 		{
 			for (int objectId : tier.getGameObjectIds())
 			{

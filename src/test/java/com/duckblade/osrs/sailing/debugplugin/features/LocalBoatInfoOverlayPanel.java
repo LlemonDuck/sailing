@@ -68,13 +68,13 @@ public class LocalBoatInfoOverlayPanel
 		getPanelComponent().getChildren()
 			.add(LineComponent.builder()
 				.left("Sail Pattern")
-				.right(String.valueOf(boat.getSailPatternObject()))
+				.right(String.valueOf(boat.getSailPattern().getId()))
 				.build());
 
 		getPanelComponent().getChildren()
 			.add(LineComponent.builder()
 				.left("Sail Mast")
-				.right(String.valueOf(boat.getSailMastObject()))
+				.right(String.valueOf(boat.getSailMastTier()))
 				.build());
 
 		getPanelComponent().getChildren()

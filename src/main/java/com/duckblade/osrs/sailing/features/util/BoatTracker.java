@@ -1,6 +1,11 @@
 package com.duckblade.osrs.sailing.features.util;
 
-import com.duckblade.osrs.sailing.model.*;
+import com.duckblade.osrs.sailing.model.Boat;
+import com.duckblade.osrs.sailing.model.CargoHoldTier;
+import com.duckblade.osrs.sailing.model.HelmTier;
+import com.duckblade.osrs.sailing.model.HullTier;
+import com.duckblade.osrs.sailing.model.SailTier;
+import com.duckblade.osrs.sailing.model.SalvagingHookTier;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import java.util.HashMap;
 import java.util.Map;
@@ -72,12 +77,12 @@ public class BoatTracker
 		if (Boat.SAIL_PATTERN_IDS.contains(o.getId()))
 		{
 			boat.setSailPattern(o);
-			log.trace("found sail pattern {}={} for boat in wv {}", o.getId(), boat.getSailPatternObject(), boat.getWorldViewId());
+			log.trace("found sail pattern {}={} for boat in wv {}", o.getId(), boat.getSailPattern().getId(), boat.getWorldViewId());
 		}
-		if (SailMast.fromGameObjectId(o.getId()) != null)
+		if (SailTier.fromGameObjectId(o.getId()) != null)
 		{
 			boat.setSailMast(o);
-			log.trace("found sail mast {}={} for boat in wv {}", o.getId(), boat.getSailMastObject(), boat.getWorldViewId());
+			log.trace("found sail mast {}={} for boat in wv {}", o.getId(), boat.getSailMastTier(), boat.getWorldViewId());
 		}
 		if (HelmTier.fromGameObjectId(o.getId()) != null)
 		{

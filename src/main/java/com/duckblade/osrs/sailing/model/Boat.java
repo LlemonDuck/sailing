@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import com.google.common.collect.ImmutableSet;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -70,19 +69,9 @@ public class Boat
 		return hull != null ? HullTier.fromGameObjectId(hull.getId()) : null;
 	}
 
-	public Integer getSailPatternObject()
+	public SailTier getSailMastTier()
 	{
-		if (sailPattern == null)
-		{
-			return null;
-		}
-
-		int id = sailPattern.getId();
-		return SAIL_PATTERN_IDS.contains(id) ? id : null;
-	}
-	public SailMast getSailMastObject()
-	{
-		return sailMast != null ? SailMast.fromGameObjectId(sailMast.getId()) : null;
+		return sailMast != null ? SailTier.fromGameObjectId(sailMast.getId()) : null;
 	}
 
 	public HelmTier getHelmTier()
@@ -133,13 +122,13 @@ public class Boat
 
 	public int getSpeedBoostDuration()
 	{
-		SailMast sailMast = getSailMastObject();
-		if (sailMast == null)
+		SailTier sailTier = getSailMastTier();
+		if (sailTier == null)
 		{
 			return -1;
 		}
 
-		return sailMast.getSpeedBoostDuration(getSizeClass());
+		return sailTier.getSpeedBoostDuration(getSizeClass());
 	}
 
 	public String getDebugString()
@@ -148,8 +137,8 @@ public class Boat
 			"Id: %d, Hull: %s, Sail Pattern: %s, Sail Mast: %s, Helm: %s, Hook: %s, Cargo: %s",
 			worldViewId,
 			getHullTier(),
-			getSailPatternObject(),
-			getSailMastObject(),
+			getSailPattern().getId(),
+			getSailMastTier(),
 			getHelmTier(),
 			getSalvagingHookTiers()
 				.stream()
