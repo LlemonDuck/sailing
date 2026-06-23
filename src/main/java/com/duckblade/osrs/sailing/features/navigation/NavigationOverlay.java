@@ -185,31 +185,31 @@ public class NavigationOverlay
 	{
 		Boat boat = boatTracker.getBoat();
 		WorldEntity we = boat.getWorldEntity();
-		GameObject sail = boat.getSail();
+		GameObject sailPattern = boat.getSailPattern();
 
 		int height = 0;
 		LocalPoint lp = boat.getWorldEntity().getLocalLocation();
-		if (sail != null)
+		if (sailPattern != null)
 		{
 			switch (boat.getSizeClass())
 			{
 				case RAFT:
 					height = 250;
-					lp = sail.getLocalLocation()
+					lp = sailPattern.getLocalLocation()
 						.dx(Perspective.LOCAL_TILE_SIZE / 2)
 						.dy(0);
 					break;
 
 				case SKIFF:
 					height = 450;
-					lp = sail.getLocalLocation()
+					lp = sailPattern.getLocalLocation()
 						.dx(-Perspective.LOCAL_TILE_SIZE / 2)
 						.dy(-5 * Perspective.LOCAL_TILE_SIZE / 2);
 					break;
 
 				case SLOOP:
 					height = 550;
-					lp = sail.getLocalLocation()
+					lp = sailPattern.getLocalLocation()
 						.dx(-Perspective.LOCAL_TILE_SIZE)
 						.dy(-11 * Perspective.LOCAL_TILE_SIZE / 2);
 					break;

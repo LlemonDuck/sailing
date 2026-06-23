@@ -63,15 +63,15 @@ public class LuffOverlay
 		}
 
 		Boat boat = boatTracker.getBoat();
-		GameObject sail = boat != null ? boat.getSail() : null;
+		GameObject sailPattern = boat != null ? boat.getSailPattern() : null;
 
-		if (sail == null)
+		if (sailPattern == null)
 		{
 			return null;
 		}
 
 		// Core behaviour: only show when the luff action is actually available
-		if (!sail.isOpShown(0))
+		if (!sailPattern.isOpShown(0))
 		{
 			return null;
 		}
@@ -80,7 +80,7 @@ public class LuffOverlay
 
 		if (mode == SailingConfig.SailHighlightMode.AREA)
 		{
-			Shape hull = sail.getConvexHull();
+			Shape hull = sailPattern.getConvexHull();
 			if (hull != null)
 			{
 				OverlayUtil.renderPolygon(g, hull, Color.GREEN);
@@ -88,7 +88,7 @@ public class LuffOverlay
 		}
 		else if (mode == SailingConfig.SailHighlightMode.SAIL)
 		{
-			modelOutlineRenderer.drawOutline(sail, 2, Color.GREEN, 250);
+			modelOutlineRenderer.drawOutline(sailPattern, 2, Color.GREEN, 250);
 		}
 
 		return null;
