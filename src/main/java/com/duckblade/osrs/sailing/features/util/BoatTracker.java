@@ -77,7 +77,7 @@ public class BoatTracker
 		if (Boat.SAIL_PATTERN_IDS.contains(o.getId()))
 		{
 			boat.setSailPattern(o);
-			log.trace("found sail pattern {}={} for boat in wv {}", o.getId(), boat.getSailPattern().getId(), boat.getWorldViewId());
+			log.trace("found sail pattern {} for boat in wv {}", o.getId(), boat.getWorldViewId());
 		}
 		if (SailTier.fromGameObjectId(o.getId()) != null)
 		{
