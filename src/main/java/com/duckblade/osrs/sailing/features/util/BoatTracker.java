@@ -69,15 +69,15 @@ public class BoatTracker
 			boat.setHull(o);
 			log.trace("found hull {}={}+{} for boat in wv {}", o.getId(), boat.getHullTier(), boat.getSizeClass(), boat.getWorldViewId());
 		}
-		if (Sail.fromGameObjectId(o.getId()) != null)
+		if (Boat.SAIL_PATTERN_IDS.contains(o.getId()))
 		{
-			boat.setSail(o);
-			log.trace("found sail {}={} for boat in wv {}", o.getId(), boat.getSailObject(), boat.getWorldViewId());
+			boat.setSailPattern(o);
+			log.trace("found sail pattern {}={} for boat in wv {}", o.getId(), boat.getSailPatternObject(), boat.getWorldViewId());
 		}
-		if (SailTier.fromGameObjectId(o.getId()) != null)
+		if (SailMast.fromGameObjectId(o.getId()) != null)
 		{
-			boat.setSailTier(o);
-			log.trace("found sail tier {}={} for boat in wv {}", o.getId(), boat.getSailTierObject(), boat.getWorldViewId());
+			boat.setSailMast(o);
+			log.trace("found sail mast {}={} for boat in wv {}", o.getId(), boat.getSailMastObject(), boat.getWorldViewId());
 		}
 		if (HelmTier.fromGameObjectId(o.getId()) != null)
 		{
@@ -110,15 +110,15 @@ public class BoatTracker
 			boat.setHull(null);
 			log.trace("unsetting hull for boat in wv {}", boat.getWorldViewId());
 		}
-		if (boat.getSail() == o)
+		if (boat.getSailPattern() == o)
 		{
-			boat.setSail(null);
-			log.trace("unsetting sail for boat in wv {}", boat.getWorldViewId());
+			boat.setSailPattern(null);
+			log.trace("unsetting sail pattern for boat in wv {}", boat.getWorldViewId());
 		}
-		if (boat.getSailTier() == o)
+		if (boat.getSailMast() == o)
 		{
-			boat.setSailTier(null);
-			log.trace("unsetting sail tier for boat in wv {}", boat.getWorldViewId());
+			boat.setSailMast(null);
+			log.trace("unsetting sail mast for boat in wv {}", boat.getWorldViewId());
 		}
 		if (boat.getHelm() == o)
 		{

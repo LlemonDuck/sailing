@@ -4,24 +4,59 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.google.common.collect.ImmutableSet;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.GameObject;
 import net.runelite.api.WorldEntity;
+import net.runelite.api.gameval.ObjectID;
 
 @Data
 public class Boat
 {
+	public static final ImmutableSet<Integer> SAIL_PATTERN_IDS = ImmutableSet.of(
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_1X3_LINEN,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_1X3_CANVAS,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_1X3_COTTON,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_1X3_BLACK,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_1X3_YELLOW,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_1X3_PURPLE,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_1X3_GREEN,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_1X3_BLUE,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_1X3_PINK,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_1X3_RED,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_2X5_LINEN,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_2X5_CANVAS,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_2X5_COTTON,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_2X5_BLACK,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_2X5_YELLOW,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_2X5_PURPLE,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_2X5_GREEN,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_2X5_BLUE,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_2X5_PINK,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_2X5_RED,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_3X8_LINEN,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_3X8_CANVAS,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_3X8_COTTON,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_3X8_BLACK,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_3X8_YELLOW,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_3X8_PURPLE,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_3X8_GREEN,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_3X8_BLUE,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_3X8_PINK,
+		ObjectID.SAILING_BOAT_SAIL_KANDARIN_3X8_RED
+	);
 
 	@Getter
 	private final int worldViewId;
 	private final WorldEntity worldEntity;
 
 	GameObject hull;
-	GameObject sail;
-	GameObject sailTier;
+	GameObject sailPattern;
+	GameObject sailMast;
 	GameObject helm;
 	GameObject cargoHold;
 
@@ -35,10 +70,19 @@ public class Boat
 		return hull != null ? HullTier.fromGameObjectId(hull.getId()) : null;
 	}
 
-	public Sail getSailObject() { return sail != null ? Sail.fromGameObjectId(sail.getId()) : null; }
-	public SailTier getSailTierObject()
+	public Integer getSailPatternObject()
 	{
-		return sailTier != null ? SailTier.fromGameObjectId(sailTier.getId()) : null;
+		if (sailPattern == null)
+		{
+			return null;
+		}
+
+		int id = sailPattern.getId();
+		return SAIL_PATTERN_IDS.contains(id) ? id : null;
+	}
+	public SailMast getSailMastObject()
+	{
+		return sailMast != null ? SailMast.fromGameObjectId(sailMast.getId()) : null;
 	}
 
 	public HelmTier getHelmTier()
@@ -68,8 +112,8 @@ public class Boat
 	{
 		Set<GameObject> facilities = new HashSet<>();
 		facilities.add(hull);
-		facilities.add(sail);
-		facilities.add(sailTier);
+		facilities.add(sailPattern);
+		facilities.add(sailMast);
 		facilities.add(helm);
 		facilities.addAll(salvagingHooks);
 		facilities.add(cargoHold);
@@ -89,23 +133,23 @@ public class Boat
 
 	public int getSpeedBoostDuration()
 	{
-		SailTier sailTier = getSailTierObject();
-		if (sailTier == null)
+		SailMast sailMast = getSailMastObject();
+		if (sailMast == null)
 		{
 			return -1;
 		}
 
-		return sailTier.getSpeedBoostDuration(getSizeClass());
+		return sailMast.getSpeedBoostDuration(getSizeClass());
 	}
 
 	public String getDebugString()
 	{
 		return String.format(
-			"Id: %d, Hull: %s, Sail: %s, Sail Tier: %s, Helm: %s, Hook: %s, Cargo: %s",
+			"Id: %d, Hull: %s, Sail Pattern: %s, Sail Mast: %s, Helm: %s, Hook: %s, Cargo: %s",
 			worldViewId,
 			getHullTier(),
-			getSailObject(),
-			getSailTierObject(),
+			getSailPatternObject(),
+			getSailMastObject(),
 			getHelmTier(),
 			getSalvagingHookTiers()
 				.stream()
