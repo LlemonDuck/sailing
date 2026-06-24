@@ -36,12 +36,15 @@ import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.OverheadTextChanged;
+import net.runelite.api.Preferences;
+import net.runelite.api.events.SoundEffectPlayed;
 import net.runelite.api.events.StatChanged;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -118,6 +121,14 @@ public class CargoHoldTracker
 
 	private int lastXp;
 	private boolean pendingJenkinsAction;
+	//sfx variables
+	private boolean sfxVolumeOverridden = false;
+	private int previousSfxVolume = -1;
+	private static final int SFX_OVERRIDE_VOLUME = 1;
+	private static final int SFX_DEPOSIT_ALL_ID = 10905;
+	private static final int DEPOSIT_ALL_MAX_TICKS_TIMEOUT = 12;
+	private int depositAllTicksRemaining;
+	private Multiset<Integer> initialDepositAllInventory;
 
 	@Inject
 	public CargoHoldTracker(Client client, ConfigManager configManager, BoatTracker boatTracker, CourierTaskTracker courierTaskTracker)
@@ -283,6 +294,11 @@ public class CargoHoldTracker
 	{
 		pendingJenkinsAction = false;
 
+		if (--depositAllTicksRemaining <= 0)
+		{
+				resetDepositAllState();
+		}
+
 		if (--pendingInventoryAction < 0)
 		{
 			sawItemContainerUpdate = false;
@@ -330,6 +346,13 @@ public class CargoHoldTracker
 		{
 			return;
 		}
+		if (e.getMenuOption().equals("Deposit-all"))
+		{
+			beginSfxOverrideIfMuted();
+			depositAllTicksRemaining = DEPOSIT_ALL_MAX_TICKS_TIMEOUT;
+			initialDepositAllInventory = getInventoryMap();
+			log.debug("Initial deposit-all player inventory {}", initialDepositAllInventory);
+		}
 
 		Widget cargoHoldWidget = client.getWidget(InterfaceID.SailingBoatCargohold.UNIVERSE); // todo confirm
 		if (cargoHoldWidget != null && !cargoHoldWidget.isHidden())
@@ -353,6 +376,25 @@ public class CargoHoldTracker
 		if (itemsChild != null && Objects.equals(itemsChild.getText(), WIDGET_TEXT_CARGO_HOLD_EMPTY))
 		{
 			cargoHold().clear();
+		}
+	}
+
+	@Subscribe
+	public void onSoundEffectPlayed(SoundEffectPlayed e)
+	{
+		if (sfxVolumeOverridden)
+		{
+			e.consume();
+		}
+		if (e.getSoundId() == SFX_DEPOSIT_ALL_ID && depositAllTicksRemaining > 0)
+		{
+
+			Multiset<Integer> deposit = Multisets.difference(initialDepositAllInventory, getInventoryMap()); // items missing from inv that were in prior snapshot
+			Multiset<Integer> cargoHoldToUpdate = cargoHold();
+			deposit.entrySet().forEach(entry -> cargoHoldToUpdate.add(entry.getElement(), entry.getCount()));
+			log.debug("updated cargo hold from deposit-all inventory delta {}", cargoHoldToUpdate);
+			writeToConfig();
+			resetDepositAllState();
 		}
 	}
 
@@ -497,4 +539,41 @@ public class CargoHoldTracker
 		log.trace("wrote cargoHold {} to config {} = {}", boatSlot, key, configValue);
 	}
 
+	private void setSfxVolume(int vol)
+	{
+		Preferences preferences = client.getPreferences();
+		preferences.setSoundEffectVolume(vol);
+
+		client.getVarps()[VarPlayerID.OPTION_SOUNDS] = vol;
+		client.queueChangedVarp(VarPlayerID.OPTION_SOUNDS);
+	}
+
+	private void beginSfxOverrideIfMuted()
+	{
+		Preferences preferences = client.getPreferences();
+		int current = preferences.getSoundEffectVolume();
+		if (current != 0 || sfxVolumeOverridden)
+		{
+			return;
+		}
+
+		previousSfxVolume = current;
+		sfxVolumeOverridden = true;
+
+		setSfxVolume(SFX_OVERRIDE_VOLUME);
+	}
+
+	private void resetDepositAllState()
+	{
+		if (sfxVolumeOverridden) {
+			// if we never captured previous, default to muted
+			int restore = previousSfxVolume >= 0 ? previousSfxVolume : 0;
+			setSfxVolume(restore);
+			sfxVolumeOverridden = false;
+			previousSfxVolume = -1;
+		}
+
+		depositAllTicksRemaining = 0;
+		initialDepositAllInventory = null;
+	}
 }
