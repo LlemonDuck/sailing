@@ -5,6 +5,7 @@ import com.duckblade.osrs.sailing.features.courier.CourierTaskTracker;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.model.Boat;
+import com.duckblade.osrs.sailing.model.CargoHoldTier;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -29,6 +30,7 @@ import net.runelite.api.GameObject;
 import net.runelite.api.GameState;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
+import net.runelite.api.MenuAction;
 import net.runelite.api.NPC;
 import net.runelite.api.Point;
 import net.runelite.api.Skill;
@@ -113,8 +115,10 @@ public class CargoHoldTracker
 	private Color colourFull;
 
 	private int pendingInventoryAction;
+	private boolean pendingQuickDepositAction;
 	private boolean sawItemContainerUpdate;
 	private boolean sawInventoryContainerUpdate;
+	private boolean lastClickWasQuickDeposit;
 
 	private int lastXp;
 	private boolean pendingJenkinsAction;
@@ -158,6 +162,7 @@ public class CargoHoldTracker
 		cargoHoldItems.clear();
 		memoizedInventory = null;
 		pendingJenkinsAction = false;
+		lastClickWasQuickDeposit = false;
 	}
 
 	@Override
@@ -246,6 +251,11 @@ public class CargoHoldTracker
 		if (e.getContainerId() == InventoryID.INV)
 		{
 			sawInventoryContainerUpdate = true;
+			if (pendingQuickDepositAction)
+			{
+				pendingInventoryAction = 1; // tick goes last
+				log.debug("inv change queued pendingInventoryAction with inventory {}", memoizedInventory);
+			}
 			return;
 		}
 
@@ -282,6 +292,10 @@ public class CargoHoldTracker
 	public void onGameTick(GameTick e)
 	{
 		pendingJenkinsAction = false;
+		if (!lastClickWasQuickDeposit)
+		{
+			pendingQuickDepositAction = false;
+		}
 
 		if (--pendingInventoryAction < 0)
 		{
@@ -326,9 +340,25 @@ public class CargoHoldTracker
 	@Subscribe
 	public void onMenuOptionClicked(MenuOptionClicked e)
 	{
+		// CC_OP won't actually cancel the deposit-all action
+		if (e.getMenuEntry().getType() != MenuAction.CC_OP)
+		{
+			lastClickWasQuickDeposit = false;
+		}
+
 		if (!e.getMenuOption().contains("Withdraw") && !e.getMenuOption().contains("Deposit"))
 		{
 			return;
+		}
+
+		if (e.getMenuOption().equals("Deposit-all")
+			&& e.getMenuEntry().getType() == MenuAction.GAME_OBJECT_SECOND_OPTION
+			&& CargoHoldTier.fromGameObjectId(e.getId()) != null)
+		{
+			lastClickWasQuickDeposit = true;
+			pendingQuickDepositAction = true;
+			memoizedInventory = getInventoryMap();
+			log.debug("queued pendingQuickDepositAction with inventory {}", memoizedInventory);
 		}
 
 		Widget cargoHoldWidget = client.getWidget(InterfaceID.SailingBoatCargohold.UNIVERSE); // todo confirm
