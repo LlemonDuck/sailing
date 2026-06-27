@@ -757,7 +757,7 @@ public interface SailingConfig extends Config
 		name = "Highlight Active Locations",
 		description = "Whether to highlight active shipwrecks.",
 		section = SECTION_SALVAGING,
-		position = 1
+		position = 10
 	)
 	default boolean salvagingHighlightActiveWrecks()
 	{
@@ -769,7 +769,7 @@ public interface SailingConfig extends Config
 		name = "Active Colour",
 		description = "Colour to highlight active shipwrecks.",
 		section = SECTION_SALVAGING,
-		position = 2
+		position = 11
 	)
 	@Alpha
 	default Color salvagingHighlightActiveWrecksColour()
@@ -777,12 +777,24 @@ public interface SailingConfig extends Config
 		return Color.GREEN;
 	}
 
+
+	@ConfigItem(
+			keyName= "salvagingHighlightActiveWrecksOpacity",
+			name = "Active Opactiy",
+			description = "Opacity for active shipwrecks",
+			section = SECTION_SALVAGING,
+			position = 12
+	)
+	@Range(
+			max = 255
+	)
+	default int salvagingHighlightActiveWrecksOpacity() { return 50; }
 	@ConfigItem(
 		keyName = "salvagingHighlightInactiveWrecks",
 		name = "Highlight Inactive Locations",
 		description = "Whether to highlight inactive shipwrecks.",
 		section = SECTION_SALVAGING,
-		position = 3
+		position = 20
 	)
 	default boolean salvagingHighlightInactiveWrecks()
 	{
@@ -794,7 +806,7 @@ public interface SailingConfig extends Config
 		name = "Inactive Colour",
 		description = "Colour to highlight inactive shipwrecks.",
 		section = SECTION_SALVAGING,
-		position = 4
+		position = 21
 	)
 	@Alpha
 	default Color salvagingHighlightInactiveWrecksColour()
@@ -803,11 +815,23 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+			keyName= "salvagingHighlightInactiveWrecksOpacity",
+			name = "Inactive Opactiy",
+			description = "Opacity for inactive shipwrecks",
+			section = SECTION_SALVAGING,
+			position = 22
+	)
+	@Range(
+			max = 255
+	)
+	default int salvagingHighlightInactiveWrecksOpacity() { return 50; }
+
+	@ConfigItem(
 		keyName = "salvagingHideHighLevelWrecks",
 		name = "High-Level Wrecks",
 		description = "Hide wrecks for which you do not have the required level to salvage.",
 		section = SECTION_SALVAGING,
-		position = 5
+		position = 30
 	)
 	default boolean salvagingHighlightHighLevelWrecks()
 	{
@@ -819,13 +843,25 @@ public interface SailingConfig extends Config
 		name = "High-Level Colour",
 		description = "Colour to highlight wrecks for which you do not have the required level to salvage.",
 		section = SECTION_SALVAGING,
-		position = 6
+		position = 31
 	)
 	@Alpha
 	default Color salvagingHighLevelWrecksColour()
 	{
 		return ColorUtil.colorWithAlpha(Color.RED, 64);
 	}
+
+	@ConfigItem(
+			keyName= "salvagingHighlightHighLevelWrecksOpacity",
+			name = "High-Level Opactiy",
+			description = "Opacity for high-level shipwrecks",
+			section = SECTION_SALVAGING,
+			position = 32
+	)
+	@Range(
+			max = 255
+	)
+	default int salvagingHighlightHighLevelWrecksOpacity() { return 50; }
 
 	@ConfigItem(
 		keyName = "cargoHoldShowCounts",
