@@ -827,6 +827,60 @@ public interface SailingConfig extends Config
 		return ColorUtil.colorWithAlpha(Color.RED, 64);
 	}
 
+    @ConfigItem(
+            keyName = "salvagingOverlayEnabled",
+            name = "Salvaging Overlay",
+            description = "Small overlay showing crew and player salvaging status.",
+            section = SECTION_SALVAGING,
+            position = 7
+    )
+    default boolean salvagingOverlayEnabled() { return false; }
+
+    @ConfigItem(
+            keyName = "salvagingNotifCrewStop",
+            name = "Notify on Crew Stop",
+            description = "Notify when crewmates stop salvaging.",
+            section = SECTION_SALVAGING,
+            position = 8
+    )
+    default Notification salvagingNotifCrewStop() { return Notification.OFF; }
+
+    @ConfigItem(
+            keyName = "salvagingNotifCrewStart",
+            name = "Notify on Crew Start",
+            description = "Notify when crewmates start salvaging.",
+            section = SECTION_SALVAGING,
+            position = 9
+    )
+    default Notification salvagingNotifCrewStart() { return Notification.OFF; }
+
+    @ConfigItem(
+            keyName = "salvagingNotifPlayerStop",
+            name = "Notify on Player Stop",
+            description = "Notify when the player stops salvaging.",
+            section = SECTION_SALVAGING,
+            position = 10
+    )
+    default Notification salvagingNotifPlayerStop() { return Notification.OFF; }
+
+    @ConfigItem(
+            keyName = "salvagingNotifSortStop",
+            name = "Notify on Sorting stop",
+            description = "Notify when the player stops sorting salvage.",
+            section = SECTION_SALVAGING,
+            position = 11
+    )
+    default Notification salvagingNotifSortStop() { return Notification.OFF; }
+
+    @ConfigItem(
+            keyName = "salvagingNotifCargoFull",
+            name = "Notify on Full Cargo",
+            description = "Notify when the ships cargo is full",
+            section = SECTION_SALVAGING,
+            position = 12
+    )
+    default Notification salvagingNotifCargoFull() { return Notification.OFF; }
+
 	@ConfigItem(
 		keyName = "cargoHoldShowCounts",
 		name = "Item Count",
