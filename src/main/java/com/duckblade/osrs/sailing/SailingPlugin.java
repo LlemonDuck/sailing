@@ -32,7 +32,7 @@ public class SailingPlugin extends Plugin
 	protected void startUp() throws Exception
 	{
 		componentManager.onPluginStart();
-	}
+    }
 
 	@Override
 	protected void shutDown() throws Exception
