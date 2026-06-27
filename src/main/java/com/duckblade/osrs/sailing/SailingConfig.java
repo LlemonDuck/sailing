@@ -866,6 +866,18 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "cargoHoldFullNotification",
+		name = "Notify when full",
+		description = "Notify when your cargo hold becomes full.",
+		section = SECTION_CARGO_HOLD_TRACKING,
+		position = 2
+	)
+	default Notification cargoHoldFullNotification()
+	{
+		return Notification.OFF;
+	}
+
+	@ConfigItem(
 		keyName = "notifyGiantClamSpawn",
 		name = "Notify on Giant clam",
 		description = "Notify when a giant clam spawns.",
