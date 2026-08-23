@@ -455,6 +455,18 @@ public interface SailingConfig extends Config
 		return true;
 	}
 
+	@ConfigItem(
+		keyName = "deprioUntargetedBounties",
+		name = "Deprio Untargeted Bounties",
+		description = "Deprioritizes the Attack option on bounty task monsters that none of your current tasks asks for.",
+		section = SECTION_MES,
+		position = 4
+	)
+	default boolean deprioUntargetedBounties()
+	{
+		return true;
+	}
+
 	enum ShowChartsMode
 	{
 		NONE,
