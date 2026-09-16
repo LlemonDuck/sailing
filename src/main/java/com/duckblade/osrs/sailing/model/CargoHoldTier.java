@@ -64,7 +64,7 @@ public enum CargoHoldTier
 		new int[]{
 			45,
 			60,
-			75,
+			90,
 			6,
 		}
 	),
