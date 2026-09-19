@@ -91,6 +91,7 @@ public class CargoHoldTracker
 	private static final char CONFIG_DELIMITER_PAIRS = ';';
 	private static final char CONFIG_DELIMITER_KV = ':';
 	private static final Splitter.MapSplitter CONFIG_SPLITTER = Splitter.on(CONFIG_DELIMITER_PAIRS)
+		.omitEmptyStrings()
 		.withKeyValueSeparator(CONFIG_DELIMITER_KV);
 	private static final Joiner.MapJoiner CONFIG_JOINER = Joiner.on(CONFIG_DELIMITER_PAIRS)
 		.withKeyValueSeparator(CONFIG_DELIMITER_KV);
