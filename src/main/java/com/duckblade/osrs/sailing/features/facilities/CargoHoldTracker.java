@@ -5,6 +5,7 @@ import com.duckblade.osrs.sailing.features.courier.CourierTaskTracker;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.model.Boat;
+import com.duckblade.osrs.sailing.model.CargoHoldTier;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -29,13 +30,17 @@ import net.runelite.api.GameObject;
 import net.runelite.api.GameState;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
+import net.runelite.api.MenuAction;
 import net.runelite.api.NPC;
+import net.runelite.api.Player;
 import net.runelite.api.Point;
 import net.runelite.api.Skill;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.OverheadTextChanged;
+import net.runelite.api.events.SoundEffectPlayed;
 import net.runelite.api.events.StatChanged;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.gameval.InterfaceID;
@@ -51,6 +56,7 @@ import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
 import net.runelite.client.util.ColorUtil;
+import net.runelite.client.util.Text;
 
 @Slf4j
 @Singleton
@@ -97,6 +103,10 @@ public class CargoHoldTracker
 
 	private static final int INVENTORY_DELTA_MAX_DELAY = 2;
 
+	// played by the server, and passed on by the client only while sound effects are on
+	private static final int SOUND_CARGO_DEPOSITED = 10905;
+	private static final int SOUND_ITEM_DROPPED = 2739;
+
 	private final Client client;
 	private final ConfigManager configManager;
 	private final BoatTracker boatTracker;
@@ -107,6 +117,9 @@ public class CargoHoldTracker
 	private final Map<Integer, Boolean> stackabilityCache = new HashMap<>();
 
 	private Multiset<Integer> memoizedInventory;
+
+	// deposits made on the hold object itself, which never open the hold
+	private final CargoHoldDepositWatch depositWatch = new CargoHoldDepositWatch();
 
 	private boolean overlayEnabled;
 	private Color colourEmpty;
@@ -158,6 +171,7 @@ public class CargoHoldTracker
 		cargoHoldItems.clear();
 		memoizedInventory = null;
 		pendingJenkinsAction = false;
+		depositWatch.clear();
 	}
 
 	@Override
@@ -246,6 +260,7 @@ public class CargoHoldTracker
 		if (e.getContainerId() == InventoryID.INV)
 		{
 			sawInventoryContainerUpdate = true;
+			depositWatch.inventoryChanged(getInventoryMap(e.getItemContainer()), client.getTickCount());
 			return;
 		}
 
@@ -255,6 +270,7 @@ public class CargoHoldTracker
 		}
 
 		sawItemContainerUpdate = true;
+		depositWatch.reset(); // the hold's own contents beat any guesswork
 
 		ItemContainer containerInv = e.getItemContainer();
 		Multiset<Integer> trackedInv = cargoHold();
@@ -282,6 +298,7 @@ public class CargoHoldTracker
 	public void onGameTick(GameTick e)
 	{
 		pendingJenkinsAction = false;
+		applyQuickDeposit(depositWatch.tick(client.getTickCount()));
 
 		if (--pendingInventoryAction < 0)
 		{
@@ -289,10 +306,18 @@ public class CargoHoldTracker
 			return;
 		}
 
-		if (sawItemContainerUpdate)
+		if (sawItemContainerUpdate && sawInventoryContainerUpdate)
 		{
 			// trust the item container event over any guesswork
 			resetInventoryDeltaState();
+			return;
+		}
+
+		if (sawItemContainerUpdate)
+		{
+			// the hold was resent before the inventory moved (e.g. a crewmate's salvage landing just after a Withdraw-All
+			// click), so it does not show this action yet; keep waiting for the inventory change
+			sawItemContainerUpdate = false;
 			return;
 		}
 
@@ -326,7 +351,32 @@ public class CargoHoldTracker
 	@Subscribe
 	public void onMenuOptionClicked(MenuOptionClicked e)
 	{
-		if (!e.getMenuOption().contains("Withdraw") && !e.getMenuOption().contains("Deposit"))
+		String option = e.getMenuOption();
+		MenuAction action = e.getMenuAction();
+		int tick = client.getTickCount();
+
+		if (isGameObjectAction(action) &&
+			CargoHoldTier.fromGameObjectId(e.getId()) != null &&
+			option.toLowerCase().contains("deposit"))
+		{
+			// Deposit-all, Quick-deposit and Deposit-held on the hold itself never open it, so its contents are not
+			// resent; the deposit shows as the inventory shrinking once the player gets there, a few ticks away.
+			Multiset<Integer> inventory = getInventoryMap();
+			applyQuickDeposit(depositWatch.depositClicked(inventory, isBesideCargoHold(), tick));
+			log.debug("queued quick deposit with inventory {}", inventory);
+			return;
+		}
+
+		if (e.getItemId() > 0 && isItemRemoval(option, e.getMenuTarget()))
+		{
+			depositWatch.itemRemovalClicked(e.getParam0(), e.getItemId(), tick);
+		}
+		if (interruptsWalk(action, e.getItemId(), option))
+		{
+			depositWatch.walkInterrupted(tick);
+		}
+
+		if (!option.contains("Withdraw") && !option.contains("Deposit"))
 		{
 			return;
 		}
@@ -336,6 +386,10 @@ public class CargoHoldTracker
 		{
 			pendingInventoryAction = INVENTORY_DELTA_MAX_DELAY;
 			memoizedInventory = getInventoryMap();
+			// only updates that arrive after this click can be its result; a flag left over from an earlier inventory
+			// change made the next tick diff the inventory before the withdrawal reached it, so it was never counted
+			sawInventoryContainerUpdate = false;
+			sawItemContainerUpdate = false;
 			log.debug("queued pendingInventoryAction with inventory {}", memoizedInventory);
 		}
 	}
@@ -354,6 +408,97 @@ public class CargoHoldTracker
 		{
 			cargoHold().clear();
 		}
+	}
+
+	@Subscribe
+	public void onSoundEffectPlayed(SoundEffectPlayed e)
+	{
+		if (e.getSoundId() == SOUND_ITEM_DROPPED)
+		{
+			depositWatch.dropSoundPlayed(client.getTickCount());
+		}
+		else if (e.getSoundId() == SOUND_CARGO_DEPOSITED)
+		{
+			depositWatch.depositSoundPlayed(client.getTickCount());
+		}
+	}
+
+	private void applyQuickDeposit(Multiset<Integer> deposited)
+	{
+		if (deposited.isEmpty())
+		{
+			return;
+		}
+
+		Multiset<Integer> cargoHoldToUpdate = cargoHold();
+		deposited.entrySet().forEach(entry -> cargoHoldToUpdate.add(entry.getElement(), entry.getCount()));
+
+		log.debug("updated cargo hold from quick deposit {}", cargoHoldToUpdate);
+		writeToConfig();
+	}
+
+	/**
+	 * Whether the player stands on a tile next to a side of the cargo hold, where a click on it is carried out
+	 * at once instead of after a walk.
+	 */
+	private boolean isBesideCargoHold()
+	{
+		Player player = client.getLocalPlayer();
+		LocalPoint playerLocation = player != null ? player.getLocalLocation() : null;
+		Boat boat = player != null ? boatTracker.getBoat() : null;
+		GameObject cargoHold = boat != null ? boat.getCargoHold() : null;
+		if (playerLocation == null || cargoHold == null)
+		{
+			return false;
+		}
+
+		Point sceneMin = cargoHold.getSceneMinLocation();
+		return sceneMin != null && CargoHoldDepositWatch.isBesideFootprint(
+			playerLocation.getSceneX(), playerLocation.getSceneY(),
+			sceneMin.getX(), sceneMin.getY(),
+			cargoHold.sizeX(), cargoHold.sizeY()
+		);
+	}
+
+	private static boolean isGameObjectAction(MenuAction action)
+	{
+		switch (action)
+		{
+			case GAME_OBJECT_FIRST_OPTION:
+			case GAME_OBJECT_SECOND_OPTION:
+			case GAME_OBJECT_THIRD_OPTION:
+			case GAME_OBJECT_FOURTH_OPTION:
+			case GAME_OBJECT_FIFTH_OPTION:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	/** Drop, Eat and an alchemy cast empty an inventory slot in a way that is not a deposit. */
+	static boolean isItemRemoval(String option, String target)
+	{
+		String lowerOption = option.toLowerCase();
+		return lowerOption.equals("drop") ||
+			lowerOption.equals("eat") ||
+			(lowerOption.startsWith("cast") && target != null && Text.removeTags(target).toLowerCase().contains("alchemy"));
+	}
+
+	/**
+	 * Whether a click stops the walk to the hold: anything in the game world does, and so does an action on an
+	 * inventory item (Drop stopped it every time). A click that only works the interface does not: a tab, a side
+	 * panel, choosing an item or spell to use, or a menu entry of RuneLite's own, which the game never sees.
+	 */
+	static boolean interruptsWalk(MenuAction action, int itemId, String option)
+	{
+		if (action == MenuAction.CANCEL || action.getId() >= MenuAction.RUNELITE.getId() || option.startsWith("Examine"))
+		{
+			return false;
+		}
+
+		boolean interfaceOnly = ((action == MenuAction.CC_OP || action == MenuAction.CC_OP_LOW_PRIORITY) && itemId <= 0) ||
+			action == MenuAction.WIDGET_TARGET;
+		return !interfaceOnly;
 	}
 
 	private void resetInventoryDeltaState()
@@ -397,7 +542,11 @@ public class CargoHoldTracker
 
 	private Multiset<Integer> getInventoryMap()
 	{
-		ItemContainer inv = client.getItemContainer(InventoryID.INV);
+		return getInventoryMap(client.getItemContainer(InventoryID.INV));
+	}
+
+	private Multiset<Integer> getInventoryMap(ItemContainer inv)
+	{
 		if (inv == null)
 		{
 			return ImmutableMultiset.of();
