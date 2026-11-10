@@ -95,7 +95,8 @@ public class CargoHoldTracker
 	private static final Joiner.MapJoiner CONFIG_JOINER = Joiner.on(CONFIG_DELIMITER_PAIRS)
 		.withKeyValueSeparator(CONFIG_DELIMITER_KV);
 
-	private static final int INVENTORY_DELTA_MAX_DELAY = 2;
+	// ticks after the latest withdraw/deposit click within which the inventory change must appear
+	private static final int INVENTORY_DELTA_MAX_DELAY = 3;
 
 	private final Client client;
 	private final ConfigManager configManager;
@@ -106,13 +107,16 @@ public class CargoHoldTracker
 	private final Map<Integer, Multiset<Integer>> cargoHoldItems = new HashMap<>();
 	private final Map<Integer, Boolean> stackabilityCache = new HashMap<>();
 
+	// inventory snapshot from before the first pending withdraw/deposit, null when nothing is pending
 	private Multiset<Integer> memoizedInventory;
 
 	private boolean overlayEnabled;
 	private Color colourEmpty;
 	private Color colourFull;
 
-	private int pendingInventoryAction;
+	private int pendingTicksRemaining;
+	private boolean pendingWithdraw;
+	private boolean pendingDeposit;
 	private boolean sawItemContainerUpdate;
 	private boolean sawInventoryContainerUpdate;
 
@@ -156,7 +160,7 @@ public class CargoHoldTracker
 	public void shutDown()
 	{
 		cargoHoldItems.clear();
-		memoizedInventory = null;
+		resetInventoryDeltaState();
 		pendingJenkinsAction = false;
 	}
 
@@ -283,30 +287,31 @@ public class CargoHoldTracker
 	{
 		pendingJenkinsAction = false;
 
-		if (--pendingInventoryAction < 0)
+		boolean sawInventoryUpdate = sawInventoryContainerUpdate;
+		boolean sawCargoHoldUpdate = sawItemContainerUpdate;
+		sawInventoryContainerUpdate = false;
+		sawItemContainerUpdate = false;
+
+		if (memoizedInventory == null)
 		{
-			sawItemContainerUpdate = false;
 			return;
 		}
 
-		if (sawItemContainerUpdate)
+		if (sawCargoHoldUpdate)
 		{
 			// trust the item container event over any guesswork
 			resetInventoryDeltaState();
 			return;
 		}
 
-		if (!sawInventoryContainerUpdate || memoizedInventory == null)
+		if (!sawInventoryUpdate)
 		{
-			// inventory change might be delayed an extra tick if action was clicked near the tick boundary
+			// withdraw/deposit can resolve a few ticks later (e.g. queued, then interface closed)
+			countDownPendingAction();
 			return;
 		}
 
 		Multiset<Integer> oldInventory = memoizedInventory;
-		resetInventoryDeltaState();
-
-		Multiset<Integer> cargoHoldToUpdate = cargoHold();
-
 		Multiset<Integer> newInventory = getInventoryMap();
 		log.trace("new inventory {}", newInventory);
 
@@ -316,6 +321,22 @@ public class CargoHoldTracker
 		Multiset<Integer> deposited = Multisets.difference(oldInventory, newInventory); // items missing from inv that were in prior snapshot
 		log.trace("deposited: {}", deposited);
 
+		if (withdrawn.isEmpty() && deposited.isEmpty())
+		{
+			// e.g. items rearranged, keep waiting for the pending action
+			countDownPendingAction();
+			return;
+		}
+
+		boolean expected = (withdrawn.isEmpty() || pendingWithdraw) && (deposited.isEmpty() || pendingDeposit);
+		resetInventoryDeltaState();
+		if (!expected)
+		{
+			log.debug("discarding unexpected inventory delta, withdrawn {} deposited {}", withdrawn, deposited);
+			return;
+		}
+
+		Multiset<Integer> cargoHoldToUpdate = cargoHold();
 		Multisets.removeOccurrences(cargoHoldToUpdate, withdrawn);
 		deposited.entrySet().forEach(entry -> cargoHoldToUpdate.add(entry.getElement(), entry.getCount()));
 
@@ -326,7 +347,10 @@ public class CargoHoldTracker
 	@Subscribe
 	public void onMenuOptionClicked(MenuOptionClicked e)
 	{
-		if (!e.getMenuOption().contains("Withdraw") && !e.getMenuOption().contains("Deposit"))
+		String option = e.getMenuOption();
+		boolean withdraw = option.contains("Withdraw");
+		boolean deposit = option.contains("Deposit");
+		if (!withdraw && !deposit)
 		{
 			return;
 		}
@@ -334,9 +358,15 @@ public class CargoHoldTracker
 		Widget cargoHoldWidget = client.getWidget(InterfaceID.SailingBoatCargohold.UNIVERSE); // todo confirm
 		if (cargoHoldWidget != null && !cargoHoldWidget.isHidden())
 		{
-			pendingInventoryAction = INVENTORY_DELTA_MAX_DELAY;
-			memoizedInventory = getInventoryMap();
-			log.debug("queued pendingInventoryAction with inventory {}", memoizedInventory);
+			// keep the existing snapshot if already pending, so all queued actions resolve against it
+			if (memoizedInventory == null)
+			{
+				memoizedInventory = getInventoryMap();
+			}
+			pendingTicksRemaining = INVENTORY_DELTA_MAX_DELAY;
+			pendingWithdraw |= withdraw;
+			pendingDeposit |= deposit;
+			log.debug("queued pending {} with inventory {}", option, memoizedInventory);
 		}
 	}
 
@@ -356,12 +386,23 @@ public class CargoHoldTracker
 		}
 	}
 
+	private void countDownPendingAction()
+	{
+		if (--pendingTicksRemaining <= 0)
+		{
+			log.debug("pending cargo hold action expired");
+			resetInventoryDeltaState();
+		}
+	}
+
 	private void resetInventoryDeltaState()
 	{
-		pendingInventoryAction = 0;
+		memoizedInventory = null;
+		pendingTicksRemaining = 0;
+		pendingWithdraw = false;
+		pendingDeposit = false;
 		sawItemContainerUpdate = false;
 		sawInventoryContainerUpdate = false;
-		memoizedInventory = null;
 	}
 
 	private Multiset<Integer> cargoHold()
