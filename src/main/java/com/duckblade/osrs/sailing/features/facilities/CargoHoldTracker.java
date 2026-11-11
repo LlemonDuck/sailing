@@ -46,7 +46,9 @@ import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.Notifier;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.config.Notification;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.RuneScapeProfileChanged;
 import net.runelite.client.ui.overlay.Overlay;
@@ -110,6 +112,7 @@ public class CargoHoldTracker
 	private final ConfigManager configManager;
 	private final BoatTracker boatTracker;
 	private final CourierTaskTracker courierTaskTracker;
+	private final Notifier notifier;
 
 	// boat slot -> item id+count
 	private final Map<Integer, Multiset<Integer>> cargoHoldItems = new HashMap<>();
@@ -132,13 +135,18 @@ public class CargoHoldTracker
 	private int lastXp;
 	private boolean pendingJenkinsAction;
 
+	private Notification fullNotification;
+	private boolean wasFull;
+	private int lastCheckedBoatSlot = -1;
+
 	@Inject
-	public CargoHoldTracker(Client client, ConfigManager configManager, BoatTracker boatTracker, CourierTaskTracker courierTaskTracker)
+	public CargoHoldTracker(Client client, ConfigManager configManager, BoatTracker boatTracker, CourierTaskTracker courierTaskTracker, Notifier notifier)
 	{
 		this.client = client;
 		this.configManager = configManager;
 		this.boatTracker = boatTracker;
 		this.courierTaskTracker = courierTaskTracker;
+		this.notifier = notifier;
 
 		setPosition(OverlayPosition.DYNAMIC);
 		setLayer(OverlayLayer.ABOVE_SCENE);
@@ -151,6 +159,7 @@ public class CargoHoldTracker
 		overlayEnabled = config.cargoHoldShowCounts();
 		colourEmpty = config.cargoHoldColourEmpty();
 		colourFull = config.cargoHoldColourFull();
+		fullNotification = config.cargoHoldFullNotification();
 		return true;
 	}
 
@@ -171,6 +180,8 @@ public class CargoHoldTracker
 		cargoHoldItems.clear();
 		resetInventoryDeltaState();
 		pendingJenkinsAction = false;
+		wasFull = false;
+		lastCheckedBoatSlot = -1;
 	}
 
 	@Override
@@ -223,14 +234,14 @@ public class CargoHoldTracker
 			// todo different ones? doesn't matter now since it's count only but will matter later
 			log.trace("crewmate salvage");
 			add(ItemID.SAILING_SMALL_SHIPWRECK_SALVAGE, 1);
-			writeToConfig();
+			onCargoStateUpdated();
 			return;
 		}
 
 		if (MSG_CREWMATE_SALVAGE_FULL.equals(e.getOverheadText()))
 		{
 			set(UNKNOWN_ITEM, maxCapacity() - usedCapacity());
-			writeToConfig();
+			onCargoStateUpdated();
 			return;
 		}
 
@@ -249,7 +260,7 @@ public class CargoHoldTracker
 		{
 			log.trace("jenkins salvage");
 			add(ItemID.SAILING_SMALL_SHIPWRECK_SALVAGE, 1);
-			writeToConfig();
+			onCargoStateUpdated();
 		}
 	}
 
@@ -288,7 +299,7 @@ public class CargoHoldTracker
 		}
 
 		log.debug("read cargo hold inventory from event {}", trackedInv);
-		writeToConfig();
+		onCargoStateUpdated();
 	}
 
 	@Subscribe
@@ -371,7 +382,7 @@ public class CargoHoldTracker
 		deposited.entrySet().forEach(entry -> cargoHoldToUpdate.add(entry.getElement(), entry.getCount()));
 
 		log.debug("updated cargo hold from inventory delta {}", cargoHoldToUpdate);
-		writeToConfig();
+		onCargoStateUpdated();
 	}
 
 	@Subscribe
@@ -587,6 +598,32 @@ public class CargoHoldTracker
 				hold.add(Integer.parseInt(k), Integer.parseInt(v)));
 			log.debug("read cargoHold {} from config {} = {}", boatSlot, key, hold);
 		}
+	}
+
+	private void onCargoStateUpdated()
+	{
+		writeToConfig();
+		checkFull();
+	}
+
+	private void checkFull()
+	{
+		int max = maxCapacity();
+		int boatSlot = currentBoatSlot();
+		boolean isFull = max > 0 && usedCapacity() >= max;
+
+		if (boatSlot != lastCheckedBoatSlot)
+		{
+			lastCheckedBoatSlot = boatSlot;
+			wasFull = isFull;
+			return;
+		}
+
+		if (isFull && !wasFull)
+		{
+			notifier.notify(fullNotification, "Your cargo hold is full!");
+		}
+		wasFull = isFull;
 	}
 
 	private void writeToConfig()
