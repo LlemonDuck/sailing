@@ -25,6 +25,7 @@ import com.duckblade.osrs.sailing.features.facilities.CrystalExtractorHighlight;
 import com.duckblade.osrs.sailing.features.facilities.LuffOverlay;
 import com.duckblade.osrs.sailing.features.facilities.SpeedBoostInfoBox;
 import com.duckblade.osrs.sailing.features.mes.DeprioSailsOffHelm;
+import com.duckblade.osrs.sailing.features.mes.DeprioUntargetedBounties;
 import com.duckblade.osrs.sailing.features.mes.HideStopNavigatingDuringTrials;
 import com.duckblade.osrs.sailing.features.mes.PrioritizeCargoHold;
 import com.duckblade.osrs.sailing.features.navigation.LightningCloudsOverlay;
@@ -81,6 +82,7 @@ public class SailingModule extends AbstractModule
 		CrystalExtractorHighlight crystalExtractorHighlight,
 		CurrentDuckTaskTracker currentDuckTaskTracker,
 		DeprioSailsOffHelm deprioSailsOffHelm,
+		DeprioUntargetedBounties deprioUntargetedBounties,
 		GiantClam giantClam,
 		HidePortalTransitions hidePortalTransitions,
 		HideStopNavigatingDuringTrials hideStopNavigatingDuringTrials,
@@ -125,6 +127,7 @@ public class SailingModule extends AbstractModule
 			.add(crystalExtractorHighlight)
 			.add(currentDuckTaskTracker)
 			.add(deprioSailsOffHelm)
+			.add(deprioUntargetedBounties)
 			.add(giantClam)
 			.add(hidePortalTransitions)
 			.add(hideStopNavigatingDuringTrials)
