@@ -588,6 +588,31 @@ public interface SailingConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "showChartingPath",
+		name = "Show Charting Path",
+		description = "Display an optimized path through uncompleted charting locations.",
+		section = SECTION_SEA_CHARTING,
+		position = 9
+	)
+	default boolean showChartingPath()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "chartingPathColor",
+		name = "Path Colour",
+		description = "Colour of the charting path line.",
+		section = SECTION_SEA_CHARTING,
+		position = 10
+	)
+	@Alpha
+	default Color chartingPathColor()
+	{
+		return Color.CYAN;
+	}
+
+	@ConfigItem(
 		keyName = "barracudaHighlightLostCrates",
 		name = "Highlight Crates",
 		description = "Highlight lost crates that need to be collected during Barracuda Trials.",

@@ -9,6 +9,7 @@ import com.duckblade.osrs.sailing.features.barracudatrials.splits.BarracudaSplit
 import com.duckblade.osrs.sailing.features.barracudatrials.splits.BarracudaSplitsFileWriter;
 import com.duckblade.osrs.sailing.features.barracudatrials.splits.BarracudaSplitsOverlayPanel;
 import com.duckblade.osrs.sailing.features.barracudatrials.splits.BarracudaSplitsTracker;
+import com.duckblade.osrs.sailing.features.charting.ChartingPathOverlay;
 import com.duckblade.osrs.sailing.features.charting.CurrentDuckTaskTracker;
 import com.duckblade.osrs.sailing.features.charting.MermaidTaskSolver;
 import com.duckblade.osrs.sailing.features.charting.SeaChartMapPointManager;
@@ -72,6 +73,7 @@ public class SailingModule extends AbstractModule
 		BoatTracker boatTracker,
 		CargoHoldTracker cargoHoldTracker,
 		Castaway castaway,
+		ChartingPathOverlay chartingPathOverlay,
 		ClueCasket clueCasket,
 		ClueTurtle clueTurtle,
 		CourierTaskLedgerOverlay courierTaskLedgerOverlay,
@@ -116,6 +118,7 @@ public class SailingModule extends AbstractModule
 			.add(boatTracker)
 			.add(cargoHoldTracker)
 			.add(castaway)
+			.add(chartingPathOverlay)
 			.add(clueCasket)
 			.add(clueTurtle)
 			.add(courierTaskLedgerOverlay)
