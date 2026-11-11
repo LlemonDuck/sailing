@@ -5,6 +5,7 @@ import com.duckblade.osrs.sailing.features.courier.CourierTaskTracker;
 import com.duckblade.osrs.sailing.features.util.BoatTracker;
 import com.duckblade.osrs.sailing.features.util.SailingUtil;
 import com.duckblade.osrs.sailing.model.Boat;
+import com.duckblade.osrs.sailing.model.CargoHoldTier;
 import com.duckblade.osrs.sailing.module.PluginLifecycleComponent;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -30,8 +31,10 @@ import net.runelite.api.GameState;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.NPC;
+import net.runelite.api.Player;
 import net.runelite.api.Point;
 import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
@@ -98,6 +101,11 @@ public class CargoHoldTracker
 	// ticks after the latest withdraw/deposit click within which the inventory change must appear
 	private static final int INVENTORY_DELTA_MAX_DELAY = 3;
 
+	// timeout to invalidate a Deposit-all, needed to give time for players to walk over to it
+	private static final int DEPOSIT_ALL_APPROACH_MAX_DELAY = 7;
+
+	private static final String MENU_OPTION_DEPOSIT_ALL = "Deposit-all";
+
 	private final Client client;
 	private final ConfigManager configManager;
 	private final BoatTracker boatTracker;
@@ -115,6 +123,7 @@ public class CargoHoldTracker
 	private Color colourFull;
 
 	private int pendingTicksRemaining;
+	private int depositAllApproachTicksRemaining;
 	private boolean pendingWithdraw;
 	private boolean pendingDeposit;
 	private boolean sawItemContainerUpdate;
@@ -304,6 +313,27 @@ public class CargoHoldTracker
 			return;
 		}
 
+		if (depositAllApproachTicksRemaining > 0)
+		{
+			if (!isBesideCargoHold())
+			{
+				if (--depositAllApproachTicksRemaining <= 0)
+				{
+					log.debug("pending Deposit-all expired before reaching cargo hold");
+					resetInventoryDeltaState();
+					return;
+				}
+
+				// only changes from the tick the player arrives count towards the deposit
+				memoizedInventory = getInventoryMap();
+				return;
+			}
+
+			log.debug("reached cargo hold for pending Deposit-all");
+			depositAllApproachTicksRemaining = 0;
+			pendingTicksRemaining = INVENTORY_DELTA_MAX_DELAY;
+		}
+
 		if (!sawInventoryUpdate)
 		{
 			// withdraw/deposit can resolve a few ticks later (e.g. queued, then interface closed)
@@ -348,6 +378,27 @@ public class CargoHoldTracker
 	public void onMenuOptionClicked(MenuOptionClicked e)
 	{
 		String option = e.getMenuOption();
+		if (MENU_OPTION_DEPOSIT_ALL.equals(option) && CargoHoldTier.fromGameObjectId(e.getId()) != null)
+		{
+			// deposits straight from the game object without opening the interface, possibly after walking over
+			if (memoizedInventory == null)
+			{
+				memoizedInventory = getInventoryMap();
+			}
+			pendingDeposit = true;
+			if (isBesideCargoHold())
+			{
+				depositAllApproachTicksRemaining = 0;
+				pendingTicksRemaining = INVENTORY_DELTA_MAX_DELAY;
+			}
+			else
+			{
+				depositAllApproachTicksRemaining = DEPOSIT_ALL_APPROACH_MAX_DELAY;
+			}
+			log.debug("queued pending {} (approaching = {}) with inventory {}", option, depositAllApproachTicksRemaining > 0, memoizedInventory);
+			return;
+		}
+
 		boolean withdraw = option.contains("Withdraw");
 		boolean deposit = option.contains("Deposit");
 		if (!withdraw && !deposit)
@@ -399,10 +450,28 @@ public class CargoHoldTracker
 	{
 		memoizedInventory = null;
 		pendingTicksRemaining = 0;
+		depositAllApproachTicksRemaining = 0;
 		pendingWithdraw = false;
 		pendingDeposit = false;
 		sawItemContainerUpdate = false;
 		sawInventoryContainerUpdate = false;
+	}
+
+	private boolean isBesideCargoHold()
+	{
+		Boat boat = boatTracker.getBoat();
+		GameObject cargoHold = boat != null ? boat.getCargoHold() : null;
+		Player player = client.getLocalPlayer();
+		if (cargoHold == null || player == null || cargoHold.getWorldView() != player.getWorldView())
+		{
+			return false;
+		}
+
+		WorldPoint playerLocation = player.getWorldLocation();
+		WorldPoint holdLocation = cargoHold.getWorldLocation();
+		int dx = Math.abs(playerLocation.getX() - holdLocation.getX());
+		int dy = Math.abs(playerLocation.getY() - holdLocation.getY());
+		return dx + dy == 1;
 	}
 
 	private Multiset<Integer> cargoHold()
